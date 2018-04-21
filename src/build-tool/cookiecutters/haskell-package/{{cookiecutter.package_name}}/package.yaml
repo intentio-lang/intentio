@@ -1,0 +1,20 @@
+_common: !include "../package-common.yaml"
+
+name: {{cookiecutter.package_name}}
+
+<<: *meta
+
+dependencies:
+  - base
+  - intentio-core
+
+library:
+  source-dirs: src
+
+tests:
+  {{cookiecutter.package_name}}-test:
+    main: Spec.hs
+    source-dirs: test
+    dependencies:
+      - {{cookiecutter.package_name}}
+      - hspec

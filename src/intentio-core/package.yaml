@@ -1,0 +1,22 @@
+_common: !include "../package-common.yaml"
+
+name: intentio-core
+
+<<: *meta
+
+dependencies:
+  - base
+  - mtl
+  - protolude
+  - text
+
+library:
+  source-dirs: src
+
+tests:
+  intentio-core-test:
+    main: Spec.hs
+    source-dirs: test
+    dependencies:
+      - intentio-core
+      - hspec

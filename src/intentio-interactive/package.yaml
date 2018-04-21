@@ -1,0 +1,21 @@
+_common: !include "../package-common.yaml"
+
+name: intentio-interactive
+
+<<: *meta
+
+dependencies:
+  - base
+  - haskeline
+  - intentio-core
+  - text
+
+library:
+  source-dirs: src
+
+executables:
+  intentioi:
+    main: Main.hs
+    source-dirs: app
+    dependencies:
+      - intentio-interactive

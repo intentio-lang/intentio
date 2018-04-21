@@ -1,0 +1,21 @@
+_common: !include "../package-common.yaml"
+
+name: intentio-syntax
+
+<<: *meta
+
+dependencies:
+  - base
+  - intentio-core
+  - megaparsec
+
+library:
+  source-dirs: src
+
+tests:
+  intentio-syntax-test:
+    main: Spec.hs
+    source-dirs: test
+    dependencies:
+      - intentio-syntax
+      - hspec

@@ -21,7 +21,7 @@ install:
   - travis_wait stack --no-terminal test --only-dependencies
 
 script:
-  - stack --no-terminal test --haddock --no-haddock-deps --ghc-options -Werror
+  - stack --no-terminal test --haddock --no-haddock-deps
 
 notifications:
   email: false

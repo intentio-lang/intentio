@@ -12,9 +12,10 @@ import qualified Data.Text                     as T
 
 import           System.Console.Haskeline
 
---
+import           Language.Intentio.Lexer        ( lexTest' )
+
+--------------------------------------------------------------------------------
 -- runInteractive
---
 
 runInteractive :: IO ()
 runInteractive = evalStateT (runInputT settings monad) initialReplState
@@ -59,6 +60,7 @@ data Cmd
   = AstCmd Text
   | EvalCmd Text
   | HelpCmd
+  | LexCmd Text
   | SetModeCmd Text
   | CurrModeCmd Text
   deriving (Show)
@@ -68,6 +70,8 @@ instance Parse Cmd where
 
   parse (T.words -> [":help"]) = (Just HelpCmd, "")
 
+  parse (T.stripPrefix ":lex" -> Just r) = (Just $ LexCmd (trimStart r), "")
+
   parse (T.words -> [":mode", modeName]) = (Just $ SetModeCmd modeName, "")
 
   parse r
@@ -75,20 +79,23 @@ instance Parse Cmd where
     | T.head r == ':'   = (Nothing, r)
     | otherwise         = (Just $ CurrModeCmd r, "")
 
-data ReplMode = AstMode | EvalMode
+data ReplMode = AstMode | EvalMode | LexMode
 
 mode2cmd :: ReplMode -> (Text -> Cmd)
 mode2cmd AstMode  = AstCmd
 mode2cmd EvalMode = EvalCmd
+mode2cmd LexMode  = LexCmd
 
 instance P.Show ReplMode where
   show AstMode  = "ast"
   show EvalMode = "intentio"
+  show LexMode  = "lex"
 
 instance Parse ReplMode where
   parse (T.stripPrefix "ast"      -> Just r) = (Just AstMode, r)
   parse (T.stripPrefix "eval"     -> Just r) = (Just EvalMode, r)
   parse (T.stripPrefix "intentio" -> Just r) = (Just EvalMode, r)
+  parse (T.stripPrefix "lex"      -> Just r) = (Just LexMode, r)
   parse r                                    = (Nothing, r)
 
 newtype ReplState = ReplState {
@@ -100,9 +107,8 @@ initialReplState = ReplState {mode = EvalMode}
 
 type Repl a = InputT (StateT ReplState IO) a
 
---
+--------------------------------------------------------------------------------
 -- Command evaluation
---
 
 evaluateCmd :: Cmd -> Repl ()
 
@@ -117,11 +123,12 @@ evaluateCmd (SetModeCmd modeName) = case parseFull modeName of
   Just mode -> lift . modify $ \s -> s { mode }
   Nothing   -> outputStrLn $ red "unknown mode"
 
-evaluateCmd c = outputStrLn $ "TODO: " ++ show c
+evaluateCmd (LexCmd input) = liftIO $ lexTest' input
 
---
+evaluateCmd c              = outputStrLn $ "TODO: " ++ show c
+
+--------------------------------------------------------------------------------
 -- Utilities
---
 
 trimStart :: Text -> Text
 trimStart = T.dropWhile isSpace

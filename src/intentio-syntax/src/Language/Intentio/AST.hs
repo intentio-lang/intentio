@@ -1,22 +1,22 @@
-module Intentio.AST
+module Language.Intentio.AST
 where
 
 import           Intentio.Prelude
 
 import           Data.Text                      ( Text )
 
-type Name = Text
+type Qid = Text
 
 data Expr
   = Float Double
-  | BinOp Op Expr Expr
+  | BinOp Operator Expr Expr
   | Var Text
-  | Call Name [Expr]
-  | Function Name [Expr] Expr
-  | Extern Name [Expr]
+  | Call Qid [Expr]
+  | Function Qid [Expr] Expr
+  | Extern Qid [Expr]
   deriving (Eq, Ord, Show)
 
-data Op
+data Operator
   = Plus
   | Minus
   | Times

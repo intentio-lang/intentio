@@ -6,6 +6,7 @@ name: intentio-core
 
 dependencies:
   - base
+  - convertible
   - mtl
   - protolude
   - text

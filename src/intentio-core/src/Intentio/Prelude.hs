@@ -1,13 +1,14 @@
 module Intentio.Prelude
-  ( module P
-  , module S
+  ( module X
   )
 where
 
-import           Prelude                       as P
-                                                ( String )
+import           Prelude                       as X
+                                                ( String
+                                                , fail
+                                                )
 
-import           Protolude                     as P
+import           Protolude                     as X
                                          hiding ( MonadState
                                                 , State
                                                 , StateT(StateT)
@@ -25,7 +26,7 @@ import           Protolude                     as P
                                                 , evalStateT
                                                 )
 
-import           Control.Monad.State.Strict    as S
+import           Control.Monad.State.Strict    as X
                                                 ( MonadState
                                                 , State
                                                 , StateT(StateT)
@@ -42,4 +43,10 @@ import           Control.Monad.State.Strict    as S
                                                 , runStateT
                                                 , execStateT
                                                 , evalStateT
+                                                )
+
+import           Data.Convertible              as X
+                                                ( Convertible
+                                                , convert
+                                                , safeConvert
                                                 )

@@ -1,0 +1,15 @@
+_common: !include "../package-common.yaml"
+
+name: intentio-testutil
+
+<<: *meta
+
+dependencies:
+  - base
+  - directory
+  - filepath
+  - hspec
+  - intentio-core
+
+library:
+  source-dirs: src

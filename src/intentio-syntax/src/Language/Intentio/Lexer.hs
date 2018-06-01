@@ -61,9 +61,8 @@ program = sc *> many itoken <* eof
 itoken :: Lexer I.Token
 itoken = keyword <|> literal <|> operator <|> ident
 
---
+--------------------------------------------------------------------------------
 -- Token productions
---
 
 ident :: Lexer I.Token
 ident = I.Ident <$> (lexeme . try $ (p >>= nonReserved)) <?> "identifier"
@@ -73,7 +72,7 @@ ident = I.Ident <$> (lexeme . try $ (p >>= nonReserved)) <?> "identifier"
 
   nonReserved :: Text -> Lexer Text
   nonReserved w
-    | w `M.member` keywords = fail $ "Illegal identifier: " ++ show w
+    | w `M.member` keywords = fail $ "Illegal identifier: " ++ toS w
     | otherwise             = return w
 
 keyword :: Lexer I.Token

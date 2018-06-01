@@ -21,12 +21,17 @@
 
   default-extensions:
     - BangPatterns
+    - FlexibleContexts
+    - FunctionalDependencies
     - GADTs
     - LambdaCase
+    - MultiParamTypeClasses
     - MultiWayIf
     - NamedFieldPuns
     - NoImplicitPrelude
     - OverloadedStrings
+    - TemplateHaskell
+    - TypeFamilies
     - ViewPatterns
 
   ghc-options:

@@ -4,12 +4,10 @@ import           Intentio.Prelude
 
 import           Test.Hspec
 
-import           Language.Intentio.Lexer
+import           Language.Intentio.Lexer        ( lex )
 
-import           Intentio.TestUtil
+import           Intentio.TestUtil.Fixture      ( runFileFixtures )
 
 spec :: Spec
 spec = describe "lexer" $ do
-  it "test" $ do
-    getFixtures "lexer" >>= print
-    1 `shouldBe` 1
+  context "fixture:" $ runFileFixtures "lexer" (show . lex "<test>")

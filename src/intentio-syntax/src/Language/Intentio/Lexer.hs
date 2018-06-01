@@ -69,7 +69,7 @@ ident :: Lexer I.Token
 ident = I.Ident <$> (lexeme . try $ (p >>= nonReserved)) <?> "identifier"
  where
   p :: Lexer Text
-  p = T.pack <$> ((:) <$> identStart <*> many identContinue)
+  p = toS <$> ((:) <$> identStart <*> many identContinue)
 
   nonReserved :: Text -> Lexer Text
   nonReserved w
@@ -105,25 +105,25 @@ literal = lexeme (choiceTry [iinteger, ifloat, istring]) <?> "literal"
 
   idecimal :: Lexer Text
   idecimal =
-    T.pack
+    toS
       <$> ((:) <$> digitChar <*> many (digitChar <|> char '_'))
       <?> "decimal digits"
 
   ibinary :: Lexer Text
   ibinary =
-    T.pack
+    toS
       <$> ((:) <$> binDigitChar <*> many (binDigitChar <|> char '_'))
       <?> "binary digits"
 
   ioctal :: Lexer Text
   ioctal =
-    T.pack
+    toS
       <$> ((:) <$> octDigitChar <*> many (octDigitChar <|> char '_'))
       <?> "octal digits"
 
   ihexadecimal :: Lexer Text
   ihexadecimal =
-    T.pack
+    toS
       <$> ((:) <$> hexDigitChar <*> many (hexDigitChar <|> char '_'))
       <?> "hexadecimal digits"
 
@@ -131,7 +131,7 @@ literal = lexeme (choiceTry [iinteger, ifloat, istring]) <?> "literal"
   iexponent = do
     e           <- T.singleton <$> char' 'e'
     sign        <- T.singleton <$> oneOf ("+-" :: String)
-    underscores <- T.pack <$> many (char '_')
+    underscores <- toS <$> many (char '_')
     val         <- idecimal
     return $ e <> sign <> underscores <> val
 
@@ -147,7 +147,7 @@ literal = lexeme (choiceTry [iinteger, ifloat, istring]) <?> "literal"
     return $ cst modstr
 
   stringmod :: Lexer Text
-  stringmod = T.pack <$> some (satisfy isStringModChar) <?> "string modifier"
+  stringmod = toS <$> some (satisfy isStringModChar) <?> "string modifier"
     where isStringModChar c = c /= 'c' && c /= 'r' && c /= 'x' && isLower c
 
   istring' :: Lexer Text
@@ -165,19 +165,19 @@ literal = lexeme (choiceTry [iinteger, ifloat, istring]) <?> "literal"
   iregexstring :: Lexer Text
   iregexstring =
     (<>)
-      <$> (string "x")
+      <$> string "x"
       <*> choiceTry [istring', irawstring]
       <?> "regex string"
 
   irawstring :: Lexer Text
-  irawstring = T.cons <$> char 'r' <*> rawstring' 0 <?> "raw string"
+  irawstring = cons <$> char 'r' <*> rawstring' 0 <?> "raw string"
    where
     rawstring' :: Int -> Lexer Text
     rawstring' n = concatP [string "\"", rawstring'' n, string "\""]
       <|> concatP [string "#", rawstring' n, string "#"]
 
     rawstring'' :: Int -> Lexer Text
-    rawstring'' n = T.pack <$> many rwsany
+    rawstring'' n = toS <$> many rwsany
      where
       rwsany = notChar '"' <|> (char '"' <* notFollowedBy hashes)
       hashes = count n $ char '#'
@@ -194,19 +194,19 @@ literal = lexeme (choiceTry [iinteger, ifloat, istring]) <?> "literal"
     charesc = do
       slash <- char '\\'
       code  <- oneOf ("'\"nrt\\0" :: String)
-      return $ T.pack [slash, code]
+      return $ toS [slash, code]
 
     asciiesc = do
       prefix <- string "\\x"
       d1     <- hexDigitChar
       d2     <- hexDigitChar
-      return $ prefix `T.snoc` d1 `T.snoc` d2
+      return $ prefix `snoc` d1 `snoc` d2
 
     unicodeesc = do
       prefix <- string "\\u{"
       val    <- many (hexDigitChar <|> char '_')
       suffix <- string "}"
-      return $ prefix <> T.pack val <> suffix
+      return $ prefix <> toS val <> suffix
 
 --------------------------------------------------------------------------------
 -- Utilities

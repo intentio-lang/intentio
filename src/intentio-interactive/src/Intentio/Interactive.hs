@@ -3,8 +3,39 @@ module Intentio.Interactive
   )
 where
 
-import qualified Prelude                       as P
-import           Intentio.Prelude
+import           Intentio.Prelude        hiding ( MonadState
+                                                , State
+                                                , StateT(StateT)
+                                                , put
+                                                , get
+                                                , gets
+                                                , modify
+                                                , state
+                                                , withState
+                                                , runState
+                                                , execState
+                                                , evalState
+                                                , runStateT
+                                                , execStateT
+                                                , evalStateT
+                                                )
+
+import           Control.Monad.State.Strict     ( MonadState
+                                                , State
+                                                , StateT(StateT)
+                                                , put
+                                                , get
+                                                , gets
+                                                , modify
+                                                , state
+                                                , withState
+                                                , runState
+                                                , execState
+                                                , evalState
+                                                , runStateT
+                                                , execStateT
+                                                , evalStateT
+                                                )
 
 import           Data.Char                      ( isSpace )
 import           Data.String                    ( fromString )
@@ -32,7 +63,7 @@ runInteractive = evalStateT (runInputT settings monad) initialReplState
   loop :: Repl ()
   loop = do
     currMode <- lift $ gets mode
-    input'   <- getInputLine $ blue (show currMode ++ "> ")
+    input'   <- getInputLine $ blue (printMode currMode ++ "> ")
     case input' of
       Nothing    -> return ()
       Just ":q"  -> return ()
@@ -86,10 +117,10 @@ mode2cmd AstMode  = AstCmd
 mode2cmd EvalMode = EvalCmd
 mode2cmd LexMode  = LexCmd
 
-instance P.Show ReplMode where
-  show AstMode  = "ast"
-  show EvalMode = "intentio"
-  show LexMode  = "lex"
+printMode :: IsString a => ReplMode -> a
+printMode AstMode  = "ast"
+printMode EvalMode = "intentio"
+printMode LexMode  = "lex"
 
 instance Parse ReplMode where
   parse (T.stripPrefix "ast"      -> Just r) = (Just AstMode, r)

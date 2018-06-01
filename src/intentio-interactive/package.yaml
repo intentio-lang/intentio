@@ -9,6 +9,7 @@ dependencies:
   - haskeline
   - intentio-core
   - intentio-syntax
+  - mtl
   - text
 
 library:

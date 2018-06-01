@@ -1,12 +1,12 @@
 module Language.Intentio.LexerSpec where
 
-import Intentio.Prelude
+import           Intentio.Prelude
 
-import Test.Hspec
+import           Test.Hspec
 
-import Language.Intentio.Lexer
+import           Language.Intentio.Lexer
 
-import Intentio.TestUtil
+import           Intentio.TestUtil
 
 spec :: Spec
 spec = describe "lexer" $ do

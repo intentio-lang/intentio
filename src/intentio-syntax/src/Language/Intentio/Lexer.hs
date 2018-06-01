@@ -291,4 +291,4 @@ concatP :: (Monoid a, Foldable f, MonadParsec e s m) => f (m a) -> m a
 concatP = foldrM (\p rs -> (<> rs) <$> p) mempty
 
 choiceTry :: (Functor f, Foldable f, MonadParsec e s m) => f (m a) -> m a
-choiceTry = choice . fmap try
+choiceTry = choice . map try

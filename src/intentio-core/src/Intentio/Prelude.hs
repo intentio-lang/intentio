@@ -9,40 +9,14 @@ import           Prelude                       as X
                                                 )
 
 import           Protolude                     as X
-                                         hiding ( MonadState
-                                                , State
-                                                , StateT(StateT)
-                                                , put
-                                                , get
-                                                , gets
-                                                , modify
-                                                , state
-                                                , withState
-                                                , runState
-                                                , execState
-                                                , evalState
-                                                , runStateT
-                                                , execStateT
-                                                , evalStateT
-                                                )
-
-import           Control.Monad.State.Strict    as X
-                                                ( MonadState
-                                                , State
-                                                , StateT(StateT)
-                                                , put
-                                                , get
-                                                , gets
-                                                , modify
-                                                , modify'
-                                                , state
-                                                , withState
-                                                , runState
-                                                , execState
-                                                , evalState
-                                                , runStateT
-                                                , execStateT
-                                                , evalStateT
+                                         hiding ( uncons
+                                                , unsnoc
+                                                , Lenient
+                                                , Strict
+                                                , (<&>)
+                                                , (<.>)
+                                                , from
+                                                , to
                                                 )
 
 import           Data.Convertible              as X
@@ -50,3 +24,5 @@ import           Data.Convertible              as X
                                                 , convert
                                                 , safeConvert
                                                 )
+
+import           Control.Lens                  as X

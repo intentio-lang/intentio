@@ -2,8 +2,8 @@ module Intentio.TestUtil where
 
 import           Intentio.Prelude
 
-import System.Directory
-import System.FilePath
+import           System.Directory
+import           System.FilePath
 
 --------------------------------------------------------------------------------
 -- Tools for fixture based tests.
@@ -16,10 +16,10 @@ data FixtureInfo = FixtureInfo {
     deriving (Eq, Show)
 
 mkFixtureInfo :: FilePath -> FixtureInfo
-mkFixtureInfo inputPath = FixtureInfo {
-    name = takeBaseName inputPath,
-    inputPath = inputPath,
-    expectedPath = addExtension inputPath ".expected"
+mkFixtureInfo inputPath = FixtureInfo
+  { name         = takeBaseName inputPath
+  , inputPath    = inputPath
+  , expectedPath = addExtension inputPath ".expected"
   }
 
 -- | Returns list of fixture infos with given prefix.
@@ -33,4 +33,4 @@ getFixtures prefix = do
   let path = cwd </> "fixtures" </> prefix
   createDirectoryIfMissing True path
   inputs <- listDirectory path
-  return $ (mkFixtureInfo . (path </>)) `fmap` inputs
+  return $ (mkFixtureInfo . (path </>)) `map` inputs

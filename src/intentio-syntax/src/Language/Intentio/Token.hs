@@ -2,6 +2,8 @@ module Language.Intentio.Token where
 
 import           Intentio.Prelude
 
+import           Language.Intentio.Debug        ( SyntaxDebugPrint(..) )
+
 newtype StringMod = StringMod Text
   deriving (Eq, Ord, Show)
 
@@ -71,3 +73,6 @@ data Token
   | RegexString Text StringMod
 
   deriving (Eq, Show)
+
+instance SyntaxDebugPrint Token where
+  syntaxDebugPrint = show

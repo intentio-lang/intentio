@@ -1,7 +1,6 @@
-{-# LANGUAGE Strict #-}
-
 module Intentio.TestUtil.Fixture
   ( Fixture(..)
+  , FixtureMaterializable(..)
   , runFixture
   , runFixtures
   , runFileFixtures
@@ -24,25 +23,36 @@ class Fixture f where
   getFixtureExpected   :: f -> IO (Maybe Text)
   writeFixtureExpected :: f -> Text -> IO ()
 
+class FixtureMaterializable a where
+  fixtureMaterialize :: a -> Text
+
 --------------------------------------------------------------------------------
 -- Fixture-based test framework.
 
 -- | Build specification for given fixture.
 -- The specification is names as the fixture.
-runFixture :: Fixture f => (Text -> Text) -> f -> SpecWith ()
-runFixture s f = it (fixtureName f) $ do
-  input <- getFixtureInput f
-  let actual = s input
-  exp <- getFixtureExpected f
-  case exp of
-    Nothing       -> do
-      putStrLn $ "WARN: generating test case for fixture " ++ fixtureName f
-      writeFixtureExpected f actual
-      True `shouldBe` True
-    Just expected -> actual `shouldBe` expected
+runFixture
+  :: (Fixture f, FixtureMaterializable m)
+  => (Text -> m)
+  -> f
+  -> SpecWith ()
+runFixture s f =
+  it (fixtureName f) $ do
+    input <- getFixtureInput f
+    let actual = fixtureMaterialize . s $ input
+    getFixtureExpected f >>= \case
+      Nothing -> do
+        putStrLn $ "WARN: generating test case for fixture " ++ fixtureName f
+        writeFixtureExpected f actual
+        True `shouldBe` True
+      Just expected -> actual `shouldBe` expected
 
 -- | Build multiple specifications for given list of fixtures.
-runFixtures :: Fixture f => (Text -> Text) -> [f] -> SpecWith ()
+runFixtures
+  :: (Fixture f, FixtureMaterializable m)
+  => (Text -> m)
+  -> [f]
+  -> SpecWith ()
 runFixtures s = mapM_ (runFixture s)
 
 --------------------------------------------------------------------------------
@@ -95,7 +105,8 @@ getFileFixtures prefix = do
 -- The fixture directory is @$PROJECT_ROOT/fixtures/$PREFIX/@.
 -- Creates prefix directory if it does not exist.
 runFileFixtures
-  :: String         -- ^ Prefix directory of fixtures
-  -> (Text -> Text) -- ^ Test function
+  :: FixtureMaterializable m
+  => String                  -- ^ Prefix directory of fixtures
+  -> (Text -> m)             -- ^ Test function
   -> SpecWith ()
 runFileFixtures prefix s = runIO (getFileFixtures prefix) >>= runFixtures s

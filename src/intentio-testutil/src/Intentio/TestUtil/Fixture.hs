@@ -73,9 +73,7 @@ instance Fixture FileFixture where
   getFixtureExpected f = do
     exists <- doesFileExist $ expectedPath f
     if exists
-    then do
-      input <- readFile $ expectedPath f
-      return $ Just input
+    then Just <$> readFile (expectedPath f)
     else return Nothing
 
   writeFixtureExpected = writeFile . expectedPath

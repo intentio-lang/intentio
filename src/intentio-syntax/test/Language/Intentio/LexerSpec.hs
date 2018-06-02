@@ -4,12 +4,21 @@ import           Intentio.Prelude
 
 import           Test.Hspec
 
-import           Language.Intentio.Lexer
+import           Language.Intentio.Debug        ( SyntaxDebugPrint
+                                                , syntaxDebugPrint
+                                                )
+import           Language.Intentio.Lexer        ( lex )
 
-import           Intentio.TestUtil
+import           Intentio.TestUtil.Fixture      ( FixtureMaterializable
+                                                , runFileFixtures
+                                                , fixtureMaterialize
+                                                )
+
+instance (Show l, SyntaxDebugPrint r) => FixtureMaterializable (Either l r)
+ where
+  fixtureMaterialize (Left l) = "[ERROR]\n" <> show l
+  fixtureMaterialize (Right r) = syntaxDebugPrint r
 
 spec :: Spec
 spec = describe "lexer" $ do
-  it "test" $ do
-    getFixtures "lexer" >>= print
-    1 `shouldBe` 1
+  runFileFixtures "lexer" (lex "<test>")

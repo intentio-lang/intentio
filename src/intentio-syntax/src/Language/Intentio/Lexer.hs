@@ -87,7 +87,8 @@ program :: Lexer [I.Token]
 program = sc *> many itoken <* eof
 
 itoken :: Lexer I.Token
-itoken = keyword <|> literal <|> operator <|> ident
+itoken = ident
+-- itoken = keyword <|> literal <|> operator <|> ident
 
 --------------------------------------------------------------------------------
 -- Token productions

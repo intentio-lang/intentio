@@ -7,3 +7,19 @@ Ident "\4315\4312\4310\4304\4316\4312"
 Ident "\2311\2352\2366\2342\2366"
 Ident "_\2311\2352\2366\2342\2366_"
 Ident "\2311\2352\2366\2342\2366'"
+Ident "funny_ident"
+KwFun
+Ident "ident"
+Ident "identfun"
+Ident "ident_fun"
+Ident "ident"
+KwFun
+Ident "a"
+OpAdd
+Ident "b"
+Ident "a"
+OpAdd
+Ident "b"
+KwFun
+OpAdd
+Ident "a"

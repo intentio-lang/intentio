@@ -7,3 +7,13 @@ qëllim
 इरादा
 _इरादा_
 इरादा'
+
+funny_ident
+fun ident
+identfun
+ident_fun
+ident fun
+
+a+b
+a + b
+fun + a

@@ -8,17 +8,45 @@ module Language.Intentio.Lexer
 where
 
 import           Intentio.Prelude        hiding ( many
-                                                , try
                                                 , option
                                                 , some
+                                                , try
                                                 )
 
 import           Data.Char                      ( isLower )
 import qualified Data.HashMap.Strict           as M
 import qualified Data.Text                     as T
 
-import           Text.Megaparsec
-import           Text.Megaparsec.Char
+import           Text.Megaparsec                ( MonadParsec
+                                                , Parsec
+                                                , ParseError
+                                                , Token
+                                                , (<?>)
+                                                , choice
+                                                , count
+                                                , eof
+                                                , many
+                                                , notFollowedBy
+                                                , option
+                                                , parse
+                                                , parseTest
+                                                , parseTest'
+                                                , some
+                                                , try
+                                                )
+import           Text.Megaparsec.Char           ( alphaNumChar
+                                                , char
+                                                , char'
+                                                , digitChar
+                                                , hexDigitChar
+                                                , letterChar
+                                                , notChar
+                                                , octDigitChar
+                                                , oneOf
+                                                , satisfy
+                                                , space1
+                                                , string
+                                                )
 import qualified Text.Megaparsec.Char.Lexer    as L
 
 import qualified Language.Intentio.Token       as I
@@ -71,9 +99,8 @@ ident = I.Ident <$> (lexeme . try $ (p >>= nonReserved)) <?> "identifier"
   p = toS <$> ((:) <$> identStart <*> many identContinue)
 
   nonReserved :: Text -> Lexer Text
-  nonReserved w
-    | w `M.member` keywords = fail $ "Illegal identifier: " ++ toS w
-    | otherwise             = return w
+  nonReserved w | w `M.member` keywords = fail $ "Illegal identifier: " ++ toS w
+                | otherwise             = return w
 
 keyword :: Lexer I.Token
 keyword = reserved keywords <?> "keyword"
@@ -163,10 +190,7 @@ literal = lexeme (choiceTry [iinteger, ifloat, istring]) <?> "literal"
 
   iregexstring :: Lexer Text
   iregexstring =
-    (<>)
-      <$> string "x"
-      <*> choiceTry [istring', irawstring]
-      <?> "regex string"
+    (<>) <$> string "x" <*> choiceTry [istring', irawstring] <?> "regex string"
 
   irawstring :: Lexer Text
   irawstring = cons <$> char 'r' <*> rawstring' 0 <?> "raw string"

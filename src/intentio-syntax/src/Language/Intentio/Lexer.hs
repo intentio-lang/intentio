@@ -57,6 +57,8 @@ import qualified Language.Intentio.Token       as I
 -- | The lexer monad.
 type Lexer = Parsec Void Text
 
+type LexerError = ParseError (Token Text) Void
+
 --------------------------------------------------------------------------------
 -- Lexer entry points
 
@@ -64,7 +66,7 @@ type Lexer = Parsec Void Text
 lex
   :: String -- ^ Name of source file.
   -> Text   -- ^ Input for lexer.
-  -> Either (ParseError (Token Text) Void) [I.Token]
+  -> Either LexerError [I.Token]
 lex = parse program
 
 -- | Run lexer over input text and print the results to stdout.

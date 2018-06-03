@@ -57,6 +57,8 @@ import qualified Language.Intentio.Token       as I
 -- | The lexer monad.
 type Lexer = Parsec Void Text
 
+type LexerError = ParseError (Token Text) Void
+
 --------------------------------------------------------------------------------
 -- Lexer entry points
 
@@ -64,7 +66,7 @@ type Lexer = Parsec Void Text
 lex
   :: String -- ^ Name of source file.
   -> Text   -- ^ Input for lexer.
-  -> Either (ParseError (Token Text) Void) [I.Token]
+  -> Either LexerError [I.Token]
 lex = parse program
 
 -- | Run lexer over input text and print the results to stdout.
@@ -87,14 +89,13 @@ program :: Lexer [I.Token]
 program = sc *> many itoken <* eof
 
 itoken :: Lexer I.Token
-itoken = ident
--- itoken = keyword <|> literal <|> operator <|> ident
+itoken = literal <|> ident <|> keyword <|> operator
 
 --------------------------------------------------------------------------------
 -- Token productions
 
 ident :: Lexer I.Token
-ident = I.Ident <$> (lexeme . try $ (p >>= nonReserved)) <?> "identifier"
+ident = (try . lexeme $ (p >>= nonReserved)) >>= mkt I.Ident <?> "identifier"
  where
   p :: Lexer Text
   p = toS <$> ((:) <$> identStart <*> many identContinue)
@@ -110,21 +111,24 @@ operator :: Lexer I.Token
 operator = reserved operators <?> "operator"
 
 literal :: Lexer I.Token
-literal = lexeme (choiceTry [iinteger, ifloat, istring]) <?> "literal"
+literal = lexeme (try ifloat <|> try iinteger <|> try istring) <?> "literal"
  where
   iinteger :: Lexer I.Token
   iinteger =
-    I.Integer
-      <$> choiceTry [ibinary, ioctal, ihexadecimal, idecimal]
+    choiceTry
+        [ char '0' <::> oneOf ['b', 'B'] <::> ibinary
+        , char '0' <::> oneOf ['o', 'O'] <::> ioctal
+        , char '0' <::> oneOf ['x', 'X'] <::> ihexadecimal
+        , idecimal
+        ]
+      >>= mkt I.Integer
       <?> "integer literal"
 
   ifloat :: Lexer I.Token
   ifloat =
-    I.Float
-      <$> choiceTry
-            [ concatP [idecimal, string ".", idecimal, option "" iexponent]
-            , concatP [idecimal, iexponent]
-            ]
+    try (idecimal <~> string "." <~> idecimal <~> option "" iexponent)
+      <|> try (idecimal <~> iexponent)
+      >>= mkt I.Float
       <?> "floating-point literal"
 
   binDigitChar :: (MonadParsec e s m, Token s ~ Char) => m (Token s)
@@ -157,21 +161,18 @@ literal = lexeme (choiceTry [iinteger, ifloat, istring]) <?> "literal"
   iexponent :: Lexer Text
   iexponent = do
     e           <- T.singleton <$> char' 'e'
-    sign        <- T.singleton <$> oneOf ("+-" :: String)
+    sign        <- T.singleton <$> oneOf ['+', '-']
     underscores <- toS <$> many (char '_')
     val         <- idecimal
     return $ e <> sign <> underscores <> val
 
   istring :: Lexer I.Token
-  istring = do
-    modstr <- I.StringMod <$> stringmod
-    cst    <- choiceTry
-      [ I.String <$> istring'
-      , I.CharString <$> icharstring
-      , I.RegexString <$> iregexstring
-      , I.RawString <$> irawstring
-      ]
-    return $ cst modstr
+  istring = choiceTry
+    [ stringmod <~> istring' >>= mkt I.String
+    , stringmod <~> icharstring >>= mkt I.CharString
+    , stringmod <~> iregexstring >>= mkt I.RegexString
+    , stringmod <~> irawstring >>= mkt I.RawString
+    ]
 
   stringmod :: Lexer Text
   stringmod = toS <$> some (satisfy isStringModChar) <?> "string modifier"
@@ -187,7 +188,7 @@ literal = lexeme (choiceTry [iinteger, ifloat, istring]) <?> "literal"
       return $ lquot <> T.concat chars <> rquot
 
   icharstring :: Lexer Text
-  icharstring = concatP [string "c\"", strchr, string "\""] <?> "char string"
+  icharstring = string "c\"" <~> strchr <~> string "\"" <?> "char string"
 
   iregexstring :: Lexer Text
   iregexstring =
@@ -197,8 +198,13 @@ literal = lexeme (choiceTry [iinteger, ifloat, istring]) <?> "literal"
   irawstring = cons <$> char 'r' <*> rawstring' 0 <?> "raw string"
    where
     rawstring' :: Int -> Lexer Text
-    rawstring' n = concatP [string "\"", rawstring'' n, string "\""]
-      <|> concatP [string "#", rawstring' n, string "#"]
+    rawstring' n =
+      string "\""
+        <~> rawstring'' n
+        <~> string "\""
+        <|> string "#"
+        <~> rawstring' n
+        <~> string "#"
 
     rawstring'' :: Int -> Lexer Text
     rawstring'' n = toS <$> many rwsany
@@ -217,7 +223,7 @@ literal = lexeme (choiceTry [iinteger, ifloat, istring]) <?> "literal"
    where
     charesc = do
       slash <- char '\\'
-      code  <- oneOf ("'\"nrt\\0" :: String)
+      code  <- oneOf ['\'', '"', 'n', 'r', 't', '\\', '0']
       return $ toS [slash, code]
 
     asciiesc = do
@@ -235,6 +241,9 @@ literal = lexeme (choiceTry [iinteger, ifloat, istring]) <?> "literal"
 --------------------------------------------------------------------------------
 -- Utilities
 
+mkt :: I.TokenType -> Text -> Lexer I.Token
+mkt t s = return $ I.Token {I.ty = t, I.text = s}
+
 sc :: Lexer ()
 sc = L.space space1 lineComment empty
   where lineComment = L.skipLineComment "#"
@@ -251,10 +260,10 @@ identStart = letterChar <|> char '_'
 identContinue :: Lexer Char
 identContinue = alphaNumChar <|> char '_' <|> char '\''
 
-reserved :: M.HashMap Text I.Token -> Lexer I.Token
-reserved = try . M.foldrWithKey (\s t p -> (symbol s $> t) <|> p) empty
+reserved :: M.HashMap Text I.TokenType -> Lexer I.Token
+reserved = try . M.foldrWithKey (\s t p -> (symbol s >>= mkt t) <|> p) empty
 
-keywords :: M.HashMap Text I.Token
+keywords :: M.HashMap Text I.TokenType
 keywords = M.fromList
   [ ("abstract", I.KwAbstract)
   , ("and"     , I.KwAnd)
@@ -286,7 +295,7 @@ keywords = M.fromList
   , ("_"       , I.KwUnderscore)
   ]
 
-operators :: M.HashMap Text I.Token
+operators :: M.HashMap Text I.TokenType
 operators = M.fromList
   [ ("+" , I.OpAdd)
   , ("-" , I.OpSub)
@@ -311,8 +320,13 @@ operators = M.fromList
   , ("%" , I.OpPercent)
   ]
 
-concatP :: (Monoid a, Foldable f, MonadParsec e s m) => f (m a) -> m a
-concatP = foldrM (\p rs -> (<> rs) <$> p) mempty
+infixr 6 <::>
+(<::>) :: MonadParsec e s m => m Char -> m Text -> m Text
+(<::>) l r = T.cons <$> l <*> r
+
+infixr 6 <~>
+(<~>) :: (Monoid a, MonadParsec e s m) => m a -> m a -> m a
+(<~>) l r = (<>) <$> l <*> r
 
 choiceTry :: (Functor f, Foldable f, MonadParsec e s m) => f (m a) -> m a
 choiceTry = choice . map try

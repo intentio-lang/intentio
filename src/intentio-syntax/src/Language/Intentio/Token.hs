@@ -4,11 +4,8 @@ import           Intentio.Prelude
 
 import           Language.Intentio.Debug        ( SyntaxDebugPrint(..) )
 
-newtype StringMod = StringMod Text
-  deriving (Eq, Ord, Show)
-
-data Token
-  = Ident Text
+data TokenType
+  = Ident
 
   | KwAbstract
   | KwAnd
@@ -64,14 +61,20 @@ data Token
   | OpDollar
   | OpPercent
 
-  | Integer Text
-  | Float Text
+  | Integer
+  | Float
 
-  | String Text StringMod
-  | CharString Text StringMod
-  | RawString Text StringMod
-  | RegexString Text StringMod
+  | String
+  | CharString
+  | RawString
+  | RegexString
 
+  deriving (Eq, Ord, Show)
+
+data Token = Token {
+    ty :: TokenType,
+    text :: Text
+  }
   deriving (Eq, Show)
 
 instance SyntaxDebugPrint Token where

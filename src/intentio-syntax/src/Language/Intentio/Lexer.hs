@@ -93,7 +93,7 @@ itoken = ident <|> keyword <|> operator <|> literal
 -- Token productions
 
 ident :: Lexer I.Token
-ident = I.Ident <$> (try . lexeme $ (p >>= nonReserved)) <?> "identifier"
+ident = (try . lexeme $ (p >>= nonReserved)) >>= mkt I.Ident <?> "identifier"
  where
   p :: Lexer Text
   p = toS <$> ((:) <$> identStart <*> many identContinue)
@@ -109,26 +109,24 @@ operator :: Lexer I.Token
 operator = reserved operators <?> "operator"
 
 literal :: Lexer I.Token
-literal = lexeme (choiceTry [iinteger, ifloat, istring]) <?> "literal"
+literal = lexeme (try iinteger <|> try ifloat <|> try istring) <?> "literal"
  where
   iinteger :: Lexer I.Token
   iinteger =
-    I.Integer
-      <$> choiceTry [
-          char '0' <::> oneOf ['b', 'B'] <::> ibinary,
-          char '0' <::> oneOf ['o', 'O'] <::> ioctal,
-          char '0' <::> oneOf ['x', 'X'] <::> ihexadecimal,
-          idecimal
+    choiceTry
+        [ char '0' <::> oneOf ['b', 'B'] <::> ibinary
+        , char '0' <::> oneOf ['o', 'O'] <::> ioctal
+        , char '0' <::> oneOf ['x', 'X'] <::> ihexadecimal
+        , idecimal
         ]
+      >>= mkt I.Integer
       <?> "integer literal"
 
   ifloat :: Lexer I.Token
   ifloat =
-    I.Float
-      <$> choiceTry
-            [ idecimal <~> string "." <~> idecimal <~> option "" iexponent
-            , idecimal <~> iexponent
-            ]
+    try (idecimal <~> string "." <~> idecimal <~> option "" iexponent)
+      <|> try (idecimal <~> iexponent)
+      >>= mkt I.Float
       <?> "floating-point literal"
 
   binDigitChar :: (MonadParsec e s m, Token s ~ Char) => m (Token s)
@@ -167,15 +165,12 @@ literal = lexeme (choiceTry [iinteger, ifloat, istring]) <?> "literal"
     return $ e <> sign <> underscores <> val
 
   istring :: Lexer I.Token
-  istring = do
-    modstr <- I.StringMod <$> stringmod
-    cst    <- choiceTry
-      [ I.String <$> istring'
-      , I.CharString <$> icharstring
-      , I.RegexString <$> iregexstring
-      , I.RawString <$> irawstring
-      ]
-    return $ cst modstr
+  istring = choiceTry
+    [ stringmod <~> istring' >>= mkt I.String
+    , stringmod <~> icharstring >>= mkt I.CharString
+    , stringmod <~> iregexstring >>= mkt I.RegexString
+    , stringmod <~> irawstring >>= mkt I.RawString
+    ]
 
   stringmod :: Lexer Text
   stringmod = toS <$> some (satisfy isStringModChar) <?> "string modifier"
@@ -201,8 +196,13 @@ literal = lexeme (choiceTry [iinteger, ifloat, istring]) <?> "literal"
   irawstring = cons <$> char 'r' <*> rawstring' 0 <?> "raw string"
    where
     rawstring' :: Int -> Lexer Text
-    rawstring' n = string "\"" <~> rawstring'' n <~> string "\""
-      <|> string "#" <~> rawstring' n <~> string "#"
+    rawstring' n =
+      string "\""
+        <~> rawstring'' n
+        <~> string "\""
+        <|> string "#"
+        <~> rawstring' n
+        <~> string "#"
 
     rawstring'' :: Int -> Lexer Text
     rawstring'' n = toS <$> many rwsany
@@ -239,6 +239,9 @@ literal = lexeme (choiceTry [iinteger, ifloat, istring]) <?> "literal"
 --------------------------------------------------------------------------------
 -- Utilities
 
+mkt :: I.TokenType -> Text -> Lexer I.Token
+mkt t s = return $ I.Token {I.ty = t, I.text = s}
+
 sc :: Lexer ()
 sc = L.space space1 lineComment empty
   where lineComment = L.skipLineComment "#"
@@ -255,10 +258,10 @@ identStart = letterChar <|> char '_'
 identContinue :: Lexer Char
 identContinue = alphaNumChar <|> char '_' <|> char '\''
 
-reserved :: M.HashMap Text I.Token -> Lexer I.Token
-reserved = try . M.foldrWithKey (\s t p -> (symbol s $> t) <|> p) empty
+reserved :: M.HashMap Text I.TokenType -> Lexer I.Token
+reserved = try . M.foldrWithKey (\s t p -> (symbol s >>= mkt t) <|> p) empty
 
-keywords :: M.HashMap Text I.Token
+keywords :: M.HashMap Text I.TokenType
 keywords = M.fromList
   [ ("abstract", I.KwAbstract)
   , ("and"     , I.KwAnd)
@@ -290,7 +293,7 @@ keywords = M.fromList
   , ("_"       , I.KwUnderscore)
   ]
 
-operators :: M.HashMap Text I.Token
+operators :: M.HashMap Text I.TokenType
 operators = M.fromList
   [ ("+" , I.OpAdd)
   , ("-" , I.OpSub)

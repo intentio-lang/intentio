@@ -93,7 +93,7 @@ itoken = ident <|> keyword <|> operator <|> literal
 -- Token productions
 
 ident :: Lexer I.Token
-ident = I.Ident <$> (lexeme . try $ (p >>= nonReserved)) <?> "identifier"
+ident = I.Ident <$> (try . lexeme $ (p >>= nonReserved)) <?> "identifier"
  where
   p :: Lexer Text
   p = toS <$> ((:) <$> identStart <*> many identContinue)
@@ -114,15 +114,20 @@ literal = lexeme (choiceTry [iinteger, ifloat, istring]) <?> "literal"
   iinteger :: Lexer I.Token
   iinteger =
     I.Integer
-      <$> choiceTry [ibinary, ioctal, ihexadecimal, idecimal]
+      <$> choiceTry [
+          char '0' <::> oneOf ['b', 'B'] <::> ibinary,
+          char '0' <::> oneOf ['o', 'O'] <::> ioctal,
+          char '0' <::> oneOf ['x', 'X'] <::> ihexadecimal,
+          idecimal
+        ]
       <?> "integer literal"
 
   ifloat :: Lexer I.Token
   ifloat =
     I.Float
       <$> choiceTry
-            [ concatP [idecimal, string ".", idecimal, option "" iexponent]
-            , concatP [idecimal, iexponent]
+            [ idecimal <~> string "." <~> idecimal <~> option "" iexponent
+            , idecimal <~> iexponent
             ]
       <?> "floating-point literal"
 
@@ -186,7 +191,7 @@ literal = lexeme (choiceTry [iinteger, ifloat, istring]) <?> "literal"
       return $ lquot <> T.concat chars <> rquot
 
   icharstring :: Lexer Text
-  icharstring = concatP [string "c\"", strchr, string "\""] <?> "char string"
+  icharstring = string "c\"" <~> strchr <~> string "\"" <?> "char string"
 
   iregexstring :: Lexer Text
   iregexstring =
@@ -196,8 +201,8 @@ literal = lexeme (choiceTry [iinteger, ifloat, istring]) <?> "literal"
   irawstring = cons <$> char 'r' <*> rawstring' 0 <?> "raw string"
    where
     rawstring' :: Int -> Lexer Text
-    rawstring' n = concatP [string "\"", rawstring'' n, string "\""]
-      <|> concatP [string "#", rawstring' n, string "#"]
+    rawstring' n = string "\"" <~> rawstring'' n <~> string "\""
+      <|> string "#" <~> rawstring' n <~> string "#"
 
     rawstring'' :: Int -> Lexer Text
     rawstring'' n = toS <$> many rwsany
@@ -310,8 +315,13 @@ operators = M.fromList
   , ("%" , I.OpPercent)
   ]
 
-concatP :: (Monoid a, Foldable f, MonadParsec e s m) => f (m a) -> m a
-concatP = foldrM (\p rs -> (<> rs) <$> p) mempty
+infixr 6 <::>
+(<::>) :: MonadParsec e s m => m Char -> m Text -> m Text
+(<::>) l r = T.cons <$> l <*> r
+
+infixr 6 <~>
+(<~>) :: (Monoid a, MonadParsec e s m) => m a -> m a -> m a
+(<~>) l r = (<>) <$> l <*> r
 
 choiceTry :: (Functor f, Foldable f, MonadParsec e s m) => f (m a) -> m a
 choiceTry = choice . map try

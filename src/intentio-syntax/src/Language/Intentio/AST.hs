@@ -1,24 +1,54 @@
-module Language.Intentio.AST
-where
+module Language.Intentio.AST where
 
-import           Intentio.Prelude
+import           Intentio.Prelude ()
 
-import           Data.Text                      ( Text )
+data Module = Module [ItemDecl]
 
-type Qid = Text
+data ItemDecl = FunDecl QId [FunParam] FunBody
+
+newtype ModId = ModId Id
+
+data QId = QId ModId Id
+
+data Id = Ident
+
+newtype FunParam = FunParam [Id]
+
+newtype FunBody = FunBody [Expr]
 
 data Expr
-  = Float Double
-  | BinOp Operator Expr Expr
-  | Var Text
-  | Call Qid [Expr]
-  | Function Qid [Expr] Expr
-  | Extern Qid [Expr]
-  deriving (Eq, Ord, Show)
+  =   BinExpr BinOp Expr Expr
+  | BlockExpr [Expr]
+  | FunCallExpr Expr [Expr]
+  | IdExpr QId
+  | IfExpr Expr [Expr]
+  | IfElseExpr Expr [Expr] [Expr]
+  | LetDeclExpr Id Expr
+  | LitExpr Literal
+  | LoopExpr Expr [Expr]
+  | UnaryExpr UnaryOp Expr
+  | ParenExpr Expr
 
-data Operator
-  = Plus
-  | Minus
-  | Times
-  | Divide
-  deriving (Eq, Ord, Show)
+data Literal
+  = CharStr
+  | Float
+  | Integer
+  | RawStr
+  | RegStr
+  | Str
+
+data BinOp
+  = BinAdd
+  | BinSub
+  | BinMul
+  | BinDiv
+  | BinEq
+  | BinNEq
+  | BinLt
+  | BinLtEq
+  | BinGt
+  | BinGtEq
+
+data UnaryOp
+  = UnaryAdd
+  | UnarySub

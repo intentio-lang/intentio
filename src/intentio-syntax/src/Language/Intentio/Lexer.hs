@@ -161,7 +161,7 @@ literal = lexeme (choiceTry [iinteger, ifloat, istring]) <?> "literal"
   iexponent :: Lexer Text
   iexponent = do
     e           <- T.singleton <$> char' 'e'
-    sign        <- T.singleton <$> oneOf ("+-" :: String)
+    sign        <- T.singleton <$> oneOf ['+', '-']
     underscores <- toS <$> many (char '_')
     val         <- idecimal
     return $ e <> sign <> underscores <> val
@@ -221,7 +221,7 @@ literal = lexeme (choiceTry [iinteger, ifloat, istring]) <?> "literal"
    where
     charesc = do
       slash <- char '\\'
-      code  <- oneOf ("'\"nrt\\0" :: String)
+      code  <- oneOf ['\'', '"', 'n', 'r', 't', '\\', '0']
       return $ toS [slash, code]
 
     asciiesc = do

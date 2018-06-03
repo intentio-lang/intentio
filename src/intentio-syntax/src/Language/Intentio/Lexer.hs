@@ -89,7 +89,7 @@ program :: Lexer [I.Token]
 program = sc *> many itoken <* eof
 
 itoken :: Lexer I.Token
-itoken = ident <|> keyword <|> operator <|> literal
+itoken = literal <|> ident <|> keyword <|> operator
 
 --------------------------------------------------------------------------------
 -- Token productions
@@ -111,7 +111,7 @@ operator :: Lexer I.Token
 operator = reserved operators <?> "operator"
 
 literal :: Lexer I.Token
-literal = lexeme (try iinteger <|> try ifloat <|> try istring) <?> "literal"
+literal = lexeme (try ifloat <|> try iinteger <|> try istring) <?> "literal"
  where
   iinteger :: Lexer I.Token
   iinteger =

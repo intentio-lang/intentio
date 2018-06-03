@@ -1,0 +1,9 @@
+Token {ty = Float, text = "1.0"}
+Token {ty = Float, text = "1.0e92"}
+Token {ty = Float, text = "10e_6"}
+Token {ty = Float, text = "1_________.0_______"}
+Token {ty = Float, text = "1_.0"}
+Token {ty = Float, text = "10_e5"}
+Token {ty = Float, text = "35e+5"}
+Token {ty = Float, text = "7e-5"}
+Token {ty = Float, text = "8E5"}

@@ -160,8 +160,8 @@ literal = lexeme (try ifloat <|> try iinteger <|> try istring) <?> "literal"
 
   iexponent :: Lexer Text
   iexponent = do
-    e           <- T.singleton <$> char' 'e'
-    sign        <- T.singleton <$> oneOf ['+', '-']
+    e           <- T.singleton <$> oneOf ['e', 'E']
+    sign        <- option "" $ T.singleton <$> oneOf ['+', '-']
     underscores <- toS <$> many (char '_')
     val         <- idecimal
     return $ e <> sign <> underscores <> val

@@ -2,6 +2,12 @@ module Language.Intentio.LexerSpec where
 
 import           Intentio.Prelude
 
+import           Text.Megaparsec.Error          ( ParseError
+                                                , ShowErrorComponent
+                                                , ShowToken
+                                                , parseErrorPretty
+                                                )
+
 import           Test.Hspec
 
 import           Language.Intentio.Debug        ( SyntaxDebugPrint
@@ -14,9 +20,10 @@ import           Intentio.TestUtil.Fixture      ( FixtureMaterializable
                                                 , fixtureMaterialize
                                                 )
 
-instance (Show l, SyntaxDebugPrint r) => FixtureMaterializable (Either l r)
+instance (ShowErrorComponent e, Ord t, ShowToken t, SyntaxDebugPrint r) =>
+  FixtureMaterializable (Either (ParseError t e) r)
  where
-  fixtureMaterialize (Left l) = "[ERROR]\n" <> show l
+  fixtureMaterialize (Left l) = "[ERROR]\n" <> toS (parseErrorPretty l)
   fixtureMaterialize (Right r) = syntaxDebugPrint r
 
 spec :: Spec

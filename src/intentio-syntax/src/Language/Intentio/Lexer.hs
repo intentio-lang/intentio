@@ -1,9 +1,17 @@
 module Language.Intentio.Lexer
   ( Lexer
-  , program
   , lex
   , lexTest
   , lexTest'
+  , program
+  , anyTok
+  , tok
+  , anyKeyword
+  , anyOperator
+  , literal
+  , integer
+  , float
+  , anyString
   )
 where
 
@@ -11,6 +19,7 @@ import           Intentio.Prelude        hiding ( many
                                                 , option
                                                 , some
                                                 , try
+                                                , exponent
                                                 )
 
 import           Data.Char                      ( isLower )
@@ -20,9 +29,7 @@ import qualified Data.Text                     as T
 import           Text.Megaparsec                ( MonadParsec
                                                 , Parsec
                                                 , ParseError
-                                                , Token
                                                 , (<?>)
-                                                , choice
                                                 , count
                                                 , eof
                                                 , many
@@ -34,9 +41,9 @@ import           Text.Megaparsec                ( MonadParsec
                                                 , some
                                                 , try
                                                 )
+import qualified Text.Megaparsec               as MP
 import           Text.Megaparsec.Char           ( alphaNumChar
                                                 , char
-                                                , char'
                                                 , digitChar
                                                 , hexDigitChar
                                                 , letterChar
@@ -49,7 +56,7 @@ import           Text.Megaparsec.Char           ( alphaNumChar
                                                 )
 import qualified Text.Megaparsec.Char.Lexer    as L
 
-import qualified Language.Intentio.Token       as I
+import           Language.Intentio.Token
 
 --------------------------------------------------------------------------------
 -- Data types
@@ -57,16 +64,16 @@ import qualified Language.Intentio.Token       as I
 -- | The lexer monad.
 type Lexer = Parsec Void Text
 
-type LexerError = ParseError (Token Text) Void
+type LexerError = ParseError (MP.Token Text) Void
 
 --------------------------------------------------------------------------------
--- Lexer entry points
+-- Lexer-only parsing entry points
 
 -- | Run lexer over input text. Returns either lexer error or list of tokens.
 lex
   :: String -- ^ Name of source file.
   -> Text   -- ^ Input for lexer.
-  -> Either LexerError [I.Token]
+  -> Either LexerError [Token]
 lex = parse program
 
 -- | Run lexer over input text and print the results to standard output.
@@ -85,157 +92,206 @@ lexTest' = parseTest' program
 --------------------------------------------------------------------------------
 -- Lexer productions
 
-program :: Lexer [I.Token]
-program = sc *> many itoken <* eof
+program :: Lexer [Token]
+program = sc *> many anyTok <* eof
 
-itoken :: Lexer I.Token
-itoken = literal <|> ident <|> keyword <|> operator
+anyTok :: Lexer Token
+anyTok = literal <|> ident <|> anyKeyword <|> anyOperator
+
+tok :: TokenType -> Lexer Token
+tok Ident        = ident
+tok KwAbstract   = undefined
+tok KwAnd        = undefined
+tok KwBreak      = undefined
+tok KwCase       = undefined
+tok KwConst      = undefined
+tok KwContinue   = undefined
+tok KwDo         = undefined
+tok KwElse       = undefined
+tok KwEnum       = undefined
+tok KwExport     = undefined
+tok KwFail       = undefined
+tok KwFun        = undefined
+tok KwIf         = undefined
+tok KwImpl       = undefined
+tok KwImport     = undefined
+tok KwIn         = undefined
+tok KwIs         = undefined
+tok KwLoop       = undefined
+tok KwModule     = undefined
+tok KwNot        = undefined
+tok KwOr         = undefined
+tok KwReturn     = undefined
+tok KwStruct     = undefined
+tok KwType       = undefined
+tok KwUnderscore = undefined
+tok KwWhere      = undefined
+tok KwWhile      = undefined
+tok KwYield      = undefined
+tok OpAdd        = undefined
+tok OpSub        = undefined
+tok OpMul        = undefined
+tok OpDiv        = undefined
+tok OpLParen     = undefined
+tok OpRParen     = undefined
+tok OpLBracket   = undefined
+tok OpRBracket   = undefined
+tok OpLBrace     = undefined
+tok OpRBrace     = undefined
+tok OpColon      = undefined
+tok OpSemicolon  = undefined
+tok OpEqEq       = undefined
+tok OpLt         = undefined
+tok OpLtEq       = undefined
+tok OpGt         = undefined
+tok OpGtEq       = undefined
+tok OpColonEq    = undefined
+tok OpLtSub      = undefined
+tok OpDollar     = undefined
+tok OpPercent    = undefined
+tok Integer      = integer
+tok Float        = float
+tok String       = undefined
+tok CharString   = undefined
+tok RawString    = undefined
+tok RegexString  = undefined
 
 --------------------------------------------------------------------------------
 -- Token productions
 
-ident :: Lexer I.Token
-ident = (try . lexeme $ (p >>= nonReserved)) >>= mkt I.Ident <?> "identifier"
+ident :: Lexer Token
+ident = (try . lexeme $ (p >>= nonReserved)) >>= mkt Ident <?> "identifier"
  where
   p :: Lexer Text
   p = toS <$> ((:) <$> identStart <*> many identContinue)
 
   nonReserved :: Text -> Lexer Text
-  nonReserved w | w `M.member` keywords = fail $ "Illegal identifier: " ++ toS w
+  nonReserved w | isKeyword w = fail $ "Illegal identifier: " ++ toS w
                 | otherwise             = return w
 
-keyword :: Lexer I.Token
-keyword = reserved keywords <?> "keyword"
+anyKeyword :: Lexer Token
+anyKeyword = anyReserved keywords <?> "keyword"
 
-operator :: Lexer I.Token
-operator = reserved operators <?> "operator"
+anyOperator :: Lexer Token
+anyOperator = anyReserved operators <?> "operator"
 
-literal :: Lexer I.Token
-literal = lexeme (try ifloat <|> try iinteger <|> try istring) <?> "literal"
+literal :: Lexer Token
+literal = lexeme $ try float <|> try integer <|> try anyString
+
+integer :: Lexer Token
+integer = p >>= mkt Integer <?> "integer literal"
  where
-  iinteger :: Lexer I.Token
-  iinteger =
-    (   try (char '0' <::> oneOf ['b', 'B'] <::> ibinary)
-      <|> try (char '0' <::> oneOf ['o', 'O'] <::> ioctal)
-      <|> try (char '0' <::> oneOf ['x', 'X'] <::> ihexadecimal)
-      <|> try idecimal
-      )
-      >>= mkt I.Integer
-      <?> "integer literal"
+  p           = try binary <|> try octal <|> try hexadecimal <|> try decimalNum
 
-  ifloat :: Lexer I.Token
-  ifloat =
-    try (idecimal <~> string "." <~> idecimal <~> option "" iexponent)
-      <|> try (idecimal <~> iexponent)
-      >>= mkt I.Float
-      <?> "floating-point literal"
+  binary      = char '0' <::> oneOf ['b', 'B'] <::> binaryNum
+  octal       = char '0' <::> oneOf ['o', 'O'] <::> octalNum
+  hexadecimal = char '0' <::> oneOf ['x', 'X'] <::> hexadecimalNum
 
-  binDigitChar :: (MonadParsec e s m, Token s ~ Char) => m (Token s)
+float :: Lexer Token
+float =
+  try (decimalNum <~> string "." <~> decimalNum <~> option "" exponent)
+    <|> try (decimalNum <~> exponent)
+    >>= mkt Float
+    <?> "floating-point literal"
+
+decimalNum :: Lexer Text
+decimalNum = toS <$> p <?> "decimal digits"
+  where p = (:) <$> digitChar <*> many (digitChar <|> char '_')
+
+binaryNum :: Lexer Text
+binaryNum = toS <$> p <?> "binary digits"
+ where
+  p            = (:) <$> binDigitChar <*> many (binDigitChar <|> char '_')
   binDigitChar = oneOf ['0', '1'] <?> "binary digit"
 
-  idecimal :: Lexer Text
-  idecimal =
-    toS
-      <$> ((:) <$> digitChar <*> many (digitChar <|> char '_'))
-      <?> "decimal digits"
+octalNum :: Lexer Text
+octalNum = toS <$> p <?> "octal digits"
+  where p = (:) <$> octDigitChar <*> many (octDigitChar <|> char '_')
 
-  ibinary :: Lexer Text
-  ibinary =
-    toS
-      <$> ((:) <$> binDigitChar <*> many (binDigitChar <|> char '_'))
-      <?> "binary digits"
+hexadecimalNum :: Lexer Text
+hexadecimalNum = toS <$> p <?> "hexadecimal digits"
+  where p = (:) <$> hexDigitChar <*> many (hexDigitChar <|> char '_')
 
-  ioctal :: Lexer Text
-  ioctal =
-    toS
-      <$> ((:) <$> octDigitChar <*> many (octDigitChar <|> char '_'))
-      <?> "octal digits"
+exponent :: Lexer Text
+exponent = do
+  e           <- T.singleton <$> oneOf ['e', 'E']
+  sign        <- option "" $ T.singleton <$> oneOf ['+', '-']
+  underscores <- toS <$> many (char '_')
+  val         <- decimalNum
+  return $ e <> sign <> underscores <> val
 
-  ihexadecimal :: Lexer Text
-  ihexadecimal =
-    toS
-      <$> ((:) <$> hexDigitChar <*> many (hexDigitChar <|> char '_'))
-      <?> "hexadecimal digits"
-
-  iexponent :: Lexer Text
-  iexponent = do
-    e           <- T.singleton <$> oneOf ['e', 'E']
-    sign        <- option "" $ T.singleton <$> oneOf ['+', '-']
-    underscores <- toS <$> many (char '_')
-    val         <- idecimal
-    return $ e <> sign <> underscores <> val
-
-  istring :: Lexer I.Token
-  istring =
-    try (prefix <~> istring' >>= mkt I.String)
-      <|> try (prefix <~> icharstring >>= mkt I.CharString)
-      <|> try (prefix <~> iregexstring >>= mkt I.RegexString)
-      <|> try (prefix <~> irawstring >>= mkt I.RawString)
-    where prefix = option "" stringmod
+anyString :: Lexer Token
+anyString =
+  try (prefix <~> istring' >>= mkt String)
+    <|> try (prefix <~> icharstring >>= mkt CharString)
+    <|> try (prefix <~> iregexstring >>= mkt RegexString)
+    <|> try (prefix <~> irawstring >>= mkt RawString)
+ where
+  prefix = option "" stringmod
 
   stringmod :: Lexer Text
   stringmod = toS <$> some (satisfy isStringModChar) <?> "string modifier"
     where isStringModChar c = c /= 'c' && c /= 'r' && c /= 'x' && isLower c
 
-  istring' :: Lexer Text
-  istring' =
-    string "\""
-      <~> (T.concat <$> many strchr)
-      <~> string "\""
-      <?> "regular string"
+istring' :: Lexer Text
+istring' =
+  string "\""
+    <~> (T.concat <$> many strchr)
+    <~> string "\""
+    <?> "regular string"
 
-  icharstring :: Lexer Text
-  icharstring = string "c\"" <~> strchr <~> string "\"" <?> "char string"
+icharstring :: Lexer Text
+icharstring = string "c\"" <~> strchr <~> string "\"" <?> "char string"
 
-  iregexstring :: Lexer Text
-  iregexstring =
-    string "x" <~> (try istring' <|> try irawstring) <?> "regex string"
+iregexstring :: Lexer Text
+iregexstring =
+  string "x" <~> (try istring' <|> try irawstring) <?> "regex string"
 
-  irawstring :: Lexer Text
-  irawstring = char 'r' <::> rawstring' 0 <?> "raw string"
+irawstring :: Lexer Text
+irawstring = char 'r' <::> rawstring' 0 <?> "raw string"
+ where
+  rawstring' :: Int -> Lexer Text
+  rawstring' n =
+    (string "\"" <~> rawstring'' n <~> string "\"")
+      <|> (string "#" <~> rawstring' (n + 1) <~> string "#")
+
+  rawstring'' :: Int -> Lexer Text
+  rawstring'' n = toS <$> many rwsany
    where
-    rawstring' :: Int -> Lexer Text
-    rawstring' n =
-      (string "\"" <~> rawstring'' n <~> string "\"")
-        <|> (string "#" <~> rawstring' (n + 1) <~> string "#")
+    rwsany = try (notChar '"') <|> try (char '"' <* notFollowedBy hashes)
+    hashes = count n $ char '#'
 
-    rawstring'' :: Int -> Lexer Text
-    rawstring'' n = toS <$> many rwsany
-     where
-      rwsany = try (notChar '"') <|> try (char '"' <* notFollowedBy hashes)
-      hashes = count n $ char '#'
+strchr :: Lexer Text
+strchr =
+  try escseq
+    <|> (T.singleton <$> satisfy (\c -> c /= '"' && c /= '\\'))
+    <?> "string character or escape sequence"
 
-  strchr :: Lexer Text
-  strchr =
-    try escseq
-      <|> (T.singleton <$> satisfy (\c -> c /= '"' && c /= '\\'))
-      <?> "string character or escape sequence"
+escseq :: Lexer Text
+escseq = try charesc <|> try asciiesc <|> try unicodeesc
+ where
+  charesc = do
+    slash <- char '\\'
+    code  <- oneOf ['\'', '"', 'n', 'r', 't', '\\', '0']
+    return $ toS [slash, code]
 
-  escseq :: Lexer Text
-  escseq = try charesc <|> try asciiesc <|> try unicodeesc
-   where
-    charesc = do
-      slash <- char '\\'
-      code  <- oneOf ['\'', '"', 'n', 'r', 't', '\\', '0']
-      return $ toS [slash, code]
+  asciiesc = do
+    prefix <- string "\\x"
+    d1     <- hexDigitChar
+    d2     <- hexDigitChar
+    return $ prefix `snoc` d1 `snoc` d2
 
-    asciiesc = do
-      prefix <- string "\\x"
-      d1     <- hexDigitChar
-      d2     <- hexDigitChar
-      return $ prefix `snoc` d1 `snoc` d2
-
-    unicodeesc = do
-      prefix <- string "\\u{"
-      val    <- many (hexDigitChar <|> char '_')
-      suffix <- string "}"
-      return $ prefix <> toS val <> suffix
+  unicodeesc = do
+    prefix <- string "\\u{"
+    val    <- many (hexDigitChar <|> char '_')
+    suffix <- string "}"
+    return $ prefix <> toS val <> suffix
 
 --------------------------------------------------------------------------------
 -- Utilities
 
-mkt :: I.TokenType -> Text -> Lexer I.Token
-mkt t s = return $ I.Token {I.ty = t, I.text = s}
+mkt :: TokenType -> Text -> Lexer Token
+mkt t s = return $ Token {ty = t, text = s}
 
 sc :: Lexer ()
 sc = L.space space1 lineComment empty
@@ -253,64 +309,67 @@ identStart = letterChar <|> char '_'
 identContinue :: Lexer Char
 identContinue = alphaNumChar <|> char '_' <|> char '\''
 
-reserved :: M.HashMap Text I.TokenType -> Lexer I.Token
-reserved = try . M.foldrWithKey (\s t p -> (symbol s >>= mkt t) <|> p) empty
+isKeyword :: Text -> Bool
+isKeyword = (`M.member` keywords)
 
-keywords :: M.HashMap Text I.TokenType
+anyReserved :: M.HashMap Text TokenType -> Lexer Token
+anyReserved = try . M.foldrWithKey (\s t p -> (symbol s >>= mkt t) <|> p) empty
+
+keywords :: M.HashMap Text TokenType
 keywords = M.fromList
-  [ ("abstract", I.KwAbstract)
-  , ("and"     , I.KwAnd)
-  , ("break"   , I.KwBreak)
-  , ("case"    , I.KwCase)
-  , ("const"   , I.KwConst)
-  , ("continue", I.KwContinue)
-  , ("do"      , I.KwDo)
-  , ("else"    , I.KwElse)
-  , ("enum"    , I.KwEnum)
-  , ("export"  , I.KwExport)
-  , ("fail"    , I.KwFail)
-  , ("fun"     , I.KwFun)
-  , ("if"      , I.KwIf)
-  , ("impl"    , I.KwImpl)
-  , ("import"  , I.KwImport)
-  , ("in"      , I.KwIn)
-  , ("is"      , I.KwIs)
-  , ("loop"    , I.KwLoop)
-  , ("module"  , I.KwModule)
-  , ("not"     , I.KwNot)
-  , ("or"      , I.KwOr)
-  , ("return"  , I.KwReturn)
-  , ("struct"  , I.KwStruct)
-  , ("type"    , I.KwType)
-  , ("where"   , I.KwWhere)
-  , ("while"   , I.KwWhile)
-  , ("yield"   , I.KwYield)
-  , ("_"       , I.KwUnderscore)
+  [ ("abstract", KwAbstract)
+  , ("and"     , KwAnd)
+  , ("break"   , KwBreak)
+  , ("case"    , KwCase)
+  , ("const"   , KwConst)
+  , ("continue", KwContinue)
+  , ("do"      , KwDo)
+  , ("else"    , KwElse)
+  , ("enum"    , KwEnum)
+  , ("export"  , KwExport)
+  , ("fail"    , KwFail)
+  , ("fun"     , KwFun)
+  , ("if"      , KwIf)
+  , ("impl"    , KwImpl)
+  , ("import"  , KwImport)
+  , ("in"      , KwIn)
+  , ("is"      , KwIs)
+  , ("loop"    , KwLoop)
+  , ("module"  , KwModule)
+  , ("not"     , KwNot)
+  , ("or"      , KwOr)
+  , ("return"  , KwReturn)
+  , ("struct"  , KwStruct)
+  , ("type"    , KwType)
+  , ("where"   , KwWhere)
+  , ("while"   , KwWhile)
+  , ("yield"   , KwYield)
+  , ("_"       , KwUnderscore)
   ]
 
-operators :: M.HashMap Text I.TokenType
+operators :: M.HashMap Text TokenType
 operators = M.fromList
-  [ ("+" , I.OpAdd)
-  , ("-" , I.OpSub)
-  , ("*" , I.OpMul)
-  , ("/" , I.OpDiv)
-  , ("(" , I.OpLParen)
-  , (")" , I.OpRParen)
-  , ("[" , I.OpLBracket)
-  , ("]" , I.OpRBracket)
-  , ("{" , I.OpLBrace)
-  , ("}" , I.OpRBrace)
-  , (":" , I.OpColon)
-  , (";" , I.OpSemicolon)
-  , ("==", I.OpEqEq)
-  , ("<" , I.OpLt)
-  , ("<=", I.OpLtEq)
-  , (">" , I.OpGt)
-  , (">=", I.OpGtEq)
-  , (":=", I.OpColonEq)
-  , ("<-", I.OpLtSub)
-  , ("$" , I.OpDollar)
-  , ("%" , I.OpPercent)
+  [ ("+" , OpAdd)
+  , ("-" , OpSub)
+  , ("*" , OpMul)
+  , ("/" , OpDiv)
+  , ("(" , OpLParen)
+  , (")" , OpRParen)
+  , ("[" , OpLBracket)
+  , ("]" , OpRBracket)
+  , ("{" , OpLBrace)
+  , ("}" , OpRBrace)
+  , (":" , OpColon)
+  , (";" , OpSemicolon)
+  , ("==", OpEqEq)
+  , ("<" , OpLt)
+  , ("<=", OpLtEq)
+  , (">" , OpGt)
+  , (">=", OpGtEq)
+  , (":=", OpColonEq)
+  , ("<-", OpLtSub)
+  , ("$" , OpDollar)
+  , ("%" , OpPercent)
   ]
 
 infixr 6 <::>

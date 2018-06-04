@@ -69,7 +69,7 @@ lex
   -> Either LexerError [I.Token]
 lex = parse program
 
--- | Run lexer over input text and print the results to stdout.
+-- | Run lexer over input text and print the results to standard output.
 -- Useful for testing.
 lexTest
   :: Text -- ^ Input for lexer.

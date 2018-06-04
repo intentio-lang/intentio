@@ -115,12 +115,11 @@ literal = lexeme (try ifloat <|> try iinteger <|> try istring) <?> "literal"
  where
   iinteger :: Lexer I.Token
   iinteger =
-    choiceTry
-        [ char '0' <::> oneOf ['b', 'B'] <::> ibinary
-        , char '0' <::> oneOf ['o', 'O'] <::> ioctal
-        , char '0' <::> oneOf ['x', 'X'] <::> ihexadecimal
-        , idecimal
-        ]
+    (   try (char '0' <::> oneOf ['b', 'B'] <::> ibinary)
+      <|> try (char '0' <::> oneOf ['o', 'O'] <::> ioctal)
+      <|> try (char '0' <::> oneOf ['x', 'X'] <::> ihexadecimal)
+      <|> try idecimal
+      )
       >>= mkt I.Integer
       <?> "integer literal"
 
@@ -167,49 +166,43 @@ literal = lexeme (try ifloat <|> try iinteger <|> try istring) <?> "literal"
     return $ e <> sign <> underscores <> val
 
   istring :: Lexer I.Token
-  istring = choiceTry
-    [ stringmod <~> istring' >>= mkt I.String
-    , stringmod <~> icharstring >>= mkt I.CharString
-    , stringmod <~> iregexstring >>= mkt I.RegexString
-    , stringmod <~> irawstring >>= mkt I.RawString
-    ]
+  istring =
+    try (prefix <~> istring' >>= mkt I.String)
+      <|> try (prefix <~> icharstring >>= mkt I.CharString)
+      <|> try (prefix <~> iregexstring >>= mkt I.RegexString)
+      <|> try (prefix <~> irawstring >>= mkt I.RawString)
+    where prefix = option "" stringmod
 
   stringmod :: Lexer Text
   stringmod = toS <$> some (satisfy isStringModChar) <?> "string modifier"
     where isStringModChar c = c /= 'c' && c /= 'r' && c /= 'x' && isLower c
 
   istring' :: Lexer Text
-  istring' = go <?> "regular string"
-   where
-    go = do
-      lquot <- string "\""
-      chars <- many strchr
-      rquot <- string "\""
-      return $ lquot <> T.concat chars <> rquot
+  istring' =
+    string "\""
+      <~> (T.concat <$> many strchr)
+      <~> string "\""
+      <?> "regular string"
 
   icharstring :: Lexer Text
   icharstring = string "c\"" <~> strchr <~> string "\"" <?> "char string"
 
   iregexstring :: Lexer Text
   iregexstring =
-    (<>) <$> string "x" <*> choiceTry [istring', irawstring] <?> "regex string"
+    string "x" <~> (try istring' <|> try irawstring) <?> "regex string"
 
   irawstring :: Lexer Text
-  irawstring = cons <$> char 'r' <*> rawstring' 0 <?> "raw string"
+  irawstring = char 'r' <::> rawstring' 0 <?> "raw string"
    where
     rawstring' :: Int -> Lexer Text
     rawstring' n =
-      string "\""
-        <~> rawstring'' n
-        <~> string "\""
-        <|> string "#"
-        <~> rawstring' n
-        <~> string "#"
+      (string "\"" <~> rawstring'' n <~> string "\"")
+        <|> (string "#" <~> rawstring' (n + 1) <~> string "#")
 
     rawstring'' :: Int -> Lexer Text
     rawstring'' n = toS <$> many rwsany
      where
-      rwsany = notChar '"' <|> (char '"' <* notFollowedBy hashes)
+      rwsany = try (notChar '"') <|> try (char '"' <* notFollowedBy hashes)
       hashes = count n $ char '#'
 
   strchr :: Lexer Text
@@ -327,6 +320,3 @@ infixr 6 <::>
 infixr 6 <~>
 (<~>) :: (Monoid a, MonadParsec e s m) => m a -> m a -> m a
 (<~>) l r = (<>) <$> l <*> r
-
-choiceTry :: (Functor f, Foldable f, MonadParsec e s m) => f (m a) -> m a
-choiceTry = choice . map try

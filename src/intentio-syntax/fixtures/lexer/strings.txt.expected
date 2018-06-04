@@ -1,0 +1,11 @@
+Token {ty = String, text = "\"Quick brown fox jumps over the lazy dog\""}
+Token {ty = RawString, text = "r\"Quick brown fox jumps over the lazy dog\""}
+Token {ty = RegexString, text = "xr\"Quick brown fox jumps over the lazy dog\""}
+Token {ty = CharString, text = "c\"a\""}
+Token {ty = CharString, text = "c\"\\u{1f436}\""}
+Token {ty = String, text = "\"Quick brown fox\n jumps over\n the lazy dog\""}
+Token {ty = RawString, text = "r####\"\nQuick \\u{1f43a} jumps over the lazy \\u{1f436}\n\"####"}
+Token {ty = RawString, text = "tur####\"\nQuick \\u{1f43a} jumps over the lazy \\u{1f436}\n\"####"}
+Token {ty = RegexString, text = "xr###\"\nQuick \\u{1f43a} jumps over the lazy \\u{1f436}\n\"###"}
+Token {ty = String, text = "\"C:\\\\\""}
+Token {ty = String, text = "\"\\\"\""}

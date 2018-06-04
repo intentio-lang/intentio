@@ -1,0 +1,34 @@
+"Quick brown fox jumps over the lazy dog"
+
+r"Quick brown fox jumps over the lazy dog"
+
+xr"Quick brown fox jumps over the lazy dog"
+
+c"a"
+
+c"\u{1f436}"
+
+"Quick brown fox
+ jumps over
+ the lazy dog"
+
+r####"
+Quick \u{1f43a} jumps over the lazy \u{1f436}
+"####
+
+tur####"
+Quick \u{1f43a} jumps over the lazy \u{1f436}
+"####
+
+xr###"
+Quick \u{1f43a} jumps over the lazy \u{1f436}
+"###
+
+# TODO: Tricky case, what to do here?
+# r##"
+# Quick \u{1f43a} jumps "####" the lazy \u{1f436}
+# "##
+
+"C:\\"
+
+"\""

@@ -8,7 +8,9 @@ data ItemDecl = FunDecl QId [FunParam] FunBody
 
 newtype ModId = ModId Id
 
-data QId = QId ModId Id
+data QId 
+  = QId ModId Id
+  | QId Id
 
 data Id = Ident
 

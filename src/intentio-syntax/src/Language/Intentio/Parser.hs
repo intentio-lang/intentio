@@ -20,12 +20,11 @@ module Language.Intentio.Parser where
     :: String -- ^ Name of source file.
     -> Text   -- ^ Input for parser.
     -> Either ParserError A.Module
-  parse = M.parse program   -- ??
+  parse = M.parse program
   
   
   program :: Parser A.Module
   program = A.Module <$> many item
-  
   
   item :: Parser A.ItemDecl
   item = do
@@ -33,9 +32,12 @@ module Language.Intentio.Parser where
     p <- funparams
     b <- funbody
     return $ A.FunDecl i p b
-  
+
   qid :: Parser A.QId
-  qid = do
+  qid = try qidmod <|> try id
+  
+  qidmod :: Parser A.QId
+  qidmod = do
     m <- modid
     tok I.OpColon
     i <- id
@@ -130,7 +132,7 @@ module Language.Intentio.Parser where
   idexpr = A.IdExpr <$> qid
   
   litexpr :: Parser A.Expr
-  litexpr = A.LitExpr <$> lit -- ??
+  litexpr = A.LitExpr <$> lit
   
   block :: Parser A.Block
   block = A.Block <$> braced exprList where exprList = many (expr <* coma)
@@ -151,8 +153,20 @@ module Language.Intentio.Parser where
   lit = tok literal
   
   binop :: Parser A.BinOp
-  binop = undefined
+  binop = 
+    try binadd 
+    <|> try tok I.OpAdd
+    <|> try tok I.OpSub
+    <|> try tok I.OpMul
+    <|> try tok I.OpDiv
+    <|> try tok I.OpEqEq
+    <|> try tok I.OpLt
+    <|> try tok I.OpLtEq
+    <|> try tok I.OpGt
+    <|> try tok I.OpGtEq
   
   unaryop :: Parser A.UnaryOp
-  unaryop = undefined
+  unaryop = 
+    try tok I.OpAdd
+    <|> try tok I.OpSub
   

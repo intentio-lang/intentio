@@ -23,7 +23,7 @@ import           Intentio.Prelude        hiding ( many
                                                 )
 
 import           Data.Char                      ( isLower )
-import qualified Data.Bimap           as BM
+import qualified Data.Bimap                    as BM
 import qualified Data.Text                     as T
 
 import           Text.Megaparsec                ( MonadParsec
@@ -288,7 +288,7 @@ escseq = try charesc <|> try asciiesc <|> try unicodeesc
     code  <- oneOf ['\'', '"', 'n', 'r', 't', '\\', '0']
     return $ toS [slash, code]
 
-  asciiesc = string "\\x" <:< hexDigitChar <:< hexDigitChar
+  asciiesc   = string "\\x" <:< hexDigitChar <:< hexDigitChar
 
   unicodeesc = do
     prefix <- string "\\u{"
@@ -328,7 +328,8 @@ tokOp :: TokenType -> Lexer Token
 tokOp = tokReserved operators
 
 tokReserved :: BM.Bimap Text TokenType -> TokenType -> Lexer Token
-tokReserved = undefined
+tokReserved m t = symbol s >>= mkt t
+    where s = m BM.!> t
 
 keywords :: BM.Bimap Text TokenType
 keywords = BM.fromList

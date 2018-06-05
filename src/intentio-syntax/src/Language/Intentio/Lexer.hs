@@ -23,7 +23,7 @@ import           Intentio.Prelude        hiding ( many
                                                 )
 
 import           Data.Char                      ( isLower )
-import qualified Data.HashMap.Strict           as M
+import qualified Data.Bimap           as BM
 import qualified Data.Text                     as T
 
 import           Text.Megaparsec                ( MonadParsec
@@ -100,55 +100,55 @@ anyTok = literal <|> ident <|> anyKeyword <|> anyOperator
 
 tok :: TokenType -> Lexer Token
 tok Ident        = ident
-tok KwAbstract   = undefined
-tok KwAnd        = undefined
-tok KwBreak      = undefined
-tok KwCase       = undefined
-tok KwConst      = undefined
-tok KwContinue   = undefined
-tok KwDo         = undefined
-tok KwElse       = undefined
-tok KwEnum       = undefined
-tok KwExport     = undefined
-tok KwFail       = undefined
-tok KwFun        = undefined
-tok KwIf         = undefined
-tok KwImpl       = undefined
-tok KwImport     = undefined
-tok KwIn         = undefined
-tok KwIs         = undefined
-tok KwLoop       = undefined
-tok KwModule     = undefined
-tok KwNot        = undefined
-tok KwOr         = undefined
-tok KwReturn     = undefined
-tok KwStruct     = undefined
-tok KwType       = undefined
-tok KwUnderscore = undefined
-tok KwWhere      = undefined
-tok KwWhile      = undefined
-tok KwYield      = undefined
-tok OpAdd        = undefined
-tok OpSub        = undefined
-tok OpMul        = undefined
-tok OpDiv        = undefined
-tok OpLParen     = undefined
-tok OpRParen     = undefined
-tok OpLBracket   = undefined
-tok OpRBracket   = undefined
-tok OpLBrace     = undefined
-tok OpRBrace     = undefined
-tok OpColon      = undefined
-tok OpSemicolon  = undefined
-tok OpEqEq       = undefined
-tok OpLt         = undefined
-tok OpLtEq       = undefined
-tok OpGt         = undefined
-tok OpGtEq       = undefined
-tok OpColonEq    = undefined
-tok OpLtSub      = undefined
-tok OpDollar     = undefined
-tok OpPercent    = undefined
+tok KwAbstract   = tokKw KwAbstract
+tok KwAnd        = tokKw KwAnd
+tok KwBreak      = tokKw KwBreak
+tok KwCase       = tokKw KwCase
+tok KwConst      = tokKw KwConst
+tok KwContinue   = tokKw KwContinue
+tok KwDo         = tokKw KwDo
+tok KwElse       = tokKw KwElse
+tok KwEnum       = tokKw KwEnum
+tok KwExport     = tokKw KwExport
+tok KwFail       = tokKw KwFail
+tok KwFun        = tokKw KwFun
+tok KwIf         = tokKw KwIf
+tok KwImpl       = tokKw KwImpl
+tok KwImport     = tokKw KwImport
+tok KwIn         = tokKw KwIn
+tok KwIs         = tokKw KwIs
+tok KwLoop       = tokKw KwLoop
+tok KwModule     = tokKw KwModule
+tok KwNot        = tokKw KwNot
+tok KwOr         = tokKw KwOr
+tok KwReturn     = tokKw KwReturn
+tok KwStruct     = tokKw KwStruct
+tok KwType       = tokKw KwType
+tok KwUnderscore = tokKw KwUnderscore
+tok KwWhere      = tokKw KwWhere
+tok KwWhile      = tokKw KwWhile
+tok KwYield      = tokKw KwYield
+tok OpAdd        = tokOp OpAdd
+tok OpSub        = tokOp OpSub
+tok OpMul        = tokOp OpMul
+tok OpDiv        = tokOp OpDiv
+tok OpLParen     = tokOp OpLParen
+tok OpRParen     = tokOp OpRParen
+tok OpLBracket   = tokOp OpLBracket
+tok OpRBracket   = tokOp OpRBracket
+tok OpLBrace     = tokOp OpLBrace
+tok OpRBrace     = tokOp OpRBrace
+tok OpColon      = tokOp OpColon
+tok OpSemicolon  = tokOp OpSemicolon
+tok OpEqEq       = tokOp OpEqEq
+tok OpLt         = tokOp OpLt
+tok OpLtEq       = tokOp OpLtEq
+tok OpGt         = tokOp OpGt
+tok OpGtEq       = tokOp OpGtEq
+tok OpColonEq    = tokOp OpColonEq
+tok OpLtSub      = tokOp OpLtSub
+tok OpDollar     = tokOp OpDollar
+tok OpPercent    = tokOp OpPercent
 tok Integer      = integer
 tok Float        = float
 tok String       = string'
@@ -168,6 +168,9 @@ ident = (try . lexeme $ (p >>= nonReserved)) >>= mkt Ident <?> "identifier"
   nonReserved :: Text -> Lexer Text
   nonReserved w | isKeyword w = fail $ "Illegal identifier: " ++ toS w
                 | otherwise   = return w
+
+  isKeyword :: Text -> Bool
+  isKeyword = (`BM.member` keywords)
 
 anyKeyword :: Lexer Token
 anyKeyword = anyReserved keywords <?> "keyword"
@@ -315,14 +318,20 @@ identStart = letterChar <|> char '_'
 identContinue :: Lexer Char
 identContinue = alphaNumChar <|> char '_' <|> char '\''
 
-isKeyword :: Text -> Bool
-isKeyword = (`M.member` keywords)
+anyReserved :: BM.Bimap Text TokenType -> Lexer Token
+anyReserved = try . BM.fold (\s t p -> (symbol s >>= mkt t) <|> p) empty
 
-anyReserved :: M.HashMap Text TokenType -> Lexer Token
-anyReserved = try . M.foldrWithKey (\s t p -> (symbol s >>= mkt t) <|> p) empty
+tokKw :: TokenType -> Lexer Token
+tokKw = tokReserved keywords
 
-keywords :: M.HashMap Text TokenType
-keywords = M.fromList
+tokOp :: TokenType -> Lexer Token
+tokOp = tokReserved operators
+
+tokReserved :: BM.Bimap Text TokenType -> TokenType -> Lexer Token
+tokReserved = undefined
+
+keywords :: BM.Bimap Text TokenType
+keywords = BM.fromList
   [ ("abstract", KwAbstract)
   , ("and"     , KwAnd)
   , ("break"   , KwBreak)
@@ -353,8 +362,8 @@ keywords = M.fromList
   , ("_"       , KwUnderscore)
   ]
 
-operators :: M.HashMap Text TokenType
-operators = M.fromList
+operators :: BM.Bimap Text TokenType
+operators = BM.fromList
   [ ("+" , OpAdd)
   , ("-" , OpSub)
   , ("*" , OpMul)

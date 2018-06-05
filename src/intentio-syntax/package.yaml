@@ -6,6 +6,7 @@ name: intentio-syntax
 
 dependencies:
   - base
+  - bimap
   - intentio-core
   - megaparsec
   - text

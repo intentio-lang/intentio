@@ -10,7 +10,7 @@ newtype ModId = ModId Id
 
 data QId 
   = QId ModId Id
-  | QId Id
+  | Id Id
 
 data Id = Ident
 

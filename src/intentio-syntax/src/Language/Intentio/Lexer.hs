@@ -12,6 +12,10 @@ module Language.Intentio.Lexer
   , integer
   , float
   , anyString
+  , string'
+  , charstring
+  , regexstring
+  , rawstring
   )
 where
 
@@ -92,12 +96,15 @@ lexTest' = parseTest' program
 --------------------------------------------------------------------------------
 -- Lexer productions
 
+-- | Parse whole program as a list of tokens.
 program :: Lexer [Token]
 program = sc *> many anyTok <* eof
 
+-- | Parse any valid token.
 anyTok :: Lexer Token
 anyTok = literal <|> ident <|> anyKeyword <|> anyOperator
 
+-- | Parse token of given type.
 tok :: TokenType -> Lexer Token
 tok Ident        = ident
 tok KwAbstract   = tokKw KwAbstract
@@ -159,6 +166,7 @@ tok RegexString  = regexstring
 --------------------------------------------------------------------------------
 -- Token productions
 
+-- | Parse an identifier.
 ident :: Lexer Token
 ident = (try . lexeme $ (p >>= nonReserved)) >>= mkt Ident <?> "identifier"
  where
@@ -172,17 +180,21 @@ ident = (try . lexeme $ (p >>= nonReserved)) >>= mkt Ident <?> "identifier"
   isKeyword :: Text -> Bool
   isKeyword = (`BM.member` keywords)
 
+-- | Parse any valid keyword.
 anyKeyword :: Lexer Token
 anyKeyword = anyReserved keywords <?> "keyword"
 
+-- | Parse any valid operator.
 anyOperator :: Lexer Token
 anyOperator = anyReserved operators <?> "operator"
 
+-- | Parse any valid literal.
 literal :: Lexer Token
-literal = lexeme $ try float <|> try integer <|> try anyString
+literal = try float <|> try integer <|> try anyString
 
+-- | Parse any valid integer literal.
 integer :: Lexer Token
-integer = p >>= mkt Integer <?> "integer literal"
+integer = lexeme p >>= mkt Integer <?> "integer literal"
  where
   p           = try binary <|> try octal <|> try hexadecimal <|> try decimalNum
 
@@ -190,12 +202,12 @@ integer = p >>= mkt Integer <?> "integer literal"
   octal       = char '0' >:> oneOf ['o', 'O'] >:> octalNum
   hexadecimal = char '0' >:> oneOf ['x', 'X'] >:> hexadecimalNum
 
+-- | Parse any valid floating-point literal.
 float :: Lexer Token
-float =
-  try (decimalNum <~> string "." <~> decimalNum <~> option "" exponent)
+float = lexeme p >>= mkt Float <?> "floating-point literal"
+ where
+  p = try (decimalNum <~> string "." <~> decimalNum <~> option "" exponent)
     <|> try (decimalNum <~> exponent)
-    >>= mkt Float
-    <?> "floating-point literal"
 
 decimalNum :: Lexer Text
 decimalNum = toS <$> p <?> "decimal digits"
@@ -223,21 +235,26 @@ exponent = do
   val         <- decimalNum
   return $ e <> sign <> underscores <> val
 
+-- | Parse any valid string literal.
 anyString :: Lexer Token
 anyString =
   try string' <|> try charstring <|> try regexstring <|> try rawstring
 
+-- | Parse valid regular string literal.
 string' :: Lexer Token
-string' = stringprefix <~> istring' >>= mkt String
+string' = lexeme (stringprefix <~> istring') >>= mkt String
 
+-- | Parse valid character literal.
 charstring :: Lexer Token
-charstring = stringprefix <~> icharstring >>= mkt CharString
+charstring = lexeme (stringprefix <~> icharstring) >>= mkt CharString
 
+-- | Parse valid regex literal.
 regexstring :: Lexer Token
-regexstring = stringprefix <~> iregexstring >>= mkt RegexString
+regexstring = lexeme (stringprefix <~> iregexstring) >>= mkt RegexString
 
+-- | Parse valid raw string literal.
 rawstring :: Lexer Token
-rawstring = stringprefix <~> irawstring >>= mkt RawString
+rawstring = lexeme (stringprefix <~> irawstring) >>= mkt RawString
 
 istring' :: Lexer Text
 istring' =
@@ -328,8 +345,7 @@ tokOp :: TokenType -> Lexer Token
 tokOp = tokReserved operators
 
 tokReserved :: BM.Bimap Text TokenType -> TokenType -> Lexer Token
-tokReserved m t = symbol s >>= mkt t
-    where s = m BM.!> t
+tokReserved m t = symbol s >>= mkt t where s = m BM.!> t
 
 keywords :: BM.Bimap Text TokenType
 keywords = BM.fromList

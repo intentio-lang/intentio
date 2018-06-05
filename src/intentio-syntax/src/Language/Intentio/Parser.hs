@@ -8,8 +8,8 @@ import qualified Language.Intentio.AST         as A
 
 import qualified Language.Intentio.Token       as I
 
-type Parser = Parsec Void [I.Token]
-type ParserError = ParseError I.Token Void
+type Parser = Parsec Void Text
+type ParserError = ParseError Token Void
 
 parse
   :: String -- ^ Name of source file.

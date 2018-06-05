@@ -151,10 +151,10 @@ tok OpDollar     = undefined
 tok OpPercent    = undefined
 tok Integer      = integer
 tok Float        = float
-tok String       = undefined
-tok CharString   = undefined
-tok RawString    = undefined
-tok RegexString  = undefined
+tok String       = string'
+tok CharString   = charstring
+tok RawString    = rawstring
+tok RegexString  = regexstring
 
 --------------------------------------------------------------------------------
 -- Token productions
@@ -163,11 +163,11 @@ ident :: Lexer Token
 ident = (try . lexeme $ (p >>= nonReserved)) >>= mkt Ident <?> "identifier"
  where
   p :: Lexer Text
-  p = toS <$> ((:) <$> identStart <*> many identContinue)
+  p = identStart >:> many identContinue
 
   nonReserved :: Text -> Lexer Text
   nonReserved w | isKeyword w = fail $ "Illegal identifier: " ++ toS w
-                | otherwise             = return w
+                | otherwise   = return w
 
 anyKeyword :: Lexer Token
 anyKeyword = anyReserved keywords <?> "keyword"
@@ -183,9 +183,9 @@ integer = p >>= mkt Integer <?> "integer literal"
  where
   p           = try binary <|> try octal <|> try hexadecimal <|> try decimalNum
 
-  binary      = char '0' <::> oneOf ['b', 'B'] <::> binaryNum
-  octal       = char '0' <::> oneOf ['o', 'O'] <::> octalNum
-  hexadecimal = char '0' <::> oneOf ['x', 'X'] <::> hexadecimalNum
+  binary      = char '0' >:> oneOf ['b', 'B'] >:> binaryNum
+  octal       = char '0' >:> oneOf ['o', 'O'] >:> octalNum
+  hexadecimal = char '0' >:> oneOf ['x', 'X'] >:> hexadecimalNum
 
 float :: Lexer Token
 float =
@@ -196,21 +196,21 @@ float =
 
 decimalNum :: Lexer Text
 decimalNum = toS <$> p <?> "decimal digits"
-  where p = (:) <$> digitChar <*> many (digitChar <|> char '_')
+  where p = digitChar >:> many (digitChar <|> char '_')
 
 binaryNum :: Lexer Text
 binaryNum = toS <$> p <?> "binary digits"
  where
-  p            = (:) <$> binDigitChar <*> many (binDigitChar <|> char '_')
+  p            = binDigitChar >:> many (binDigitChar <|> char '_')
   binDigitChar = oneOf ['0', '1'] <?> "binary digit"
 
 octalNum :: Lexer Text
 octalNum = toS <$> p <?> "octal digits"
-  where p = (:) <$> octDigitChar <*> many (octDigitChar <|> char '_')
+  where p = octDigitChar >:> many (octDigitChar <|> char '_')
 
 hexadecimalNum :: Lexer Text
 hexadecimalNum = toS <$> p <?> "hexadecimal digits"
-  where p = (:) <$> hexDigitChar <*> many (hexDigitChar <|> char '_')
+  where p = hexDigitChar >:> many (hexDigitChar <|> char '_')
 
 exponent :: Lexer Text
 exponent = do
@@ -222,16 +222,19 @@ exponent = do
 
 anyString :: Lexer Token
 anyString =
-  try (prefix <~> istring' >>= mkt String)
-    <|> try (prefix <~> icharstring >>= mkt CharString)
-    <|> try (prefix <~> iregexstring >>= mkt RegexString)
-    <|> try (prefix <~> irawstring >>= mkt RawString)
- where
-  prefix = option "" stringmod
+  try string' <|> try charstring <|> try regexstring <|> try rawstring
 
-  stringmod :: Lexer Text
-  stringmod = toS <$> some (satisfy isStringModChar) <?> "string modifier"
-    where isStringModChar c = c /= 'c' && c /= 'r' && c /= 'x' && isLower c
+string' :: Lexer Token
+string' = stringprefix <~> istring' >>= mkt String
+
+charstring :: Lexer Token
+charstring = stringprefix <~> icharstring >>= mkt CharString
+
+regexstring :: Lexer Token
+regexstring = stringprefix <~> iregexstring >>= mkt RegexString
+
+rawstring :: Lexer Token
+rawstring = stringprefix <~> irawstring >>= mkt RawString
 
 istring' :: Lexer Text
 istring' =
@@ -248,7 +251,7 @@ iregexstring =
   string "x" <~> (try istring' <|> try irawstring) <?> "regex string"
 
 irawstring :: Lexer Text
-irawstring = char 'r' <::> rawstring' 0 <?> "raw string"
+irawstring = char 'r' >:> rawstring' 0 <?> "raw string"
  where
   rawstring' :: Int -> Lexer Text
   rawstring' n =
@@ -260,6 +263,13 @@ irawstring = char 'r' <::> rawstring' 0 <?> "raw string"
    where
     rwsany = try (notChar '"') <|> try (char '"' <* notFollowedBy hashes)
     hashes = count n $ char '#'
+
+stringprefix :: Lexer Text
+stringprefix = option "" stringmod
+
+stringmod :: Lexer Text
+stringmod = toS <$> some (satisfy isStringModChar) <?> "string modifier"
+  where isStringModChar c = c /= 'c' && c /= 'r' && c /= 'x' && isLower c
 
 strchr :: Lexer Text
 strchr =
@@ -275,11 +285,7 @@ escseq = try charesc <|> try asciiesc <|> try unicodeesc
     code  <- oneOf ['\'', '"', 'n', 'r', 't', '\\', '0']
     return $ toS [slash, code]
 
-  asciiesc = do
-    prefix <- string "\\x"
-    d1     <- hexDigitChar
-    d2     <- hexDigitChar
-    return $ prefix `snoc` d1 `snoc` d2
+  asciiesc = string "\\x" <:< hexDigitChar <:< hexDigitChar
 
   unicodeesc = do
     prefix <- string "\\u{"
@@ -372,9 +378,13 @@ operators = M.fromList
   , ("%" , OpPercent)
   ]
 
-infixr 6 <::>
-(<::>) :: MonadParsec e s m => m Char -> m Text -> m Text
-(<::>) l r = T.cons <$> l <*> r
+infixl 6 <:<
+(<:<) :: (MonadParsec e s m, StringConv t Text) => m t -> m Char -> m Text
+(<:<) l r = snoc <$> (toS <$> l) <*> r
+
+infixr 6 >:>
+(>:>) :: (MonadParsec e s m, StringConv t Text) => m Char -> m t -> m Text
+(>:>) l r = cons <$> l <*> (toS <$> r)
 
 infixr 6 <~>
 (<~>) :: (Monoid a, MonadParsec e s m) => m a -> m a -> m a

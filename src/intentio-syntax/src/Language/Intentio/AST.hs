@@ -18,16 +18,18 @@ newtype FunBody = FunBody [Expr]
 
 data Expr
   =   BinExpr BinOp Expr Expr
-  | BlockExpr [Expr]
+  | BlockExpr Block
   | FunCallExpr Expr [Expr]
   | IdExpr QId
-  | IfExpr Expr [Expr]
-  | IfElseExpr Expr [Expr] [Expr]
+  | IfExpr Expr Block
+  | IfElseExpr Expr Block Block
   | LetDeclExpr Id Expr
   | LitExpr Literal
-  | LoopExpr Expr [Expr]
+  | LoopExpr Expr Block
   | UnaryExpr UnaryOp Expr
   | ParenExpr Expr
+
+newtype Block = Block [Expr]
 
 data Literal
   = CharStr

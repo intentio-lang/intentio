@@ -367,6 +367,7 @@ keywords = BM.fromList
   , ("import"  , KwImport)
   , ("in"      , KwIn)
   , ("is"      , KwIs)
+  , ("let")    , KwLet)
   , ("loop"    , KwLoop)
   , ("module"  , KwModule)
   , ("not"     , KwNot)

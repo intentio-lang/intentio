@@ -125,6 +125,7 @@ tok KwImport     = tokKw KwImport
 tok KwIn         = tokKw KwIn
 tok KwIs         = tokKw KwIs
 tok KwLoop       = tokKw KwLoop
+tok KwLet        = tokKw KwLet
 tok KwModule     = tokKw KwModule
 tok KwNot        = tokKw KwNot
 tok KwOr         = tokKw KwOr

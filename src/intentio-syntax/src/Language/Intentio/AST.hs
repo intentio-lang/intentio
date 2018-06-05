@@ -14,7 +14,7 @@ data Id = Ident
 
 newtype FunParam = FunParam [Id]
 
-newtype FunBody = FunBody [Expr]
+newtype FunBody = FunBody Block
 
 data Expr
   =   BinExpr BinOp Expr Expr

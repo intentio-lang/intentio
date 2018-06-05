@@ -169,4 +169,4 @@ module Language.Intentio.Parser where
   unaryop = 
     try tok I.OpAdd
     <|> try tok I.OpSub
-  
+

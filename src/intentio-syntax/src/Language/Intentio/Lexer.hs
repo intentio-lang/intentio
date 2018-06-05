@@ -117,6 +117,7 @@ tok KwImpl       = undefined
 tok KwImport     = undefined
 tok KwIn         = undefined
 tok KwIs         = undefined
+tok KwLet        = undefined
 tok KwLoop       = undefined
 tok KwModule     = undefined
 tok KwNot        = undefined
@@ -167,7 +168,7 @@ ident = (try . lexeme $ (p >>= nonReserved)) >>= mkt Ident <?> "identifier"
 
   nonReserved :: Text -> Lexer Text
   nonReserved w | isKeyword w = fail $ "Illegal identifier: " ++ toS w
-                | otherwise             = return w
+                | otherwise   = return w
 
 anyKeyword :: Lexer Token
 anyKeyword = anyReserved keywords <?> "keyword"

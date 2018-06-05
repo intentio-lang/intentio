@@ -4,7 +4,7 @@ import           Intentio.Prelude ()
 
 data Module = Module [ItemDecl]
 
-data ItemDecl = FunDecl QId [FunParam] FunBody
+data ItemDecl = FunDecl QId FunParam FunBody
 
 newtype ModId = ModId Id
 
@@ -14,7 +14,7 @@ data Id = Ident
 
 newtype FunParam = FunParam [Id]
 
-newtype FunBody = FunBody [Expr]
+newtype FunBody = FunBody Block
 
 data Expr
   =   BinExpr BinOp Expr Expr

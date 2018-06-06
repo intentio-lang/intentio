@@ -15,52 +15,52 @@ module Language.Intentio.Parser where
                                                   , ident
                                                   )
   
-  type Parser = Parsec Void Text
+  type Lexer = Parsec Void Text
   type ParserError = ParseError Text Void
   
   parse
     :: String -- ^ Name of source file.
     -> Text   -- ^ Input for parser.
-    -> Either ParserError A.Module
+    -> Either LexerError A.Module
   parse = M.parse program
   
   
-  program :: Parser A.Module
+  program :: Lexer A.Module
   program = A.Module <$> many item
   
-  item :: Parser A.ItemDecl
+  item :: Lexer A.ItemDecl
   item = do
     i <- qid
     p <- funparams
     b <- funbody
     return $ A.FunDecl i p b
 
-  qid :: Parser A.QId
+  qid :: Lexer A.QId
   qid = try qidmod <|> try id
   
-  qidmod :: Parser A.QId
+  qidmod :: Lexer A.QId
   qidmod = do
     m <- modid
     tok I.OpColon
     i <- id
     return $ A.QId m i
   
-  modid :: Parser A.ModId
+  modid :: Lexer A.ModId
   modid = do
     A.ModId <$> id
   
-  id :: Parser A.Id
+  id :: Lexer A.Id
   id = lexer ident
   
-  funparams :: Parser A.FunParam
+  funparams :: Lexer A.FunParam
   funparams = A.FunParam <$> braced paramList
     where paramList = many (id <* semi)
   
-  funbody :: Parser A.FunBody
+  funbody :: Lexer A.FunBody
   funbody = do
     A.FunBody <$> block
   
-  expr :: Parser A.Expr
+  expr :: Lexer A.Expr
   expr =
     try letdeclexpr
       <|> try loopexpr
@@ -74,21 +74,21 @@ module Language.Intentio.Parser where
       <|> try idexpr
       <|> try litexpr
   
-  letdeclexpr :: Parser A.Expr
+  letdeclexpr :: Lexer A.Expr
   letdeclexpr = do
     tok I.KwLet
     i <- id
     e <- expr
     return $ A.LetDeclExpr i e
   
-  loopexpr :: Parser A.Expr
+  loopexpr :: Lexer A.Expr
   loopexpr = do
     tok I.KwWhile
     e <- expr
     b <- block
     return $ A.LoopExpr e b
   
-  ifelseexpr :: Parser A.Expr
+  ifelseexpr :: Lexer A.Expr
   ifelseexpr = do
     tok I.KwIf
     i <- expr
@@ -97,64 +97,64 @@ module Language.Intentio.Parser where
     e <- block
     return $ A.IfElseExpr i t e
   
-  ifexpr :: Parser A.Expr
+  ifexpr :: Lexer A.Expr
   ifexpr = do
     tok I.KwIf --am am
     e <- expr
     b <- block
     return $ A.IfExpr e b
   
-  blockexpr :: Parser A.Expr
+  blockexpr :: Lexer A.Expr
   blockexpr = A.BlockExpr <$> block
   
-  binexpr :: Parser A.Expr
+  binexpr :: Lexer A.Expr
   binexpr = do
     o <- binop
     l <- expr
     r <- expr
     return $ A.BinExpr o l r
   
-  unaryexpr :: Parser A.Expr
+  unaryexpr :: Lexer A.Expr
   unaryexpr = do
     o <- unaryop
     e <- expr
     return $ A.UnaryExpr o e
   
-  parenexpr :: Parser A.Expr
+  parenexpr :: Lexer A.Expr
   parenexpr = A.ParenExpr <$> paren expr
   
-  funcallexpr :: Parser A.Expr
+  funcallexpr :: Lexer A.Expr
   funcallexpr = do
     c <- expr
     p <- paren paramList
     return $ A.FunCallExpr c p
     where paramList = many (expr <* semi)
   
-  idexpr :: Parser A.Expr
+  idexpr :: Lexer A.Expr
   idexpr = A.IdExpr <$> qid
   
-  litexpr :: Parser A.Expr
-  litexpr = A.LitExpr <$> literal
+  litexpr :: Lexer A.Expr
+  litexpr = A.LitExpr literal
   
-  block :: Parser A.Block
+  block :: Lexer A.Block
   block = A.Block <$> braced exprList where exprList = many (expr <* coma)
   
-  braced :: Parser a -> Parser a
+  braced :: Lexer a -> Lexer a
   braced = between (tok I.OpLBrace) (tok I.OpRBrace)
   
-  paren :: Parser a -> Parser a
+  paren :: Lexer a -> Lexer a
   paren = between (tok I.OpLParen) (tok I.OpRParen)
   
-  semi :: Parser I.Token
+  semi :: Lexer I.Token
   semi = tok I.OpSemicolon
   
-  coma :: Parser I.Token
+  coma :: Lexer I.Token
   coma = tok I.OpComa
   
-  lit :: Parser I.Token
+  lit :: Lexer I.Token
   lit = literal
   
-  binop :: Parser I.Token
+  binop :: Lexer I.Token
   binop = 
     try (tok I.OpAdd)
     <|> try (tok I.OpSub)
@@ -166,7 +166,7 @@ module Language.Intentio.Parser where
     <|> try (tok I.OpGt)
     <|> try (tok I.OpGtEq)
   
-  unaryop :: Parser I.Token
+  unaryop :: Lexer I.Token
   unaryop = 
     try (tok I.OpAdd)
     <|> (try tok I.OpSub)

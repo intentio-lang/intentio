@@ -48,6 +48,7 @@ data TokenType
   | OpRBracket
   | OpLBrace
   | OpRBrace
+  | OpComa
   | OpColon
   | OpSemicolon
 

@@ -8,6 +8,7 @@ module Language.Intentio.Lexer
   , tok
   , anyKeyword
   , anyOperator
+  , ident
   , literal
   , integer
   , float
@@ -146,6 +147,7 @@ tok OpLBracket   = tokOp OpLBracket
 tok OpRBracket   = tokOp OpRBracket
 tok OpLBrace     = tokOp OpLBrace
 tok OpRBrace     = tokOp OpRBrace
+tok OpComa      = tokOp OpComa
 tok OpColon      = tokOp OpColon
 tok OpSemicolon  = tokOp OpSemicolon
 tok OpEqEq       = tokOp OpEqEq
@@ -393,6 +395,7 @@ operators = BM.fromList
   , ("]" , OpRBracket)
   , ("{" , OpLBrace)
   , ("}" , OpRBrace)
+  , ("," , OpComa)
   , (":" , OpColon)
   , (";" , OpSemicolon)
   , ("==", OpEqEq)

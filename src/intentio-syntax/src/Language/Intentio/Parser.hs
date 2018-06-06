@@ -1,6 +1,8 @@
 module Language.Intentio.Parser where
 
-  import           Intentio.Prelude        hiding ( many )
+  import           Intentio.Prelude        hiding ( many
+                                                  , try   
+                                                  )
   
   import           Text.Megaparsec         hiding ( parse )
   import qualified Text.Megaparsec               as M
@@ -132,7 +134,7 @@ module Language.Intentio.Parser where
   idexpr = A.IdExpr <$> qid
   
   litexpr :: Parser A.Expr
-  litexpr = A.LitExpr <$> lit
+  litexpr = A.LitExpr <$> literal
   
   block :: Parser A.Block
   block = A.Block <$> braced exprList where exprList = many (expr <* coma)
@@ -147,26 +149,25 @@ module Language.Intentio.Parser where
   semi = tok I.OpSemicolon
   
   coma :: Parser I.Token
-  coma = tok I.OpCom
+  coma = tok I.OpComa
   
   lit :: Parser I.Token
-  lit = tok literal
+  lit = literal
   
-  binop :: Parser A.BinOp
+  binop :: Parser I.Token
   binop = 
-    try binadd 
-    <|> try tok I.OpAdd
-    <|> try tok I.OpSub
-    <|> try tok I.OpMul
-    <|> try tok I.OpDiv
-    <|> try tok I.OpEqEq
-    <|> try tok I.OpLt
-    <|> try tok I.OpLtEq
-    <|> try tok I.OpGt
-    <|> try tok I.OpGtEq
+    try (tok I.OpAdd)
+    <|> try (tok I.OpSub)
+    <|> try (tok I.OpMul)
+    <|> try (tok I.OpDiv)
+    <|> try (tok I.OpEqEq)
+    <|> try (tok I.OpLt)
+    <|> try (tok I.OpLtEq)
+    <|> try (tok I.OpGt)
+    <|> try (tok I.OpGtEq)
   
-  unaryop :: Parser A.UnaryOp
+  unaryop :: Parser I.Token
   unaryop = 
-    try tok I.OpAdd
-    <|> try tok I.OpSub
+    try (tok I.OpAdd)
+    <|> (try tok I.OpSub)
 

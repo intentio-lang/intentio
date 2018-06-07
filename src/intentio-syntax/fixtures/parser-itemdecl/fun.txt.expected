@@ -1,0 +1,8 @@
+FunDecl 
+    { _funDeclName = ScopeId "foo"
+    , _funDeclParams = FunParams 
+        [ FunParam ( ScopeId "a" )
+        , FunParam ( ScopeId "b" )
+        ] 
+    , _funDeclBody = FunBody ( Block [ IdExpr ( Id ( ScopeId "a" ) ) ] )
+    } 

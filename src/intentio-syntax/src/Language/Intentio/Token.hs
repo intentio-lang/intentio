@@ -53,11 +53,13 @@ data TokenType
   | TOpColon
   | TOpSemicolon
 
+  | TOpEq
   | TOpEqEq
-  | TOpLt
-  | TOpLtEq
   | TOpGt
   | TOpGtEq
+  | TOpLt
+  | TOpLtEq
+  | TOpNeq
 
   | TOpColonEq
   | TOpLtSub

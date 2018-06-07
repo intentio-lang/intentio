@@ -15,21 +15,25 @@ import           Intentio.Prelude        hiding ( many
                                                 , try
                                                 )
 
-import           Text.Megaparsec                ( between
-                                                , try
+import           Text.Megaparsec                ( (<?>)
+                                                , between
+                                                , dbg
                                                 , many
+                                                , optional
+                                                , sepBy
+                                                , sepEndBy
+                                                , try
                                                 )
 import qualified Text.Megaparsec               as M
 
 import           Language.Intentio.AST
-import           Language.Intentio.Token
-
 import           Language.Intentio.Lexer        ( Parser
                                                 , ParserError
-                                                , tok
-                                                , literal
                                                 , ident
+                                                , literal
+                                                , tok
                                                 )
+import           Language.Intentio.Token
 
 --------------------------------------------------------------------------------
 -- Parser entry-points
@@ -69,13 +73,14 @@ expr =
     <|> try whileexpr
     <|> try ifelseexpr
     <|> try ifexpr
+    <|> try returnexpr
     <|> try blockexpr
-    <|> try binexpr
-    <|> try unaryexpr
+    -- <|> try binexpr
+    -- <|> try unaryexpr
     <|> try parenexpr
-    <|> try funcallexpr
-    <|> try idexpr
+    -- <|> try funcallexpr
     <|> try litexpr
+    <|> try idexpr
 
 --------------------------------------------------------------------------------
 -- Identifiers
@@ -87,20 +92,21 @@ scopeId :: Parser ScopeId
 scopeId = ScopeId . (^. text) <$> ident
 
 anyId :: Parser AnyId
-anyId = (Qid <$> modId <*> scopeId) <|> (Id <$> scopeId)
+anyId = try (Qid <$> modId <*> scopeId) <|> try (Id <$> scopeId)
 
 --------------------------------------------------------------------------------
 -- Item declarations
 
 funDecl :: Parser ItemDecl
 funDecl = do
+  _              <- tok TKwFun
   _funDeclName   <- scopeId
   _funDeclParams <- params
   _funDeclBody   <- body
   return FunDecl {..}
  where
   params    = FunParams <$> parenthesized paramList
-  paramList = many (param <* semi)
+  paramList = sepEndBy param comma
   param     = FunParam <$> scopeId
   body      = FunBody <$> block
 
@@ -109,14 +115,15 @@ funDecl = do
 
 letdeclexpr :: Parser Expr
 letdeclexpr = do
-  _ <- tok TKwLet
+  _            <- tok TKwLet
   _letDeclName <- scopeId
+  _            <- tok TOpEq
   _letDeclVal  <- expr
   return LetDeclExpr {..}
 
 whileexpr :: Parser Expr
 whileexpr = do
-  _ <- tok TKwWhile
+  _               <- tok TKwWhile
   _whileCondition <- expr
   _whileBody      <- block
   return WhileExpr {..}
@@ -136,6 +143,12 @@ ifexpr = do
   e <- expr
   b <- block
   return $ IfExpr e b
+
+returnexpr :: Parser Expr
+returnexpr = do
+  _ <- tok TKwReturn
+  e <- optional expr
+  return $ ReturnExpr e
 
 blockexpr :: Parser Expr
 blockexpr = BlockExpr <$> block
@@ -163,7 +176,7 @@ idexpr :: Parser Expr
 idexpr = IdExpr <$> anyId
 
 litexpr :: Parser Expr
-litexpr = LitExpr . convert <$> literal
+litexpr = LitExpr . convert <$> literal <?> "literal"
 
 --------------------------------------------------------------------------------
 -- Binary expressions
@@ -191,7 +204,7 @@ binexpr = do
 -- Utilities
 
 block :: Parser Block
-block = Block <$> braced exprList where exprList = many (expr <* comma)
+block = Block <$> braced exprList where exprList = sepEndBy expr semi
 
 braced :: Parser a -> Parser a
 braced = between (tok TOpLBrace) (tok TOpRBrace)

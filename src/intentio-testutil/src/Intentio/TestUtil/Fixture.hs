@@ -1,3 +1,5 @@
+{-# LANGUAGE UndecidableInstances #-}
+
 module Intentio.TestUtil.Fixture
   ( Fixture(..)
   , runFixture
@@ -15,6 +17,12 @@ import           System.FilePath
 
 import           Test.Hspec
 
+import           Text.Megaparsec.Error          ( ParseError
+                                                , ShowErrorComponent
+                                                , ShowToken
+                                                , parseErrorPretty
+                                                )
+
 import           Text.Pretty.Simple             ( pShowNoColor )
 
 --------------------------------------------------------------------------------
@@ -26,27 +34,41 @@ class Fixture f where
   getFixtureExpected   :: f -> IO (Maybe Text)
   writeFixtureExpected :: f -> Text -> IO ()
 
-fixtureMaterialize :: Show a => a -> Text
-fixtureMaterialize = TL.toStrict . pShowNoColor
+class FixtureMaterializable a where
+  fixtureMaterialize :: a -> Text
+
+instance (ShowErrorComponent e, Ord t, ShowToken t, Show r) =>
+  FixtureMaterializable (Either (ParseError t e) r)
+ where
+  fixtureMaterialize (Left l) = "[ERROR]\n" <> toS (parseErrorPretty l)
+  fixtureMaterialize (Right r) = TL.toStrict . pShowNoColor $ r
 
 --------------------------------------------------------------------------------
 -- Fixture-based test framework.
 
 -- | Build specification for given fixture.
 -- The specification is names as the fixture.
-runFixture :: (Fixture f, Show m) => (Text -> m) -> f -> SpecWith ()
-runFixture s f = it (fixtureName f) $ do
-  input <- getFixtureInput f
-  let actual = fixtureMaterialize . s $ input
-  getFixtureExpected f >>= \case
-    Nothing -> do
-      putStrLn $ "WARN: generating test case for fixture " ++ fixtureName f
-      writeFixtureExpected f actual
-      True `shouldBe` True
-    Just expected -> actual `shouldBe` expected
+runFixture
+  :: (Fixture f, FixtureMaterializable m) => (Text -> m) -> f -> SpecWith ()
+runFixture s f = it fname
+  $ if isIgnored then pendingWith "fixture ignored" else go
+ where
+  fname     = fixtureName f
+  isIgnored = "ignore" `isPrefixOf` fname
+
+  go        = do
+    input <- getFixtureInput f
+    let actual = fixtureMaterialize . s $ input
+    getFixtureExpected f >>= \case
+      Nothing -> do
+        putStrLn $ "WARN: generating test case for fixture " ++ fixtureName f
+        writeFixtureExpected f actual
+        True `shouldBe` True
+      Just expected -> actual `shouldBe` expected
 
 -- | Build multiple specifications for given list of fixtures.
-runFixtures :: (Fixture f, Show m) => (Text -> m) -> [f] -> SpecWith ()
+runFixtures
+  :: (Fixture f, FixtureMaterializable m) => (Text -> m) -> [f] -> SpecWith ()
 runFixtures s = mapM_ (runFixture s)
 
 --------------------------------------------------------------------------------
@@ -97,7 +119,7 @@ getFileFixtures prefix = do
 -- The fixture directory is @$PROJECT_ROOT/fixtures/$PREFIX/@.
 -- Creates prefix directory if it does not exist.
 runFileFixtures
-  :: Show m
+  :: FixtureMaterializable m
   => String                  -- ^ Prefix directory of fixtures
   -> (Text -> m)             -- ^ Test function
   -> SpecWith ()

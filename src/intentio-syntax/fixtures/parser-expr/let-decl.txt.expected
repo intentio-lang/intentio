@@ -1,0 +1,4 @@
+LetDeclExpr 
+    { _letDeclName = ScopeId "e"
+    , _letDeclVal = LitExpr ( RawString "r#"my sweet "string""#" )
+    } 

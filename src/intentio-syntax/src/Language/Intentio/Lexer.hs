@@ -150,11 +150,13 @@ tok TOpRBrace     = tokOp TOpRBrace
 tok TOpComma      = tokOp TOpComma
 tok TOpColon      = tokOp TOpColon
 tok TOpSemicolon  = tokOp TOpSemicolon
+tok TOpEq         = tokOp TOpEq
 tok TOpEqEq       = tokOp TOpEqEq
 tok TOpLt         = tokOp TOpLt
 tok TOpLtEq       = tokOp TOpLtEq
 tok TOpGt         = tokOp TOpGt
 tok TOpGtEq       = tokOp TOpGtEq
+tok TOpNeq        = tokOp TOpNeq
 tok TOpColonEq    = tokOp TOpColonEq
 tok TOpLtSub      = tokOp TOpLtSub
 tok TOpDollar     = tokOp TOpDollar
@@ -398,11 +400,13 @@ operators = BM.fromList
   , ("," , TOpComma)
   , (":" , TOpColon)
   , (";" , TOpSemicolon)
+  , ("=" , TOpEq)
   , ("==", TOpEqEq)
   , ("<" , TOpLt)
   , ("<=", TOpLtEq)
   , (">" , TOpGt)
   , (">=", TOpGtEq)
+  , ("/=", TOpNeq)
   , (":=", TOpColonEq)
   , ("<-", TOpLtSub)
   , ("$" , TOpDollar)

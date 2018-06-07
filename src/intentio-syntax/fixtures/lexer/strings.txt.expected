@@ -1,54 +1,53 @@
-Right 
-    [ Token 
-        { _ty = TString
-        , _text = ""Quick brown fox jumps over the lazy dog""
-        } 
-    , Token 
-        { _ty = TRawString
-        , _text = "r"Quick brown fox jumps over the lazy dog""
-        } 
-    , Token 
-        { _ty = TRegexString
-        , _text = "xr"Quick brown fox jumps over the lazy dog""
-        } 
-    , Token 
-        { _ty = TCharString
-        , _text = "c"a""
-        } 
-    , Token 
-        { _ty = TCharString
-        , _text = "c"\u{1f436}""
-        } 
-    , Token 
-        { _ty = TString
-        , _text = ""Quick brown fox
+[ Token 
+    { _ty = TString
+    , _text = ""Quick brown fox jumps over the lazy dog""
+    } 
+, Token 
+    { _ty = TRawString
+    , _text = "r"Quick brown fox jumps over the lazy dog""
+    } 
+, Token 
+    { _ty = TRegexString
+    , _text = "xr"Quick brown fox jumps over the lazy dog""
+    } 
+, Token 
+    { _ty = TCharString
+    , _text = "c"a""
+    } 
+, Token 
+    { _ty = TCharString
+    , _text = "c"\u{1f436}""
+    } 
+, Token 
+    { _ty = TString
+    , _text = ""Quick brown fox
        jumps over
        the lazy dog""
-        } 
-    , Token 
-        { _ty = TRawString
-        , _text = "r####"
+    } 
+, Token 
+    { _ty = TRawString
+    , _text = "r####"
       Quick \u{1f43a} jumps over the lazy \u{1f436}
       "####"
-        } 
-    , Token 
-        { _ty = TRawString
-        , _text = "tur####"
+    } 
+, Token 
+    { _ty = TRawString
+    , _text = "tur####"
       Quick \u{1f43a} jumps over the lazy \u{1f436}
       "####"
-        } 
-    , Token 
-        { _ty = TRegexString
-        , _text = "xr###"
+    } 
+, Token 
+    { _ty = TRegexString
+    , _text = "xr###"
       Quick \u{1f43a} jumps over the lazy \u{1f436}
       "###"
-        } 
-    , Token 
-        { _ty = TString
-        , _text = ""C:\\""
-        } 
-    , Token 
-        { _ty = TString
-        , _text = ""\"""
-        } 
-    ] 
+    } 
+, Token 
+    { _ty = TString
+    , _text = ""C:\\""
+    } 
+, Token 
+    { _ty = TString
+    , _text = ""\"""
+    } 
+] 

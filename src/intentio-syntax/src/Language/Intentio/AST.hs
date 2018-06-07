@@ -2,9 +2,9 @@ module Language.Intentio.AST where
 
 import           Intentio.Prelude
 
-import           Language.Intentio.Token        ( Token(..)
-                                                , TokenType(..)
-                                                )
+import           Data.Convertible               ( convError )
+
+import           Language.Intentio.Token
 
 --------------------------------------------------------------------------------
 -- AST data structures
@@ -59,6 +59,7 @@ data Expr
   | WhileExpr { _whileCondition :: Expr, _whileBody :: Block }
   | UnaryExpr UnaryOp Expr
   | ParenExpr Expr
+  | ReturnExpr (Maybe Expr)
   deriving (Eq, Show)
 
 newtype FunArgs = FunArgs [Expr]
@@ -82,7 +83,7 @@ data BinOp
   | BinMul
   | BinDiv
   | BinEq
-  | BinNEq
+  | BinNeq
   | BinLt
   | BinLtEq
   | BinGt
@@ -114,13 +115,34 @@ makeLenses ''ScopeId
 -- Token/TokenType -> AST tag conversions
 
 instance Convertible TokenType BinOp where
+  safeConvert TOpAdd  = Right BinAdd
+  safeConvert TOpSub  = Right BinSub
+  safeConvert TOpMul  = Right BinMul
+  safeConvert TOpDiv  = Right BinDiv
+  safeConvert TOpEq   = Right BinEq
+  safeConvert TOpNeq  = Right BinNeq
+  safeConvert TOpLt   = Right BinLt
+  safeConvert TOpLtEq = Right BinLtEq
+  safeConvert TOpGt   = Right BinGt
+  safeConvert TOpGtEq = Right BinGtEq
+  safeConvert x = convError "Not a binary operator" x
 
 instance Convertible Token BinOp where
   safeConvert Token{_ty} = safeConvert _ty
 
 instance Convertible TokenType UnaryOp where
+  safeConvert TOpAdd = Right UnaryAdd
+  safeConvert TOpSub = Right UnarySub
+  safeConvert x = convError "Not an unary operator" x
 
 instance Convertible Token UnaryOp where
   safeConvert Token{_ty} = safeConvert _ty
 
 instance Convertible Token Literal where
+  safeConvert Token{_ty=TInteger, _text}     = Right $ Integer _text
+  safeConvert Token{_ty=TFloat, _text}       = Right $ Float _text
+  safeConvert Token{_ty=TString, _text}      = Right $ String _text
+  safeConvert Token{_ty=TCharString, _text}  = Right $ CharString _text
+  safeConvert Token{_ty=TRawString, _text}   = Right $ RawString _text
+  safeConvert Token{_ty=TRegexString, _text} = Right $ RegexString _text
+  safeConvert x = convError "Not a literal" x

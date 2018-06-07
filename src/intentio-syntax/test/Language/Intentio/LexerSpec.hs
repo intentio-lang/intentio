@@ -9,5 +9,6 @@ import           Intentio.TestUtil.Fixture      ( runFileFixtures )
 import           Language.Intentio.Lexer        ( lex )
 
 spec :: Spec
-spec = describe "lexer" $ do
-  runFileFixtures "lexer" (lex "<test>")
+spec = parallel $ do
+  describe "lexer" $ do
+    runFileFixtures "lexer" (lex "<test>")

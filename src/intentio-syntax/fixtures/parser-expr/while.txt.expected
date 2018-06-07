@@ -1,0 +1,10 @@
+WhileExpr 
+    { _whileCondition = BlockExpr 
+        ( Block 
+            [ IdExpr ( Id ( ScopeId "a" ) )
+            , IdExpr ( Id ( ScopeId "b" ) )
+            , IdExpr ( Id ( ScopeId "c" ) )
+            ] 
+        )
+    , _whileBody = Block [ IdExpr ( Id ( ScopeId "x" ) ) ]
+    } 

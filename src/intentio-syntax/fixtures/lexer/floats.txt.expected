@@ -1,9 +1,38 @@
-Token {_ty = TFloat, _text = "1.0"}
-Token {_ty = TFloat, _text = "1.0e92"}
-Token {_ty = TFloat, _text = "10e_6"}
-Token {_ty = TFloat, _text = "1_________.0_______"}
-Token {_ty = TFloat, _text = "1_.0"}
-Token {_ty = TFloat, _text = "10_e5"}
-Token {_ty = TFloat, _text = "35e+5"}
-Token {_ty = TFloat, _text = "7e-5"}
-Token {_ty = TFloat, _text = "8E5"}
+Right 
+    [ Token 
+        { _ty = TFloat
+        , _text = "1.0"
+        } 
+    , Token 
+        { _ty = TFloat
+        , _text = "1.0e92"
+        } 
+    , Token 
+        { _ty = TFloat
+        , _text = "10e_6"
+        } 
+    , Token 
+        { _ty = TFloat
+        , _text = "1_________.0_______"
+        } 
+    , Token 
+        { _ty = TFloat
+        , _text = "1_.0"
+        } 
+    , Token 
+        { _ty = TFloat
+        , _text = "10_e5"
+        } 
+    , Token 
+        { _ty = TFloat
+        , _text = "35e+5"
+        } 
+    , Token 
+        { _ty = TFloat
+        , _text = "7e-5"
+        } 
+    , Token 
+        { _ty = TFloat
+        , _text = "8E5"
+        } 
+    ] 

@@ -1,25 +1,102 @@
-Token {_ty = TIdent, _text = "_ignored"}
-Token {_ty = TIdent, _text = "intentio"}
-Token {_ty = TIdent, _text = "inte_ntio'"}
-Token {_ty = TIdent, _text = "q\235llim"}
-Token {_ty = TIdent, _text = "\24847\21521"}
-Token {_ty = TIdent, _text = "\4315\4312\4310\4304\4316\4312"}
-Token {_ty = TIdent, _text = "\2311\2352\2366\2342\2366"}
-Token {_ty = TIdent, _text = "_\2311\2352\2366\2342\2366_"}
-Token {_ty = TIdent, _text = "\2311\2352\2366\2342\2366'"}
-Token {_ty = TIdent, _text = "funny_ident"}
-Token {_ty = TKwFun, _text = "fun"}
-Token {_ty = TIdent, _text = "ident"}
-Token {_ty = TIdent, _text = "identfun"}
-Token {_ty = TIdent, _text = "ident_fun"}
-Token {_ty = TIdent, _text = "ident"}
-Token {_ty = TKwFun, _text = "fun"}
-Token {_ty = TIdent, _text = "a"}
-Token {_ty = TOpAdd, _text = "+"}
-Token {_ty = TIdent, _text = "b"}
-Token {_ty = TIdent, _text = "a"}
-Token {_ty = TOpAdd, _text = "+"}
-Token {_ty = TIdent, _text = "b"}
-Token {_ty = TKwFun, _text = "fun"}
-Token {_ty = TOpAdd, _text = "+"}
-Token {_ty = TIdent, _text = "a"}
+Right 
+    [ Token 
+        { _ty = TIdent
+        , _text = "_ignored"
+        } 
+    , Token 
+        { _ty = TIdent
+        , _text = "intentio"
+        } 
+    , Token 
+        { _ty = TIdent
+        , _text = "inte_ntio'"
+        } 
+    , Token 
+        { _ty = TIdent
+        , _text = "qëllim"
+        } 
+    , Token 
+        { _ty = TIdent
+        , _text = "意向"
+        } 
+    , Token 
+        { _ty = TIdent
+        , _text = "მიზანი"
+        } 
+    , Token 
+        { _ty = TIdent
+        , _text = "इरादा"
+        } 
+    , Token 
+        { _ty = TIdent
+        , _text = "_इरादा_"
+        } 
+    , Token 
+        { _ty = TIdent
+        , _text = "इरादा'"
+        } 
+    , Token 
+        { _ty = TIdent
+        , _text = "funny_ident"
+        } 
+    , Token 
+        { _ty = TKwFun
+        , _text = "fun"
+        } 
+    , Token 
+        { _ty = TIdent
+        , _text = "ident"
+        } 
+    , Token 
+        { _ty = TIdent
+        , _text = "identfun"
+        } 
+    , Token 
+        { _ty = TIdent
+        , _text = "ident_fun"
+        } 
+    , Token 
+        { _ty = TIdent
+        , _text = "ident"
+        } 
+    , Token 
+        { _ty = TKwFun
+        , _text = "fun"
+        } 
+    , Token 
+        { _ty = TIdent
+        , _text = "a"
+        } 
+    , Token 
+        { _ty = TOpAdd
+        , _text = "+"
+        } 
+    , Token 
+        { _ty = TIdent
+        , _text = "b"
+        } 
+    , Token 
+        { _ty = TIdent
+        , _text = "a"
+        } 
+    , Token 
+        { _ty = TOpAdd
+        , _text = "+"
+        } 
+    , Token 
+        { _ty = TIdent
+        , _text = "b"
+        } 
+    , Token 
+        { _ty = TKwFun
+        , _text = "fun"
+        } 
+    , Token 
+        { _ty = TOpAdd
+        , _text = "+"
+        } 
+    , Token 
+        { _ty = TIdent
+        , _text = "a"
+        } 
+    ] 

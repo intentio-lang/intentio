@@ -2,8 +2,6 @@ module Language.Intentio.Token where
 
 import           Intentio.Prelude
 
-import           Language.Intentio.Debug        ( SyntaxDebugPrint(..) )
-
 --------------------------------------------------------------------------------
 -- Token data structures
 
@@ -82,13 +80,4 @@ data Token = Token {
   }
   deriving (Eq, Ord, Show)
 
---------------------------------------------------------------------------------
--- Lenses
-
 makeLenses ''Token
-
---------------------------------------------------------------------------------
--- SyntaxDebugPrint
-
-instance SyntaxDebugPrint Token where
-  syntaxDebugPrint = show

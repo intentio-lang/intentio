@@ -4,80 +4,91 @@ import           Intentio.Prelude
 
 import           Language.Intentio.Debug        ( SyntaxDebugPrint(..) )
 
+--------------------------------------------------------------------------------
+-- Token data structures
+
 data TokenType
-  = Ident
+  = TIdent
 
-  | KwAbstract
-  | KwAnd
-  | KwBreak
-  | KwCase
-  | KwConst
-  | KwContinue
-  | KwDo
-  | KwElse
-  | KwEnum
-  | KwExport
-  | KwFail
-  | KwFun
-  | KwIf
-  | KwImpl
-  | KwImport
-  | KwIn
-  | KwIs
-  | KwLet
-  | KwLoop
-  | KwModule
-  | KwNot
-  | KwOr
-  | KwReturn
-  | KwStruct
-  | KwType
-  | KwUnderscore
-  | KwWhere
-  | KwWhile
-  | KwYield
+  | TKwAbstract
+  | TKwAnd
+  | TKwBreak
+  | TKwCase
+  | TKwConst
+  | TKwContinue
+  | TKwDo
+  | TKwElse
+  | TKwEnum
+  | TKwExport
+  | TKwFail
+  | TKwFun
+  | TKwIf
+  | TKwImpl
+  | TKwImport
+  | TKwIn
+  | TKwIs
+  | TKwLet
+  | TKwLoop
+  | TKwModule
+  | TKwNot
+  | TKwOr
+  | TKwReturn
+  | TKwStruct
+  | TKwType
+  | TKwUnderscore
+  | TKwWhere
+  | TKwWhile
+  | TKwYield
 
-  | OpAdd
-  | OpSub
-  | OpMul
-  | OpDiv
+  | TOpAdd
+  | TOpSub
+  | TOpMul
+  | TOpDiv
 
-  | OpLParen
-  | OpRParen
-  | OpLBracket
-  | OpRBracket
-  | OpLBrace
-  | OpRBrace
-  | OpComa
-  | OpColon
-  | OpSemicolon
+  | TOpLParen
+  | TOpRParen
+  | TOpLBracket
+  | TOpRBracket
+  | TOpLBrace
+  | TOpRBrace
+  | TOpComma
+  | TOpColon
+  | TOpSemicolon
 
-  | OpEqEq
-  | OpLt
-  | OpLtEq
-  | OpGt
-  | OpGtEq
+  | TOpEqEq
+  | TOpLt
+  | TOpLtEq
+  | TOpGt
+  | TOpGtEq
 
-  | OpColonEq
-  | OpLtSub
-  | OpDollar
-  | OpPercent
+  | TOpColonEq
+  | TOpLtSub
+  | TOpDollar
+  | TOpPercent
 
-  | Integer
-  | Float
+  | TInteger
+  | TFloat
 
-  | String
-  | CharString
-  | RawString
-  | RegexString
+  | TString
+  | TCharString
+  | TRawString
+  | TRegexString
 
   deriving (Eq, Ord, Show)
 
 data Token = Token {
-    ty :: TokenType,
-    text :: Text
+    _ty :: TokenType,
+    _text :: Text
   }
   deriving (Eq, Ord, Show)
+
+--------------------------------------------------------------------------------
+-- Lenses
+
+makeLenses ''Token
+
+--------------------------------------------------------------------------------
+-- SyntaxDebugPrint
 
 instance SyntaxDebugPrint Token where
   syntaxDebugPrint = show

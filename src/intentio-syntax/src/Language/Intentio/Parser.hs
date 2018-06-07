@@ -17,7 +17,7 @@ import           Intentio.Prelude        hiding ( many
 
 import           Text.Megaparsec                ( (<?>)
                                                 , between
-                                                , dbg
+                                                , eof
                                                 , many
                                                 , optional
                                                 , sepBy
@@ -62,6 +62,7 @@ parseExpr = M.parse expr
 mod :: Parser Module
 mod = do
   _moduleItems <- many itemDecl
+  _ <- eof
   return Module {..}
 
 itemDecl :: Parser ItemDecl

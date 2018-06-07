@@ -1,3 +1,7 @@
 fun foo(a, b) {
     a;
 }
+
+fun id(x,) { x }
+
+fun constant() { 92; }

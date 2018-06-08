@@ -25,6 +25,13 @@ import           Text.Megaparsec                ( (<?>)
                                                 , try
                                                 )
 import qualified Text.Megaparsec               as M
+import           Text.Megaparsec.Expr           ( Operator
+                                                  ( InfixL
+                                                  , InfixR
+                                                  , Prefix
+                                                  )
+                                                , makeExprParser
+                                                )
 
 import           Language.Intentio.AST
 import           Language.Intentio.Lexer        ( Parser
@@ -62,26 +69,14 @@ parseExpr = M.parse expr
 mod :: Parser Module
 mod = do
   _moduleItems <- many itemDecl
-  _ <- eof
+  _            <- eof
   return Module {..}
 
 itemDecl :: Parser ItemDecl
 itemDecl = funDecl
 
 expr :: Parser Expr
-expr =
-  try letdeclexpr
-    <|> try whileexpr
-    <|> try ifelseexpr
-    <|> try ifexpr
-    <|> try returnexpr
-    <|> try blockexpr
-    -- <|> try binexpr
-    -- <|> try unaryexpr
-    <|> try parenexpr
-    -- <|> try funcallexpr
-    <|> try litexpr
-    <|> try idexpr
+expr = term
 
 --------------------------------------------------------------------------------
 -- Identifiers
@@ -93,7 +88,14 @@ scopeId :: Parser ScopeId
 scopeId = ScopeId . (^. text) <$> ident
 
 anyId :: Parser AnyId
-anyId = try (Qid <$> modId <*> scopeId) <|> try (Id <$> scopeId)
+anyId = try qid <|> try id
+ where
+  id  = Id <$> scopeId
+  qid = do
+    m <- modId
+    _ <- tok TOpColon
+    s <- scopeId
+    return $ Qid m s
 
 --------------------------------------------------------------------------------
 -- Item declarations
@@ -106,13 +108,26 @@ funDecl = do
   _funDeclBody   <- body
   return FunDecl {..}
  where
-  params    = FunParams <$> parenthesized paramList
+  params    = FunParams <$> parens paramList
   paramList = sepEndBy param comma
   param     = FunParam <$> scopeId
   body      = FunBody <$> block
 
 --------------------------------------------------------------------------------
 -- Expressions
+
+term :: Parser Expr
+term =
+  try letdeclexpr
+    <|> try whileexpr
+    <|> try ifelseexpr
+    <|> try ifexpr
+    <|> try returnexpr
+    <|> try blockexpr
+    <|> try funcallexpr
+    <|> try parenexpr
+    <|> try litexpr
+    <|> try idexpr
 
 letdeclexpr :: Parser Expr
 letdeclexpr = do
@@ -154,52 +169,21 @@ returnexpr = do
 blockexpr :: Parser Expr
 blockexpr = BlockExpr <$> block
 
-unaryexpr :: Parser Expr
-unaryexpr = do
-  o <- convert <$> unaryop
-  e <- expr
-  return $ UnaryExpr o e
- where
-  unaryop :: Parser Token
-  unaryop = try (tok TOpAdd) <|> try (tok TOpSub)
-
 parenexpr :: Parser Expr
-parenexpr = ParenExpr <$> parenthesized expr
+parenexpr = ParenExpr <$> parens expr
 
 funcallexpr :: Parser Expr
 funcallexpr = do
-  c <- expr
-  p <- parenthesized argList
+  c <- try idexpr <|> try parenexpr
+  p <- parens argList
   return $ FunCallExpr c p
-  where argList = FunArgs <$> many (expr <* semi)
+  where argList = FunArgs <$> sepEndBy expr comma
 
 idexpr :: Parser Expr
 idexpr = IdExpr <$> anyId
 
 litexpr :: Parser Expr
 litexpr = LitExpr . convert <$> literal <?> "literal"
-
---------------------------------------------------------------------------------
--- Binary expressions
-
-binexpr :: Parser Expr
-binexpr = do
-  o <- convert <$> binop
-  l <- expr
-  r <- expr
-  return $ BinExpr o l r
- where
-  binop :: Parser Token
-  binop =
-    try (tok TOpAdd)
-      <|> try (tok TOpSub)
-      <|> try (tok TOpMul)
-      <|> try (tok TOpDiv)
-      <|> try (tok TOpEqEq)
-      <|> try (tok TOpLt)
-      <|> try (tok TOpLtEq)
-      <|> try (tok TOpGt)
-      <|> try (tok TOpGtEq)
 
 --------------------------------------------------------------------------------
 -- Utilities
@@ -210,8 +194,8 @@ block = Block <$> braced exprList where exprList = sepEndBy expr semi
 braced :: Parser a -> Parser a
 braced = between (tok TOpLBrace) (tok TOpRBrace)
 
-parenthesized :: Parser a -> Parser a
-parenthesized = between (tok TOpLParen) (tok TOpRParen)
+parens :: Parser a -> Parser a
+parens = between (tok TOpLParen) (tok TOpRParen)
 
 semi :: Parser Token
 semi = tok TOpSemicolon

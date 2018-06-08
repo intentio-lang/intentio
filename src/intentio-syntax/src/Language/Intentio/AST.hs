@@ -15,9 +15,9 @@ newtype Assembly = Assembly {
   deriving (Eq, Show)
 
 newtype Module = Module {
-      _moduleItems :: [ItemDecl]
-   }
-   deriving (Eq, Show)
+    _moduleItems :: [ItemDecl]
+  }
+  deriving (Eq, Show)
 
 data ItemDecl
   = FunDecl {

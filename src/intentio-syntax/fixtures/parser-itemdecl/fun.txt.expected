@@ -1,0 +1,19 @@
+[ FunDecl 
+    { _funDeclName = ScopeId "foo"
+    , _funDeclParams = FunParams 
+        [ FunParam ( ScopeId "a" )
+        , FunParam ( ScopeId "b" )
+        ] 
+    , _funDeclBody = FunBody ( Block [ IdExpr ( Id ( ScopeId "a" ) ) ] )
+    } 
+, FunDecl 
+    { _funDeclName = ScopeId "id"
+    , _funDeclParams = FunParams [ FunParam ( ScopeId "x" ) ]
+    , _funDeclBody = FunBody ( Block [ IdExpr ( Id ( ScopeId "x" ) ) ] )
+    } 
+, FunDecl 
+    { _funDeclName = ScopeId "constant"
+    , _funDeclParams = FunParams []
+    , _funDeclBody = FunBody ( Block [ LitExpr ( Integer "92" ) ] )
+    } 
+] 

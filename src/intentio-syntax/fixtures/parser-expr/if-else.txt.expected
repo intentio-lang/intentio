@@ -1,0 +1,10 @@
+IfExpr 
+    { _ifCondition = IdExpr ( Id ( ScopeId "a" ) )
+    , _ifBody = Block 
+        [ IfElseExpr 
+            { _ifCondition = IdExpr ( Id ( ScopeId "b" ) )
+            , _ifBody = Block [ IdExpr ( Id ( ScopeId "c" ) ) ]
+            , _elseBody = Block [ IdExpr ( Id ( ScopeId "d" ) ) ]
+            } 
+        ]
+    } 

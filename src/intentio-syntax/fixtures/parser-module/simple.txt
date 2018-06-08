@@ -1,0 +1,7 @@
+fun foo(a, b) {
+    a;
+}
+
+fun bar() {
+    let x = 4;
+}

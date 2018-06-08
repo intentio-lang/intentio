@@ -1,0 +1,20 @@
+BlockExpr 
+    ( Block 
+        [ FunCallExpr ( IdExpr ( Id ( ScopeId "foo" ) ) ) 
+            ( FunArgs 
+                [ LitExpr ( Integer "1" )
+                , LitExpr ( Integer "2" )
+                , LitExpr ( Integer "3" )
+                ] 
+            )
+        , FunCallExpr ( IdExpr ( Id ( ScopeId "foo" ) ) ) ( FunArgs [] )
+        , FunCallExpr ( IdExpr ( Id ( ScopeId "foo" ) ) ) 
+            ( FunArgs 
+                [ IdExpr ( Id ( ScopeId "a" ) )
+                , IdExpr ( Id ( ScopeId "b" ) )
+                ] 
+            )
+        , FunCallExpr ( IdExpr ( Qid ( ModId "mod" ) ( ScopeId "fn" ) ) ) ( FunArgs [ FunCallExpr ( IdExpr ( Id ( ScopeId "foo" ) ) ) ( FunArgs [] ) ] )
+        , FunCallExpr ( ParenExpr ( IdExpr ( Id ( ScopeId "boo" ) ) ) ) ( FunArgs [] )
+        ] 
+    )

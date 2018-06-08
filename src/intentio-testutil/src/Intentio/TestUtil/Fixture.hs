@@ -1,6 +1,7 @@
+{-# LANGUAGE UndecidableInstances #-}
+
 module Intentio.TestUtil.Fixture
   ( Fixture(..)
-  , FixtureMaterializable(..)
   , runFixture
   , runFixtures
   , runFileFixtures
@@ -9,10 +10,20 @@ where
 
 import           Intentio.Prelude
 
+import qualified Data.Text.Lazy                as TL
+
 import           System.Directory
 import           System.FilePath
 
 import           Test.Hspec
+
+import           Text.Megaparsec.Error          ( ParseError
+                                                , ShowErrorComponent
+                                                , ShowToken
+                                                , parseErrorPretty
+                                                )
+
+import           Text.Pretty.Simple             ( pShowNoColor )
 
 --------------------------------------------------------------------------------
 -- Fixture type class.
@@ -26,18 +37,26 @@ class Fixture f where
 class FixtureMaterializable a where
   fixtureMaterialize :: a -> Text
 
+instance (ShowErrorComponent e, Ord t, ShowToken t, Show r) =>
+  FixtureMaterializable (Either (ParseError t e) r)
+ where
+  fixtureMaterialize (Left l) = "[ERROR]\n" <> toS (parseErrorPretty l)
+  fixtureMaterialize (Right r) = TL.toStrict . pShowNoColor $ r
+
 --------------------------------------------------------------------------------
 -- Fixture-based test framework.
 
 -- | Build specification for given fixture.
 -- The specification is names as the fixture.
 runFixture
-  :: (Fixture f, FixtureMaterializable m)
-  => (Text -> m)
-  -> f
-  -> SpecWith ()
-runFixture s f =
-  it (fixtureName f) $ do
+  :: (Fixture f, FixtureMaterializable m) => (Text -> m) -> f -> SpecWith ()
+runFixture s f = it fname
+  $ if isIgnored then pendingWith "fixture ignored" else go
+ where
+  fname     = fixtureName f
+  isIgnored = "ignore" `isPrefixOf` fname
+
+  go        = do
     input <- getFixtureInput f
     let actual = fixtureMaterialize . s $ input
     getFixtureExpected f >>= \case
@@ -49,10 +68,7 @@ runFixture s f =
 
 -- | Build multiple specifications for given list of fixtures.
 runFixtures
-  :: (Fixture f, FixtureMaterializable m)
-  => (Text -> m)
-  -> [f]
-  -> SpecWith ()
+  :: (Fixture f, FixtureMaterializable m) => (Text -> m) -> [f] -> SpecWith ()
 runFixtures s = mapM_ (runFixture s)
 
 --------------------------------------------------------------------------------

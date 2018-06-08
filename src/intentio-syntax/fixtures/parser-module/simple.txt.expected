@@ -1,0 +1,24 @@
+Module 
+    { _moduleItems = 
+        [ FunDecl 
+            { _funDeclName = ScopeId "foo"
+            , _funDeclParams = FunParams 
+                [ FunParam ( ScopeId "a" )
+                , FunParam ( ScopeId "b" )
+                ] 
+            , _funDeclBody = FunBody ( Block [ IdExpr ( Id ( ScopeId "a" ) ) ] )
+            } 
+        , FunDecl 
+            { _funDeclName = ScopeId "bar"
+            , _funDeclParams = FunParams []
+            , _funDeclBody = FunBody 
+                ( Block 
+                    [ LetDeclExpr 
+                        { _letDeclName = ScopeId "x"
+                        , _letDeclVal = LitExpr ( Integer "4" )
+                        } 
+                    ]
+                )
+            } 
+        ] 
+    }

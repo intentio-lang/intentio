@@ -1,5 +1,6 @@
 module Language.Intentio.Lexer
-  ( Lexer
+  ( Parser
+  , ParserError
   , lex
   , lexTest
   , lexTest'
@@ -8,6 +9,7 @@ module Language.Intentio.Lexer
   , tok
   , anyKeyword
   , anyOperator
+  , ident
   , literal
   , integer
   , float
@@ -63,21 +65,20 @@ import qualified Text.Megaparsec.Char.Lexer    as L
 import           Language.Intentio.Token
 
 --------------------------------------------------------------------------------
--- Data types
+-- Parser monad
 
--- | The lexer monad.
-type Lexer = Parsec Void Text
+type Parser = Parsec Void Text
 
-type LexerError = ParseError (MP.Token Text) Void
+type ParserError = ParseError (MP.Token Text) Void
 
 --------------------------------------------------------------------------------
 -- Lexer-only parsing entry points
 
 -- | Run lexer over input text. Returns either lexer error or list of tokens.
 lex
-  :: String -- ^ Name of source file.
+  :: String -- Parser Name of source file.
   -> Text   -- ^ Input for lexer.
-  -> Either LexerError [Token]
+  -> Either ParserError [Token]
 lex = parse program
 
 -- | Run lexer over input text and print the results to standard output.
@@ -94,86 +95,90 @@ lexTest'
 lexTest' = parseTest' program
 
 --------------------------------------------------------------------------------
--- Lexer productions
+-- Parser productions
 
 -- | Parse whole program as a list of tokens.
-program :: Lexer [Token]
+program :: Parser [Token]
 program = sc *> many anyTok <* eof
 
 -- | Parse any valid token.
-anyTok :: Lexer Token
+anyTok :: Parser Token
 anyTok = literal <|> ident <|> anyKeyword <|> anyOperator
 
 -- | Parse token of given type.
-tok :: TokenType -> Lexer Token
-tok Ident        = ident
-tok KwAbstract   = tokKw KwAbstract
-tok KwAnd        = tokKw KwAnd
-tok KwBreak      = tokKw KwBreak
-tok KwCase       = tokKw KwCase
-tok KwConst      = tokKw KwConst
-tok KwContinue   = tokKw KwContinue
-tok KwDo         = tokKw KwDo
-tok KwElse       = tokKw KwElse
-tok KwEnum       = tokKw KwEnum
-tok KwExport     = tokKw KwExport
-tok KwFail       = tokKw KwFail
-tok KwFun        = tokKw KwFun
-tok KwIf         = tokKw KwIf
-tok KwImpl       = tokKw KwImpl
-tok KwImport     = tokKw KwImport
-tok KwIn         = tokKw KwIn
-tok KwIs         = tokKw KwIs
-tok KwLoop       = tokKw KwLoop
-tok KwModule     = tokKw KwModule
-tok KwNot        = tokKw KwNot
-tok KwOr         = tokKw KwOr
-tok KwReturn     = tokKw KwReturn
-tok KwStruct     = tokKw KwStruct
-tok KwType       = tokKw KwType
-tok KwUnderscore = tokKw KwUnderscore
-tok KwWhere      = tokKw KwWhere
-tok KwWhile      = tokKw KwWhile
-tok KwYield      = tokKw KwYield
-tok OpAdd        = tokOp OpAdd
-tok OpSub        = tokOp OpSub
-tok OpMul        = tokOp OpMul
-tok OpDiv        = tokOp OpDiv
-tok OpLParen     = tokOp OpLParen
-tok OpRParen     = tokOp OpRParen
-tok OpLBracket   = tokOp OpLBracket
-tok OpRBracket   = tokOp OpRBracket
-tok OpLBrace     = tokOp OpLBrace
-tok OpRBrace     = tokOp OpRBrace
-tok OpColon      = tokOp OpColon
-tok OpSemicolon  = tokOp OpSemicolon
-tok OpEqEq       = tokOp OpEqEq
-tok OpLt         = tokOp OpLt
-tok OpLtEq       = tokOp OpLtEq
-tok OpGt         = tokOp OpGt
-tok OpGtEq       = tokOp OpGtEq
-tok OpColonEq    = tokOp OpColonEq
-tok OpLtSub      = tokOp OpLtSub
-tok OpDollar     = tokOp OpDollar
-tok OpPercent    = tokOp OpPercent
-tok Integer      = integer
-tok Float        = float
-tok String       = string'
-tok CharString   = charstring
-tok RawString    = rawstring
-tok RegexString  = regexstring
+tok :: TokenType -> Parser Token
+tok TIdent        = ident
+tok TKwAbstract   = tokKw TKwAbstract
+tok TKwAnd        = tokKw TKwAnd
+tok TKwBreak      = tokKw TKwBreak
+tok TKwCase       = tokKw TKwCase
+tok TKwConst      = tokKw TKwConst
+tok TKwContinue   = tokKw TKwContinue
+tok TKwDo         = tokKw TKwDo
+tok TKwElse       = tokKw TKwElse
+tok TKwEnum       = tokKw TKwEnum
+tok TKwExport     = tokKw TKwExport
+tok TKwFail       = tokKw TKwFail
+tok TKwFun        = tokKw TKwFun
+tok TKwIf         = tokKw TKwIf
+tok TKwImpl       = tokKw TKwImpl
+tok TKwImport     = tokKw TKwImport
+tok TKwIn         = tokKw TKwIn
+tok TKwIs         = tokKw TKwIs
+tok TKwLoop       = tokKw TKwLoop
+tok TKwLet        = tokKw TKwLet
+tok TKwModule     = tokKw TKwModule
+tok TKwNot        = tokKw TKwNot
+tok TKwOr         = tokKw TKwOr
+tok TKwReturn     = tokKw TKwReturn
+tok TKwStruct     = tokKw TKwStruct
+tok TKwType       = tokKw TKwType
+tok TKwUnderscore = tokKw TKwUnderscore
+tok TKwWhere      = tokKw TKwWhere
+tok TKwWhile      = tokKw TKwWhile
+tok TKwYield      = tokKw TKwYield
+tok TOpAdd        = tokOp TOpAdd
+tok TOpSub        = tokOp TOpSub
+tok TOpMul        = tokOp TOpMul
+tok TOpDiv        = tokOp TOpDiv
+tok TOpLParen     = tokOp TOpLParen
+tok TOpRParen     = tokOp TOpRParen
+tok TOpLBracket   = tokOp TOpLBracket
+tok TOpRBracket   = tokOp TOpRBracket
+tok TOpLBrace     = tokOp TOpLBrace
+tok TOpRBrace     = tokOp TOpRBrace
+tok TOpComma      = tokOp TOpComma
+tok TOpColon      = tokOp TOpColon
+tok TOpSemicolon  = tokOp TOpSemicolon
+tok TOpEq         = tokOp TOpEq
+tok TOpEqEq       = tokOp TOpEqEq
+tok TOpLt         = tokOp TOpLt
+tok TOpLtEq       = tokOp TOpLtEq
+tok TOpGt         = tokOp TOpGt
+tok TOpGtEq       = tokOp TOpGtEq
+tok TOpNeq        = tokOp TOpNeq
+tok TOpColonEq    = tokOp TOpColonEq
+tok TOpLtSub      = tokOp TOpLtSub
+tok TOpDollar     = tokOp TOpDollar
+tok TOpPercent    = tokOp TOpPercent
+tok TInteger      = integer
+tok TFloat        = float
+tok TString       = string'
+tok TCharString   = charstring
+tok TRawString    = rawstring
+tok TRegexString  = regexstring
 
 --------------------------------------------------------------------------------
 -- Token productions
 
 -- | Parse an identifier.
-ident :: Lexer Token
-ident = (try . lexeme $ (p >>= nonReserved)) >>= mkt Ident <?> "identifier"
+ident :: Parser Token
+ident = (try . lexeme $ (p >>= nonReserved)) >>= mkt TIdent <?> "identifier"
  where
-  p :: Lexer Text
+  p :: Parser Text
   p = identStart >:> many identContinue
 
-  nonReserved :: Text -> Lexer Text
+  nonReserved :: Text -> Parser Text
   nonReserved w | isKeyword w = fail $ "Illegal identifier: " ++ toS w
                 | otherwise   = return w
 
@@ -181,20 +186,20 @@ ident = (try . lexeme $ (p >>= nonReserved)) >>= mkt Ident <?> "identifier"
   isKeyword = (`BM.member` keywords)
 
 -- | Parse any valid keyword.
-anyKeyword :: Lexer Token
+anyKeyword :: Parser Token
 anyKeyword = anyReserved keywords <?> "keyword"
 
 -- | Parse any valid operator.
-anyOperator :: Lexer Token
+anyOperator :: Parser Token
 anyOperator = anyReserved operators <?> "operator"
 
 -- | Parse any valid literal.
-literal :: Lexer Token
+literal :: Parser Token
 literal = try float <|> try integer <|> try anyString
 
 -- | Parse any valid integer literal.
-integer :: Lexer Token
-integer = lexeme p >>= mkt Integer <?> "integer literal"
+integer :: Parser Token
+integer = lexeme p >>= mkt TInteger <?> "integer literal"
  where
   p           = try binary <|> try octal <|> try hexadecimal <|> try decimalNum
 
@@ -203,31 +208,31 @@ integer = lexeme p >>= mkt Integer <?> "integer literal"
   hexadecimal = char '0' >:> oneOf ['x', 'X'] >:> hexadecimalNum
 
 -- | Parse any valid floating-point literal.
-float :: Lexer Token
-float = lexeme p >>= mkt Float <?> "floating-point literal"
+float :: Parser Token
+float = lexeme p >>= mkt TFloat <?> "floating-point literal"
  where
   p = try (decimalNum <~> string "." <~> decimalNum <~> option "" exponent)
     <|> try (decimalNum <~> exponent)
 
-decimalNum :: Lexer Text
+decimalNum :: Parser Text
 decimalNum = toS <$> p <?> "decimal digits"
   where p = digitChar >:> many (digitChar <|> char '_')
 
-binaryNum :: Lexer Text
+binaryNum :: Parser Text
 binaryNum = toS <$> p <?> "binary digits"
  where
   p            = binDigitChar >:> many (binDigitChar <|> char '_')
   binDigitChar = oneOf ['0', '1'] <?> "binary digit"
 
-octalNum :: Lexer Text
+octalNum :: Parser Text
 octalNum = toS <$> p <?> "octal digits"
   where p = octDigitChar >:> many (octDigitChar <|> char '_')
 
-hexadecimalNum :: Lexer Text
+hexadecimalNum :: Parser Text
 hexadecimalNum = toS <$> p <?> "hexadecimal digits"
   where p = hexDigitChar >:> many (hexDigitChar <|> char '_')
 
-exponent :: Lexer Text
+exponent :: Parser Text
 exponent = do
   e           <- T.singleton <$> oneOf ['e', 'E']
   sign        <- option "" $ T.singleton <$> oneOf ['+', '-']
@@ -236,68 +241,68 @@ exponent = do
   return $ e <> sign <> underscores <> val
 
 -- | Parse any valid string literal.
-anyString :: Lexer Token
+anyString :: Parser Token
 anyString =
   try string' <|> try charstring <|> try regexstring <|> try rawstring
 
 -- | Parse valid regular string literal.
-string' :: Lexer Token
-string' = lexeme (stringprefix <~> istring') >>= mkt String
+string' :: Parser Token
+string' = lexeme (stringprefix <~> istring') >>= mkt TString
 
 -- | Parse valid character literal.
-charstring :: Lexer Token
-charstring = lexeme (stringprefix <~> icharstring) >>= mkt CharString
+charstring :: Parser Token
+charstring = lexeme (stringprefix <~> icharstring) >>= mkt TCharString
 
 -- | Parse valid regex literal.
-regexstring :: Lexer Token
-regexstring = lexeme (stringprefix <~> iregexstring) >>= mkt RegexString
+regexstring :: Parser Token
+regexstring = lexeme (stringprefix <~> iregexstring) >>= mkt TRegexString
 
 -- | Parse valid raw string literal.
-rawstring :: Lexer Token
-rawstring = lexeme (stringprefix <~> irawstring) >>= mkt RawString
+rawstring :: Parser Token
+rawstring = lexeme (stringprefix <~> irawstring) >>= mkt TRawString
 
-istring' :: Lexer Text
+istring' :: Parser Text
 istring' =
   string "\""
     <~> (T.concat <$> many strchr)
     <~> string "\""
     <?> "regular string"
 
-icharstring :: Lexer Text
+icharstring :: Parser Text
 icharstring = string "c\"" <~> strchr <~> string "\"" <?> "char string"
 
-iregexstring :: Lexer Text
+iregexstring :: Parser Text
 iregexstring =
   string "x" <~> (try istring' <|> try irawstring) <?> "regex string"
 
-irawstring :: Lexer Text
+irawstring :: Parser Text
 irawstring = char 'r' >:> rawstring' 0 <?> "raw string"
  where
-  rawstring' :: Int -> Lexer Text
+  rawstring' :: Int -> Parser Text
   rawstring' n =
     (string "\"" <~> rawstring'' n <~> string "\"")
       <|> (string "#" <~> rawstring' (n + 1) <~> string "#")
 
-  rawstring'' :: Int -> Lexer Text
+  rawstring'' :: Int -> Parser Text
   rawstring'' n = toS <$> many rwsany
    where
     rwsany = try (notChar '"') <|> try (char '"' <* notFollowedBy hashes)
     hashes = count n $ char '#'
 
-stringprefix :: Lexer Text
+stringprefix :: Parser Text
 stringprefix = option "" stringmod
 
-stringmod :: Lexer Text
+stringmod :: Parser Text
 stringmod = toS <$> some (satisfy isStringModChar) <?> "string modifier"
   where isStringModChar c = c /= 'c' && c /= 'r' && c /= 'x' && isLower c
 
-strchr :: Lexer Text
+strchr :: Parser Text
 strchr =
   try escseq
     <|> (T.singleton <$> satisfy (\c -> c /= '"' && c /= '\\'))
     <?> "string character or escape sequence"
 
-escseq :: Lexer Text
+escseq :: Parser Text
 escseq = try charesc <|> try asciiesc <|> try unicodeesc
  where
   charesc = do
@@ -316,92 +321,96 @@ escseq = try charesc <|> try asciiesc <|> try unicodeesc
 --------------------------------------------------------------------------------
 -- Utilities
 
-mkt :: TokenType -> Text -> Lexer Token
-mkt t s = return $ Token {ty = t, text = s}
+mkt :: TokenType -> Text -> Parser Token
+mkt _ty _text = return Token {..}
 
-sc :: Lexer ()
+sc :: Parser ()
 sc = L.space space1 lineComment empty
   where lineComment = L.skipLineComment "#"
 
-lexeme :: Lexer a -> Lexer a
+lexeme :: Parser a -> Parser a
 lexeme = L.lexeme sc
 
-symbol :: Text -> Lexer Text
+symbol :: Text -> Parser Text
 symbol = L.symbol sc
 
-identStart :: Lexer Char
+identStart :: Parser Char
 identStart = letterChar <|> char '_'
 
-identContinue :: Lexer Char
+identContinue :: Parser Char
 identContinue = alphaNumChar <|> char '_' <|> char '\''
 
-anyReserved :: BM.Bimap Text TokenType -> Lexer Token
+anyReserved :: BM.Bimap Text TokenType -> Parser Token
 anyReserved = try . BM.fold (\s t p -> (symbol s >>= mkt t) <|> p) empty
 
-tokKw :: TokenType -> Lexer Token
+tokKw :: TokenType -> Parser Token
 tokKw = tokReserved keywords
 
-tokOp :: TokenType -> Lexer Token
+tokOp :: TokenType -> Parser Token
 tokOp = tokReserved operators
 
-tokReserved :: BM.Bimap Text TokenType -> TokenType -> Lexer Token
+tokReserved :: BM.Bimap Text TokenType -> TokenType -> Parser Token
 tokReserved m t = symbol s >>= mkt t where s = m BM.!> t
 
 keywords :: BM.Bimap Text TokenType
 keywords = BM.fromList
-  [ ("abstract", KwAbstract)
-  , ("and"     , KwAnd)
-  , ("break"   , KwBreak)
-  , ("case"    , KwCase)
-  , ("const"   , KwConst)
-  , ("continue", KwContinue)
-  , ("do"      , KwDo)
-  , ("else"    , KwElse)
-  , ("enum"    , KwEnum)
-  , ("export"  , KwExport)
-  , ("fail"    , KwFail)
-  , ("fun"     , KwFun)
-  , ("if"      , KwIf)
-  , ("impl"    , KwImpl)
-  , ("import"  , KwImport)
-  , ("in"      , KwIn)
-  , ("is"      , KwIs)
-  , ("loop"    , KwLoop)
-  , ("module"  , KwModule)
-  , ("not"     , KwNot)
-  , ("or"      , KwOr)
-  , ("return"  , KwReturn)
-  , ("struct"  , KwStruct)
-  , ("type"    , KwType)
-  , ("where"   , KwWhere)
-  , ("while"   , KwWhile)
-  , ("yield"   , KwYield)
-  , ("_"       , KwUnderscore)
+  [ ("abstract", TKwAbstract)
+  , ("and"     , TKwAnd)
+  , ("break"   , TKwBreak)
+  , ("case"    , TKwCase)
+  , ("const"   , TKwConst)
+  , ("continue", TKwContinue)
+  , ("do"      , TKwDo)
+  , ("else"    , TKwElse)
+  , ("enum"    , TKwEnum)
+  , ("export"  , TKwExport)
+  , ("fail"    , TKwFail)
+  , ("fun"     , TKwFun)
+  , ("if"      , TKwIf)
+  , ("impl"    , TKwImpl)
+  , ("import"  , TKwImport)
+  , ("in"      , TKwIn)
+  , ("is"      , TKwIs)
+  , ("let"     , TKwLet)
+  , ("loop"    , TKwLoop)
+  , ("module"  , TKwModule)
+  , ("not"     , TKwNot)
+  , ("or"      , TKwOr)
+  , ("return"  , TKwReturn)
+  , ("struct"  , TKwStruct)
+  , ("type"    , TKwType)
+  , ("where"   , TKwWhere)
+  , ("while"   , TKwWhile)
+  , ("yield"   , TKwYield)
+  , ("_"       , TKwUnderscore)
   ]
 
 operators :: BM.Bimap Text TokenType
 operators = BM.fromList
-  [ ("+" , OpAdd)
-  , ("-" , OpSub)
-  , ("*" , OpMul)
-  , ("/" , OpDiv)
-  , ("(" , OpLParen)
-  , (")" , OpRParen)
-  , ("[" , OpLBracket)
-  , ("]" , OpRBracket)
-  , ("{" , OpLBrace)
-  , ("}" , OpRBrace)
-  , (":" , OpColon)
-  , (";" , OpSemicolon)
-  , ("==", OpEqEq)
-  , ("<" , OpLt)
-  , ("<=", OpLtEq)
-  , (">" , OpGt)
-  , (">=", OpGtEq)
-  , (":=", OpColonEq)
-  , ("<-", OpLtSub)
-  , ("$" , OpDollar)
-  , ("%" , OpPercent)
+  [ ("+" , TOpAdd)
+  , ("-" , TOpSub)
+  , ("*" , TOpMul)
+  , ("/" , TOpDiv)
+  , ("(" , TOpLParen)
+  , (")" , TOpRParen)
+  , ("[" , TOpLBracket)
+  , ("]" , TOpRBracket)
+  , ("{" , TOpLBrace)
+  , ("}" , TOpRBrace)
+  , ("," , TOpComma)
+  , (":" , TOpColon)
+  , (";" , TOpSemicolon)
+  , ("=" , TOpEq)
+  , ("==", TOpEqEq)
+  , ("<" , TOpLt)
+  , ("<=", TOpLtEq)
+  , (">" , TOpGt)
+  , (">=", TOpGtEq)
+  , ("/=", TOpNeq)
+  , (":=", TOpColonEq)
+  , ("<-", TOpLtSub)
+  , ("$" , TOpDollar)
+  , ("%" , TOpPercent)
   ]
 
 infixl 6 <:<

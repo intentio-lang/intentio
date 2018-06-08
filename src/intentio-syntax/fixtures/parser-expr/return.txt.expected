@@ -1,0 +1,6 @@
+BlockExpr 
+    ( Block 
+        [ ReturnExpr Nothing
+        , ReturnExpr ( Just ( IdExpr ( Id ( ScopeId "a" ) ) ) )
+        ] 
+    )

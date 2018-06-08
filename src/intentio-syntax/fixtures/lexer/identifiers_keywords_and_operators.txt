@@ -17,3 +17,6 @@ ident fun
 a+b
 a + b
 fun + a
+
+a==a
+# FIXME: a/=a

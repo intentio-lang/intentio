@@ -98,4 +98,20 @@
     { _ty = TIdent
     , _text = "a"
     } 
+, Token 
+    { _ty = TIdent
+    , _text = "a"
+    } 
+, Token 
+    { _ty = TOpEq
+    , _text = "="
+    } 
+, Token 
+    { _ty = TOpEq
+    , _text = "="
+    } 
+, Token 
+    { _ty = TIdent
+    , _text = "a"
+    } 
 ] 

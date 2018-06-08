@@ -1,0 +1,12 @@
+BlockExpr 
+    ( Block 
+        [ BinExpr BinSub ( BinExpr BinAdd ( LitExpr ( Integer "3" ) ) ( BinExpr BinMul ( LitExpr ( Integer "4" ) ) ( LitExpr ( Integer "5" ) ) ) ) ( BinExpr BinDiv ( ParenExpr ( BinExpr BinAdd ( LitExpr ( Integer "8" ) ) ( LitExpr ( Integer "1" ) ) ) ) ( LitExpr ( Integer "3" ) ) )
+        , UnaryExpr UnaryAdd ( LitExpr ( Integer "3" ) )
+        , UnaryExpr UnarySub ( ParenExpr ( BinExpr BinAdd ( LitExpr ( Integer "2" ) ) ( LitExpr ( Integer "2" ) ) ) )
+        , UnaryExpr UnaryAdd ( FunCallExpr ( IdExpr ( Id ( ScopeId "foo" ) ) ) ( FunArgs [] ) )
+        , BinExpr BinAnd ( UnaryExpr UnarySub ( LitExpr ( Integer "2" ) ) ) ( FunCallExpr ( IdExpr ( Id ( ScopeId "bar" ) ) ) ( FunArgs [] ) )
+        , BinExpr BinOr ( BinExpr BinAnd ( UnaryExpr UnaryNot ( IdExpr ( Id ( ScopeId "x" ) ) ) ) ( IdExpr ( Id ( ScopeId "b" ) ) ) ) ( UnaryExpr UnaryNot ( IdExpr ( Id ( ScopeId "c" ) ) ) )
+        , BinExpr BinEqEq ( LitExpr ( Integer "2" ) ) ( BinExpr BinAdd ( LitExpr ( Integer "1" ) ) ( LitExpr ( Integer "1" ) ) )
+        , BinExpr BinAnd ( BinExpr BinGtEq ( BinExpr BinMul ( LitExpr ( Integer "6" ) ) ( LitExpr ( Integer "5" ) ) ) ( LitExpr ( Integer "0" ) ) ) ( BinExpr BinLtEq ( UnaryExpr UnaryNot ( LitExpr ( Integer "2" ) ) ) ( LitExpr ( Integer "9" ) ) )
+        ] 
+    )

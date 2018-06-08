@@ -79,19 +79,22 @@ data Literal
 
 data BinOp
   = BinAdd
-  | BinSub
-  | BinMul
+  | BinAnd
   | BinDiv
-  | BinEq
-  | BinNeq
-  | BinLt
-  | BinLtEq
+  | BinEqEq
   | BinGt
   | BinGtEq
+  | BinLt
+  | BinLtEq
+  | BinMul
+  | BinNeq
+  | BinOr
+  | BinSub
   deriving (Eq, Show)
 
 data UnaryOp
   = UnaryAdd
+  | UnaryNot
   | UnarySub
   deriving (Eq, Show)
 
@@ -115,11 +118,13 @@ makeLenses ''ScopeId
 -- Token/TokenType -> AST tag conversions
 
 instance Convertible TokenType BinOp where
+  safeConvert TKwAnd  = Right BinAnd
+  safeConvert TKwOr   = Right BinOr
   safeConvert TOpAdd  = Right BinAdd
   safeConvert TOpSub  = Right BinSub
   safeConvert TOpMul  = Right BinMul
   safeConvert TOpDiv  = Right BinDiv
-  safeConvert TOpEq   = Right BinEq
+  safeConvert TOpEqEq = Right BinEqEq
   safeConvert TOpNeq  = Right BinNeq
   safeConvert TOpLt   = Right BinLt
   safeConvert TOpLtEq = Right BinLtEq
@@ -131,6 +136,7 @@ instance Convertible Token BinOp where
   safeConvert Token{_ty} = safeConvert _ty
 
 instance Convertible TokenType UnaryOp where
+  safeConvert TKwNot = Right UnaryNot
   safeConvert TOpAdd = Right UnaryAdd
   safeConvert TOpSub = Right UnarySub
   safeConvert x = convError "Not an unary operator" x

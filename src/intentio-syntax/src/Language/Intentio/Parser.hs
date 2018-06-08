@@ -10,7 +10,8 @@ module Language.Intentio.Parser
   )
 where
 
-import           Intentio.Prelude        hiding ( many
+import           Intentio.Prelude        hiding ( Prefix
+                                                , many
                                                 , mod
                                                 , try
                                                 )
@@ -20,7 +21,6 @@ import           Text.Megaparsec                ( (<?>)
                                                 , eof
                                                 , many
                                                 , optional
-                                                , sepBy
                                                 , sepEndBy
                                                 , try
                                                 )
@@ -76,7 +76,7 @@ itemDecl :: Parser ItemDecl
 itemDecl = funDecl
 
 expr :: Parser Expr
-expr = term
+expr = opexpr
 
 --------------------------------------------------------------------------------
 -- Identifiers
@@ -115,6 +115,28 @@ funDecl = do
 
 --------------------------------------------------------------------------------
 -- Expressions
+
+opexpr :: Parser Expr
+opexpr = makeExprParser term table
+ where
+  table =
+    [ [prefix TKwNot, prefix TOpSub, prefix TOpAdd]
+    , [infixL TOpMul, infixL TOpDiv]
+    , [infixL TOpAdd, infixL TOpSub]
+    , [ infixL TOpEqEq
+      , infixL TOpNeq
+      , infixL TOpLtEq
+      , infixL TOpGtEq
+      , infixL TOpLt
+      , infixL TOpGt
+      ]
+    , [infixL TKwAnd]
+    , [infixL TKwOr]
+    ]
+
+  prefix tokTy = Prefix $ UnaryExpr <$> (convert <$> tok tokTy)
+  infixL tokTy = InfixL $ BinExpr <$> (convert <$> tok tokTy)
+  infixR tokTy = InfixR $ BinExpr <$> (convert <$> tok tokTy)
 
 term :: Parser Expr
 term =

@@ -5,6 +5,7 @@ where
 
 import           Prelude                       as X
                                                 ( String
+                                                , error
                                                 , fail
                                                 )
 

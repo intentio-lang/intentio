@@ -1,0 +1,21 @@
+_common: !include "../package-common.yaml"
+
+name: intentio-codegen
+
+<<: *meta
+
+dependencies:
+  - base
+  - intentio-core
+  - language-c
+
+library:
+  source-dirs: src
+
+tests:
+  intentio-codegen-test:
+    main: Spec.hs
+    source-dirs: test
+    dependencies:
+      - intentio-codegen
+      - hspec

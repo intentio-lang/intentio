@@ -6,4 +6,4 @@ where
 import           Intentio.Prelude
 
 someFunc :: IO ()
-someFunc = putStrLn "{{cookiecutter.package_name}}"
+someFunc = putText "{{cookiecutter.package_name}}"

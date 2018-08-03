@@ -25,18 +25,23 @@
     - FlexibleInstances
     - FunctionalDependencies
     - GADTs
+    - GeneralizedNewtypeDeriving
     - LambdaCase
     - MultiParamTypeClasses
     - MultiWayIf
     - NamedFieldPuns
     - NoImplicitPrelude
     - OverloadedStrings
+    - PartialTypeSignatures
     - RecordWildCards
     - TemplateHaskell
+    - TypeApplications
     - TypeFamilies
     - TypeSynonymInstances
     - ViewPatterns
 
-  ghc-options:
-    - -Wall
-    - -threaded
+  ghc-options: >
+    -Wall
+    -Wincomplete-uni-patterns
+    -Wincomplete-record-updates
+    -threaded

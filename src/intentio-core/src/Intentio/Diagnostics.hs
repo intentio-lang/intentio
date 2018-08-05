@@ -1,13 +1,16 @@
 module Intentio.Diagnostics
-  ( DiagnosticPrintable(..)
-  , DiagnosticPrintOpts(..)
-  , diagnosticShow
-  , DiagnosticSeverity(..)
-  , Diagnostic(..)
+  ( -- * Compiler diagnostics
+    Diagnostic(..)
   , diagnosticSeverity
   , diagnosticPos
   , diagnosticMessage
+  , DiagnosticSeverity(..)
   , isDiagnosticErroneous
+  , DiagnosticPrintable(..)
+  , DiagnosticPrintOpts(..)
+  , diagnosticShow
+
+    -- * Source position
   , SourcePos(..)
   , sourcePos
   , initialSourcePos
@@ -83,7 +86,7 @@ instance IsDiagnosticErroneous [Diagnostic] where
 ----------------------------------------------------------------------------------
 -- Source position
 --
--- This part of code is inspired by Megaparsec's+-  SourcePos structure.
+-- This part of code is inspired by Megaparsec's SourcePos structure.
 
 -- | Position in source file. Contains the name of the source file,
 -- a line number, and a column number. Line and column numbers are 0-based

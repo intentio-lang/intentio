@@ -49,7 +49,11 @@ dummyAssembly1 :: DummyAssembly
 dummyAssembly1 = dummyAssembly' $ dummyModule' [dummyItem] :| []
 
 -- | An 'Module' that does not do anything special.
-data DummyModule = DummyModule { _dummyModuleName :: ModuleName, _dummyModuleItems :: [DummyItem] }
+data DummyModule
+    = DummyModule
+    { _dummyModuleName :: ModuleName
+    , _dummyModuleItems :: [DummyItem]
+    }
   deriving (Show, Eq)
 
 instance Module DummyModule where

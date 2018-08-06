@@ -20,28 +20,27 @@
     <https://github.com/intentio-lang/intentio#readme>
 
   default-extensions:
-    - BangPatterns
-    - FlexibleContexts
-    - FlexibleInstances
-    - FunctionalDependencies
-    - GADTs
-    - GeneralizedNewtypeDeriving
-    - LambdaCase
-    - MultiParamTypeClasses
-    - MultiWayIf
-    - NamedFieldPuns
-    - NoImplicitPrelude
-    - OverloadedStrings
-    - PartialTypeSignatures
-    - RecordWildCards
-    - TemplateHaskell
-    - TypeApplications
-    - TypeFamilies
-    - TypeSynonymInstances
-    - ViewPatterns
+  - BangPatterns
+  - FlexibleContexts
+  - FlexibleInstances
+  - FunctionalDependencies
+  - GADTs
+  - GeneralizedNewtypeDeriving
+  - LambdaCase
+  - MultiParamTypeClasses
+  - MultiWayIf
+  - NamedFieldPuns
+  - NoImplicitPrelude
+  - OverloadedStrings
+  - PartialTypeSignatures
+  - RecordWildCards
+  - TemplateHaskell
+  - TypeApplications
+  - TypeFamilies
+  - TypeSynonymInstances
+  - ViewPatterns
 
-  ghc-options: >
-    -Wall
-    -Wincomplete-uni-patterns
-    -Wincomplete-record-updates
-    -threaded
+  ghc-options:
+  - -Wall
+  - -Wincomplete-uni-patterns
+  - -Wincomplete-record-updates

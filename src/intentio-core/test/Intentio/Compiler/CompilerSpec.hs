@@ -78,6 +78,7 @@ spec = parallel $ do
       asm <- compileFresh (flow dummyAssembly1)
       asm ^?! _Right ^. assemblyName `shouldBe` "dummy_assembly:)"
 
+  describe "diagnostics" $ do
     it "warnings do not stop compilation" $ do
       let flow       = warnings >=> frobnicate
       let (res, ctx) = runCompilePureFresh (flow dummyAssembly)

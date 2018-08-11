@@ -1,11 +1,16 @@
 module Intentio.Compiler.Monad
-  ( -- * Compile monad
-    Compile
+  ( -- * Compile context
+    CompileCtx(..)
+  , compileDiagnosticsStack
+  , mkCompileCtx
+
+    -- * Compile monad
+  , Compile
   , CompilePure
   , CompileT
   , impurify
 
-    -- ** Running compilation
+    -- * Running compilation
   , runCompile
   , runCompilePure
   , runCompileT
@@ -18,6 +23,10 @@ module Intentio.Compiler.Monad
   , compileFresh
   , compilePureFresh
   , compileFreshT
+
+    -- * Methods
+    -- ** Diagnostics
+  , pushDiagnostic
   )
 where
 
@@ -25,14 +34,28 @@ import           Intentio.Prelude        hiding ( moduleName
                                                 , StateT(..)
                                                 )
 
-import           Control.Monad.Fail             ( MonadFail(..) )
-import           Control.Monad.Fix              ( MonadFix(..) )
+import           Control.Monad.Fail             ( MonadFail )
+import           Control.Monad.Fix              ( MonadFix )
 import           Control.Monad.Trans.Class      ( MonadTrans(..) )
 import           Control.Monad.Trans.Maybe      ( MaybeT(..) )
 import           Control.Monad.State.Strict     ( StateT(..) )
 
-import           Intentio.Compiler.Context      -- Import all
-import           Intentio.Diagnostics           ( Diagnostic )
+import           Intentio.Diagnostics           ( Diagnostic
+                                                , isDiagnosticErroneous
+                                                )
+
+--------------------------------------------------------------------------------
+-- Compile context
+
+-- | Represents state of compilation process
+data CompileCtx = CompileCtx
+  { _compileDiagnosticsStack :: [Diagnostic]
+  } deriving (Show, Eq)
+makeLenses ''CompileCtx
+
+-- | Construct empty compile context
+mkCompileCtx :: CompileCtx
+mkCompileCtx = CompileCtx {_compileDiagnosticsStack = []}
 
 --------------------------------------------------------------------------------
 -- Compile monad
@@ -46,8 +69,18 @@ newtype CompileT m a = CompileT (MaybeT (StateT CompileCtx m) a)
             MonadFix, MonadIO)
 
 instance MonadTrans CompileT where
-  lift = lift
+  lift = CompileT . lift . lift
   {-# INLINE lift #-}
+
+instance Monad m => MonadState CompileCtx (CompileT m) where
+  state = CompileT . lift . state
+  {-# INLINE state #-}
+
+  get = CompileT . lift $ get
+  {-# INLINE get #-}
+
+  put = CompileT . lift . put
+  {-# INLINE put #-}
 
 -- | Convert pure compilation to I/O compilation.
 impurify :: CompilePure a -> Compile a
@@ -70,15 +103,15 @@ runCompileT (CompileT m) = runStateT (runMaybeT m)
 {-# INLINE runCompileT #-}
 
 runCompileFresh :: Compile a -> IO (Maybe a, CompileCtx)
-runCompileFresh m = runCompile m freshCompileCtx
+runCompileFresh m = runCompile m mkCompileCtx
 {-# INLINE runCompileFresh #-}
 
 runCompilePureFresh :: CompilePure a -> (Maybe a, CompileCtx)
-runCompilePureFresh m = runCompilePure m freshCompileCtx
+runCompilePureFresh m = runCompilePure m mkCompileCtx
 {-# INLINE runCompilePureFresh #-}
 
 runCompileFreshT :: Monad m => CompileT m a -> m (Maybe a, CompileCtx)
-runCompileFreshT m = runCompileT m freshCompileCtx
+runCompileFreshT m = runCompileT m mkCompileCtx
 {-# INLINE runCompileFreshT #-}
 
 compile :: Compile a -> CompileCtx -> IO (Either [Diagnostic] a)
@@ -106,6 +139,16 @@ compileFreshT m = runTupleToEither <$> runCompileFreshT m
 {-# INLINE compileFreshT #-}
 
 runTupleToEither :: (Maybe a, CompileCtx) -> Either [Diagnostic] a
-runTupleToEither (Nothing, c) = Left (c ^. compileDiagnostics)
+runTupleToEither (Nothing, c) = Left (c ^. compileDiagnosticsStack & reverse)
 runTupleToEither (Just a , _) = Right a
 {-# INLINE runTupleToEither #-}
+
+--------------------------------------------------------------------------------
+-- Methods
+
+pushDiagnostic :: Monad m => Diagnostic -> CompileT m ()
+pushDiagnostic d = do
+  compileDiagnosticsStack %= (d :)
+  CompileT . MaybeT . return $ if not (isDiagnosticErroneous d)
+    then Just ()
+    else Nothing

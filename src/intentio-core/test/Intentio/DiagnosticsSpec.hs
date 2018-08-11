@@ -8,8 +8,8 @@ import           Intentio.Diagnostics
 
 spec :: Spec
 spec = parallel $ do
-  let sampleWarning = Diagnostic Warning (initialSourcePos "test") "Hello!"
-  let sampleICE = Diagnostic InternalCompilerError (initialSourcePos "") "Bam!"
+  let sampleWarning = Diagnostic Warning (SourcePos "test" 0 0) "Hello!"
+  let sampleICE = Diagnostic InternalCompilerError (sourcePos ()) "Bam!"
 
   describe "isDiagnosticErroneous" $ do
     describe "on DiagnosticSeverity" $ do
@@ -39,10 +39,10 @@ spec = parallel $ do
   describe "SourcePos" $ do
     describe "diagnosticPrint" $ do
       it "should show position info separated by :" $ do
-        diagnosticShow (initialSourcePos "test") `shouldBe` "test:1:1"
+        diagnosticShow (SourcePos "test" 0 0) `shouldBe` "test:1:1"
 
       it "should not include file name if empty" $ do
-        diagnosticShow (initialSourcePos "") `shouldBe` "1:1"
+        diagnosticShow (sourcePos ()) `shouldBe` "1:1"
 
       it "should increment numbers by one" $ do
-        diagnosticShow (sourcePos "" 4 0) `shouldBe` "5:1"
+        diagnosticShow (SourcePos "" 4 0) `shouldBe` "5:1"

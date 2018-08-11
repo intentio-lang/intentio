@@ -11,12 +11,13 @@ module Intentio.Diagnostics
   , diagnosticShow
 
     -- * Source position
+  , LineNumber
+  , ColumnNumber
   , SourcePos(..)
-  , sourcePos
-  , initialSourcePos
   , sourceFile
   , sourceLine
   , sourceColumn
+  , SourcePosProvider(..)
   )
 where
 
@@ -88,29 +89,35 @@ instance IsDiagnosticErroneous [Diagnostic] where
 --
 -- This part of code is inspired by Megaparsec's SourcePos structure.
 
+type LineNumber = Word
+type ColumnNumber = Word
+
 -- | Position in source file. Contains the name of the source file,
 -- a line number, and a column number. Line and column numbers are 0-based
 -- programmatically, but pretty printer returns 1-based numbers.
 data SourcePos = SourcePos
-  { _sourceFile   :: FilePath -- ^ Source file name
-  , _sourceLine   :: !Word    -- ^ Line number
-  , _sourceColumn :: !Word    -- ^ Column number
+  { _sourceFile   :: FilePath       -- ^ Source file name
+  , _sourceLine   :: !LineNumber    -- ^ Line number
+  , _sourceColumn :: !ColumnNumber  -- ^ Column number
   } deriving (Show, Read, Eq, Ord)
-
--- | Construct source position, convenience shortcut for record syntax.
-sourcePos :: FilePath -> Word -> Word -> SourcePos
-sourcePos f !l !c =
-  SourcePos {_sourceFile = f, _sourceLine = l, _sourceColumn = c}
-
--- | Construct initial source position (line 0, column 0) given source file name.
-initialSourcePos :: FilePath -> SourcePos
-initialSourcePos f = sourcePos f 0 0
 
 instance DiagnosticPrintable SourcePos where
   diagnosticPrint _ (SourcePos f l c)
     | null f    = showLC
     | otherwise = toS f <> ":" <> showLC
     where showLC = show (l + 1) <> ":" <> show (c + 1)
+
+class SourcePosProvider a where
+  -- | Construct source position of given item
+  sourcePos :: a -> SourcePos
+
+instance SourcePosProvider () where
+  sourcePos () = SourcePos "" 0 0
+  {-# INLINE sourcePos #-}
+
+instance SourcePosProvider SourcePos where
+  sourcePos = id
+  {-# INLINE sourcePos #-}
 
 ----------------------------------------------------------------------------------
 -- Lenses

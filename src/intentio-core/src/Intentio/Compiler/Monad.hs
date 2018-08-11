@@ -8,7 +8,6 @@ module Intentio.Compiler.Monad
   , Compile
   , CompilePure
   , CompileT
-  , impurify
 
     -- * Running compilation
   , runCompile
@@ -23,6 +22,10 @@ module Intentio.Compiler.Monad
   , compileFresh
   , compilePureFresh
   , compileFreshT
+
+    -- * Operations on compilation monad
+  , impurify
+  , fork
 
     -- * Methods
     -- ** Diagnostics
@@ -82,11 +85,6 @@ instance Monad m => MonadState CompileCtx (CompileT m) where
   put = CompileT . lift . put
   {-# INLINE put #-}
 
--- | Convert pure compilation to I/O compilation.
-impurify :: CompilePure a -> Compile a
-impurify m = CompileT . MaybeT $ StateT (return . runCompilePure m)
-{-# INLINE impurify #-}
-
 --------------------------------------------------------------------------------
 -- Running compilation
 
@@ -142,6 +140,18 @@ runTupleToEither :: (Maybe a, CompileCtx) -> Either [Diagnostic] a
 runTupleToEither (Nothing, c) = Left (c ^. compileDiagnosticsStack & reverse)
 runTupleToEither (Just a , _) = Right a
 {-# INLINE runTupleToEither #-}
+
+--------------------------------------------------------------------------------
+-- Operations on compilation monad
+
+-- | Convert pure compilation to I/O compilation.
+impurify :: CompilePure a -> Compile a
+impurify m = CompileT . MaybeT $ StateT (return . runCompilePure m)
+{-# INLINE impurify #-}
+
+-- | Run multiple independent compilations.
+fork :: (Monad m, Traversable t) => t (CompileT m a) -> CompileT m (t a)
+fork = sequence -- TODO: Make this run in parallel
 
 --------------------------------------------------------------------------------
 -- Methods

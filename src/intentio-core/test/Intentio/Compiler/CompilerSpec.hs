@@ -78,26 +78,50 @@ spec = parallel $ do
       asm <- compileFresh (flow dummyAssembly1)
       asm ^?! _Right ^. assemblyName `shouldBe` "dummy_assembly:)"
 
+  describe "fork" $ do
+    it "runs multiple compilations and returns results in same order" $ do
+      let l    = [1, 2, 3] :: [Int]
+      let flow = fork $ return <$> l
+      let res  = compilePureFresh flow ^?! _Right
+      res `shouldBe` l
+
+    it "collects all warnings from ran compilations" $ do
+      let l          = [1, 2, 3] :: [Int]
+      let flow       = fork $ (return >=> warnings) <$> l
+      let (res, ctx) = runCompilePureFresh flow
+      res `shouldSatisfy` has _Just
+      (ctx ^. compileDiagnosticsStack & length) `shouldBe` 6
+
+    it "stops if one of ran compilations errors" $ do
+      let l = [1, 2, 3] :: [Int]
+      let step = \case
+            2 -> anICE 2
+            x -> warnings () >> return x
+      let flow       = fork $ step <$> l
+      let (res, ctx) = runCompilePureFresh flow
+      res `shouldSatisfy` has _Nothing
+      (ctx ^. compileDiagnosticsStack & length) `shouldSatisfy` (> 1)
+
   describe "diagnostics" $ do
     it "warnings do not stop compilation" $ do
-      let flow       = warnings >=> frobnicate
-      let (res, ctx) = runCompilePureFresh (flow dummyAssembly)
+      let flow       = warnings
+      let (res, ctx) = runCompilePureFresh (flow ())
       res `shouldSatisfy` has _Just
       (ctx ^. compileDiagnosticsStack & length) `shouldBe` 2
 
     it "errors do not stop compilation" $ do
-      let flow       = anError >=> frobnicate
-      let (res, ctx) = runCompilePureFresh (flow dummyAssembly)
+      let flow       = anError
+      let (res, ctx) = runCompilePureFresh (flow ())
       res `shouldSatisfy` has _Nothing
       (ctx ^. compileDiagnosticsStack & length) `shouldBe` 1
 
     it "ICEs do not stop compilation + IO" $ do
-      let flow = impurify . frobnicate >=> impurify . anICE >=> ioStep
-      (res, ctx) <- runCompileFresh (flow dummyAssembly)
+      let flow = impurify . anICE >=> ioStep
+      (res, ctx) <- runCompileFresh (flow ())
       res `shouldSatisfy` has _Nothing
       (ctx ^. compileDiagnosticsStack & length) `shouldBe` 1
 
     it "order of diagnostics is preserved for compile* methods" $ do
       let flow  = warnings >=> anError
-      let diags = compilePureFresh (flow dummyAssembly) ^?! _Left
+      let diags = compilePureFresh (flow ()) ^?! _Left
       (^. diagnosticMessage) <$> diags `shouldBe` ["1", "2", "Error"]

@@ -79,24 +79,31 @@ instance DiagnosticPrintable [Diagnostic] where
 diagnosticFor
   :: SourcePosProvider a => DiagnosticSeverity -> a -> Text -> Diagnostic
 diagnosticFor s p m = Diagnostic s (sourcePos p) m
+{-# INLINE diagnosticFor #-}
 
 cwarning :: SourcePos -> Text -> Diagnostic
 cwarning = Diagnostic Warning
+{-# INLINE cwarning #-}
 
 cwarningFor :: SourcePosProvider a => a -> Text -> Diagnostic
 cwarningFor = diagnosticFor Warning
+{-# INLINE cwarningFor #-}
 
 cerror :: SourcePos -> Text -> Diagnostic
 cerror = Diagnostic CompileError
+{-# INLINE cerror #-}
 
 cerrorFor :: SourcePosProvider a => a -> Text -> Diagnostic
 cerrorFor = diagnosticFor CompileError
+{-# INLINE cerrorFor #-}
 
 ice :: SourcePos -> Text -> Diagnostic
 ice = Diagnostic InternalCompilerError
+{-# INLINE ice #-}
 
 iceFor :: SourcePosProvider a => a -> Text -> Diagnostic
 iceFor = diagnosticFor InternalCompilerError
+{-# INLINE iceFor #-}
 
 class IsDiagnosticErroneous a where
   -- | States whether diagnostic is erroneous - i.e. compilation cannot
@@ -142,7 +149,7 @@ class SourcePosProvider a where
 
 instance SourcePosProvider () where
   sourcePos () = SourcePos "" 0 0
-  {-# INLINE sourcePos #-}
+  {-# INLINABLE sourcePos #-}
 
 instance SourcePosProvider SourcePos where
   sourcePos = id

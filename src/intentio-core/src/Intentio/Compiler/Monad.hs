@@ -73,73 +73,73 @@ newtype CompileT m a = CompileT (MaybeT (StateT CompileCtx m) a)
 
 instance MonadTrans CompileT where
   lift = CompileT . lift . lift
-  {-# INLINE lift #-}
+  {-# INLINABLE lift #-}
 
 instance Monad m => MonadState CompileCtx (CompileT m) where
   state = CompileT . lift . state
-  {-# INLINE state #-}
+  {-# INLINABLE state #-}
 
   get = CompileT . lift $ get
-  {-# INLINE get #-}
+  {-# INLINABLE get #-}
 
   put = CompileT . lift . put
-  {-# INLINE put #-}
+  {-# INLINABLE put #-}
 
 --------------------------------------------------------------------------------
 -- Running compilation
 
 runCompile :: Compile a -> CompileCtx -> IO (Maybe a, CompileCtx)
 runCompile = runCompileT
-{-# INLINE runCompile #-}
+{-# INLINABLE runCompile #-}
 
 runCompilePure :: CompilePure a -> CompileCtx -> (Maybe a, CompileCtx)
 runCompilePure m c = runIdentity (runCompileT m c)
-{-# INLINE runCompilePure #-}
+{-# INLINABLE runCompilePure #-}
 
 runCompileT :: Monad m => CompileT m a -> CompileCtx -> m (Maybe a, CompileCtx)
 runCompileT (CompileT m) = runStateT (runMaybeT m)
-{-# INLINE runCompileT #-}
+{-# INLINABLE runCompileT #-}
 
 runCompileFresh :: Compile a -> IO (Maybe a, CompileCtx)
 runCompileFresh m = runCompile m mkCompileCtx
-{-# INLINE runCompileFresh #-}
+{-# INLINABLE runCompileFresh #-}
 
 runCompilePureFresh :: CompilePure a -> (Maybe a, CompileCtx)
 runCompilePureFresh m = runCompilePure m mkCompileCtx
-{-# INLINE runCompilePureFresh #-}
+{-# INLINABLE runCompilePureFresh #-}
 
 runCompileFreshT :: Monad m => CompileT m a -> m (Maybe a, CompileCtx)
 runCompileFreshT m = runCompileT m mkCompileCtx
-{-# INLINE runCompileFreshT #-}
+{-# INLINABLE runCompileFreshT #-}
 
 compile :: Compile a -> CompileCtx -> IO (Either [Diagnostic] a)
 compile m c = runTupleToEither <$> runCompile m c
-{-# INLINE compile #-}
+{-# INLINABLE compile #-}
 
 compilePure :: CompilePure a -> CompileCtx -> Either [Diagnostic] a
 compilePure m c = runTupleToEither $ runCompilePure m c
-{-# INLINE compilePure #-}
+{-# INLINABLE compilePure #-}
 
 compileT :: Monad m => CompileT m a -> CompileCtx -> m (Either [Diagnostic] a)
 compileT m c = runTupleToEither <$> runCompileT m c
-{-# INLINE compileT #-}
+{-# INLINABLE compileT #-}
 
 compileFresh :: Compile a -> IO (Either [Diagnostic] a)
 compileFresh m = runTupleToEither <$> runCompileFresh m
-{-# INLINE compileFresh #-}
+{-# INLINABLE compileFresh #-}
 
 compilePureFresh :: CompilePure a -> Either [Diagnostic] a
 compilePureFresh m = runTupleToEither $ runCompilePureFresh m
-{-# INLINE compilePureFresh #-}
+{-# INLINABLE compilePureFresh #-}
 
 compileFreshT :: Monad m => CompileT m a -> m (Either [Diagnostic] a)
 compileFreshT m = runTupleToEither <$> runCompileFreshT m
-{-# INLINE compileFreshT #-}
+{-# INLINABLE compileFreshT #-}
 
 runTupleToEither :: (Maybe a, CompileCtx) -> Either [Diagnostic] a
 runTupleToEither (Nothing, c) = Left (c ^. compileDiagnosticsStack & reverse)
 runTupleToEither (Just a , _) = Right a
-{-# INLINE runTupleToEither #-}
+{-# INLINABLE runTupleToEither #-}
 
 --------------------------------------------------------------------------------
 -- Operations on compilation monad
@@ -147,7 +147,7 @@ runTupleToEither (Just a , _) = Right a
 -- | Convert pure compilation to I/O compilation.
 impurify :: CompilePure a -> Compile a
 impurify m = CompileT . MaybeT $ StateT (return . runCompilePure m)
-{-# INLINE impurify #-}
+{-# INLINABLE impurify #-}
 
 -- | Run multiple independent compilations.
 fork :: (Monad m, Traversable t) => t (CompileT m a) -> CompileT m (t a)

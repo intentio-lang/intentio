@@ -33,7 +33,9 @@
   - NoImplicitPrelude
   - OverloadedStrings
   - PartialTypeSignatures
+  - RankNTypes
   - RecordWildCards
+  - ScopedTypeVariables
   - TemplateHaskell
   - TypeApplications
   - TypeFamilies

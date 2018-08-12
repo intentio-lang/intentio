@@ -1,4 +1,4 @@
-module Intentio.Compiler.CompilerSpec where
+module Intentio.Compiler.MonadSpec where
 
 import           Intentio.Prelude        hiding ( moduleName )
 
@@ -30,14 +30,16 @@ frobnicate :: DummyAssembly -> CompilePure FrobnicatedAssembly
 frobnicate asm = return $ asm & assemblyModules %~ fmap FrobnicatedModule
 
 addSmiles :: FrobnicatedAssembly -> CompilePure FrobnicatedAssembly
-addSmiles a = return $ a
-                     & assemblyName %~ (<> ":)")
-                     & assemblyModules %~ fmap (\m -> m
-                        & _Wrapped . dummyModuleName %~ (<> ":)")
-                        & _Wrapped . dummyModuleItems %~ fmap (\i -> i
-                          & dummyItemName %~ (<> ":)")
-                        )
-                     )
+addSmiles a = return $ a & assemblyName %~ (<> ":)") & assemblyModules %~ fmap
+  (\m ->
+    m
+      &  _Wrapped
+      .  dummyModuleName
+      %~ (<> ":)")
+      &  _Wrapped
+      .  dummyModuleItems
+      %~ fmap (\i -> i & dummyItemName %~ (<> ":)"))
+  )
 
 warnings :: a -> CompilePure a
 warnings a = do

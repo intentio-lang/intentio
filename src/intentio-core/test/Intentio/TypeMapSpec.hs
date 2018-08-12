@@ -2,6 +2,7 @@ module Intentio.TypeMapSpec where
 
 import           Intentio.Prelude        hiding ( empty
                                                 , null
+                                                , at
                                                 )
 
 import           Test.Hspec
@@ -107,3 +108,10 @@ spec = parallel $ do
     it "deletes value of specified type from map" $ do
       let m = singleton @Int 1 & alter @Int (const Nothing)
       lookup @Int m `shouldBe` Nothing
+
+  describe "at" $ do
+    it "gets Nothing if it does not exist" $ do
+      empty ^. at @() `shouldBe` Nothing
+
+    it "gets value if it exists" $ do
+      singleton () ^. at @() `shouldBe` Just ()

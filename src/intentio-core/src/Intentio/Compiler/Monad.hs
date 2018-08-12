@@ -2,7 +2,11 @@ module Intentio.Compiler.Monad
   ( -- * Compile context
     CompileCtx(..)
   , compileDiagnosticsStack
+  , compileComponents
   , mkCompileCtx
+
+    -- ** Lenses
+  , component
 
     -- * Compile monad
   , Compile
@@ -28,7 +32,6 @@ module Intentio.Compiler.Monad
   , fork
 
     -- * Methods
-    -- ** Diagnostics
   , pushDiagnostic
   )
 where
@@ -46,19 +49,25 @@ import           Control.Monad.State.Strict     ( StateT(..) )
 import           Intentio.Diagnostics           ( Diagnostic
                                                 , isDiagnosticErroneous
                                                 )
+import qualified Intentio.TypeMap              as TM
 
 --------------------------------------------------------------------------------
 -- Compile context
 
 -- | Represents state of compilation process
 data CompileCtx = CompileCtx
-  { _compileDiagnosticsStack :: [Diagnostic]
-  } deriving (Show, Eq)
+  { _compileDiagnosticsStack :: [Diagnostic],
+    _compileComponents :: TM.TypeMap
+  } deriving (Show)
 makeLenses ''CompileCtx
 
 -- | Construct empty compile context
 mkCompileCtx :: CompileCtx
-mkCompileCtx = CompileCtx {_compileDiagnosticsStack = []}
+mkCompileCtx =
+  CompileCtx {_compileDiagnosticsStack = [], _compileComponents = TM.empty}
+
+component :: forall a . Typeable a => Lens' CompileCtx (Maybe a)
+component = compileComponents . TM.at @a
 
 --------------------------------------------------------------------------------
 -- Compile monad

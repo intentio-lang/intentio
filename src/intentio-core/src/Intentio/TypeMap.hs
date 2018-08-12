@@ -13,6 +13,7 @@ module Intentio.TypeMap
   , size
 
     -- * Query
+  , hasType
   , lookup
   , findWithDefault
 
@@ -29,11 +30,15 @@ module Intentio.TypeMap
     -- * Union
   , union
   , unions
+
+    -- * Lenses
+  , at
   )
 where
 
 import           Intentio.Prelude        hiding ( empty
                                                 , null
+                                                , at
                                                 )
 
 import           Data.Dynamic                   ( Dynamic
@@ -77,6 +82,11 @@ null (TypeMap m) = M.null m
 size :: TypeMap -> Int
 size (TypeMap m) = M.size m
 {-# INLINABLE size #-}
+
+-- | Return 'True' if map has value of given type, otherwise 'False'.
+hasType :: forall a . Typeable a => TypeMap -> Bool
+hasType (TypeMap m) = M.member (typeRep $ Proxy @a) m
+{-# INLINABLE hasType #-}
 
 -- | Return the value of given type, or 'Nothing' if this set does not
 -- contain one.
@@ -144,6 +154,13 @@ union (TypeMap t1) (TypeMap t2) = TypeMap $ M.union t1 t2
 unions :: Foldable f => f TypeMap -> TypeMap
 unions = foldl' union empty
 {-# INLINABLE unions #-}
+
+at :: forall a . Typeable a => Lens' TypeMap (Maybe a)
+at f m = f mv <&> \case
+  Nothing -> maybe m (const $ delete @a m) mv
+  Just v' -> insert v' m
+  where mv = lookup @a m
+{-# INLINABLE at #-}
 
 fromDynamic' :: Typeable a => Dynamic -> a
 fromDynamic' x = fromDynamic x ^?! _Just

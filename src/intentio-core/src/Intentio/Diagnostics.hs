@@ -4,6 +4,13 @@ module Intentio.Diagnostics
   , diagnosticSeverity
   , diagnosticPos
   , diagnosticMessage
+  , diagnosticFor
+  , cwarning
+  , cwarningFor
+  , cerror
+  , cerrorFor
+  , ice
+  , iceFor
   , DiagnosticSeverity(..)
   , isDiagnosticErroneous
   , DiagnosticPrintable(..)
@@ -69,6 +76,28 @@ instance DiagnosticPrintable [Diagnostic] where
                       . T.intercalate "\n\n"
                       . map (diagnosticPrint o)
 
+diagnosticFor
+  :: SourcePosProvider a => DiagnosticSeverity -> a -> Text -> Diagnostic
+diagnosticFor s p m = Diagnostic s (sourcePos p) m
+
+cwarning :: SourcePos -> Text -> Diagnostic
+cwarning = Diagnostic Warning
+
+cwarningFor :: SourcePosProvider a => a -> Text -> Diagnostic
+cwarningFor = diagnosticFor Warning
+
+cerror :: SourcePos -> Text -> Diagnostic
+cerror = Diagnostic CompileError
+
+cerrorFor :: SourcePosProvider a => a -> Text -> Diagnostic
+cerrorFor = diagnosticFor CompileError
+
+ice :: SourcePos -> Text -> Diagnostic
+ice = Diagnostic InternalCompilerError
+
+iceFor :: SourcePosProvider a => a -> Text -> Diagnostic
+iceFor = diagnosticFor InternalCompilerError
+
 class IsDiagnosticErroneous a where
   -- | States whether diagnostic is erroneous - i.e. compilation cannot
   -- be continued after it is issued.
@@ -108,7 +137,7 @@ instance DiagnosticPrintable SourcePos where
     where showLC = show (l + 1) <> ":" <> show (c + 1)
 
 class SourcePosProvider a where
-  -- | Construct source position of given item
+  -- | Construct source position for given item
   sourcePos :: a -> SourcePos
 
 instance SourcePosProvider () where

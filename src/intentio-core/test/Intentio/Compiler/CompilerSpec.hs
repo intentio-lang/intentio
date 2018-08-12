@@ -41,20 +41,19 @@ addSmiles a = return $ a
 
 warnings :: a -> CompilePure a
 warnings a = do
-  pushDiagnostic $ Diagnostic Warning (sourcePos ()) "1"
-  pushDiagnostic $ Diagnostic Warning (SourcePos "" 3 4) "2"
+  pushDiagnostic $ cwarningFor () "1"
+  pushDiagnostic $ cwarning (SourcePos "" 3 4) "2"
   return a
 
 anError :: a -> CompilePure a
 anError a = do
-  pushDiagnostic $ Diagnostic CompileError (sourcePos ()) "Error"
-  pushDiagnostic
-    $ Diagnostic CompileError (sourcePos ()) "This should not be emitted"
+  pushDiagnostic $ cerrorFor () "Error"
+  pushDiagnostic $ cerrorFor () "This should not be emitted"
   return a
 
 anICE :: a -> CompilePure a
 anICE a = do
-  pushDiagnostic $ Diagnostic InternalCompilerError (sourcePos ()) "BAAM!"
+  pushDiagnostic $ iceFor () "BAAM!"
   return a
 
 ioStep :: a -> Compile a

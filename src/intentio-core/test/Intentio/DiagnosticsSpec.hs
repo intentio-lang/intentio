@@ -8,8 +8,8 @@ import           Intentio.Diagnostics
 
 spec :: Spec
 spec = parallel $ do
-  let sampleWarning = Diagnostic Warning (SourcePos "test" 0 0) "Hello!"
-  let sampleICE = Diagnostic InternalCompilerError (sourcePos ()) "Bam!"
+  let sampleWarning = cwarning (SourcePos "test" 0 0) "Hello!"
+  let sampleICE = iceFor () "Bam!"
 
   describe "isDiagnosticErroneous" $ do
     describe "on DiagnosticSeverity" $ do

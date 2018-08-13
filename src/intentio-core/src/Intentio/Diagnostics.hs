@@ -12,7 +12,6 @@ module Intentio.Diagnostics
   , ice
   , iceFor
   , DiagnosticSeverity(..)
-  , isDiagnosticErroneous
   , DiagnosticPrintable(..)
   , DiagnosticPrintOpts(..)
   , diagnosticShow
@@ -50,15 +49,19 @@ diagnosticShow :: DiagnosticPrintable a => a -> Text
 diagnosticShow = diagnosticPrint DiagnosticPrintOpts
 
 data DiagnosticSeverity
-    = Warning
-    | CompileError
-    | InternalCompilerError
-  deriving (Show, Read, Eq, Ord)
+    = DiagnosticNote
+    | DiagnosticHint
+    | DiagnosticWarning
+    | DiagnosticError
+    | DiagnosticICE
+  deriving (Show, Read, Eq, Ord, Enum, Bounded)
 
 instance DiagnosticPrintable DiagnosticSeverity where
-  diagnosticPrint _ Warning = "warning"
-  diagnosticPrint _ CompileError = "error"
-  diagnosticPrint _ InternalCompilerError = "ICE"
+  diagnosticPrint _ DiagnosticNote = "note"
+  diagnosticPrint _ DiagnosticHint = "hint"
+  diagnosticPrint _ DiagnosticWarning = "warning"
+  diagnosticPrint _ DiagnosticError = "error"
+  diagnosticPrint _ DiagnosticICE = "ICE"
 
 data Diagnostic = Diagnostic
   { _diagnosticSeverity :: DiagnosticSeverity
@@ -82,43 +85,28 @@ diagnosticFor s p m = Diagnostic s (sourcePos p) m
 {-# INLINE diagnosticFor #-}
 
 cwarning :: SourcePos -> Text -> Diagnostic
-cwarning = Diagnostic Warning
+cwarning = Diagnostic DiagnosticWarning
 {-# INLINE cwarning #-}
 
 cwarningFor :: SourcePosProvider a => a -> Text -> Diagnostic
-cwarningFor = diagnosticFor Warning
+cwarningFor = diagnosticFor DiagnosticWarning
 {-# INLINE cwarningFor #-}
 
 cerror :: SourcePos -> Text -> Diagnostic
-cerror = Diagnostic CompileError
+cerror = Diagnostic DiagnosticError
 {-# INLINE cerror #-}
 
 cerrorFor :: SourcePosProvider a => a -> Text -> Diagnostic
-cerrorFor = diagnosticFor CompileError
+cerrorFor = diagnosticFor DiagnosticError
 {-# INLINE cerrorFor #-}
 
 ice :: SourcePos -> Text -> Diagnostic
-ice = Diagnostic InternalCompilerError
+ice = Diagnostic DiagnosticICE
 {-# INLINE ice #-}
 
 iceFor :: SourcePosProvider a => a -> Text -> Diagnostic
-iceFor = diagnosticFor InternalCompilerError
+iceFor = diagnosticFor DiagnosticICE
 {-# INLINE iceFor #-}
-
-class IsDiagnosticErroneous a where
-  -- | States whether diagnostic is erroneous - i.e. compilation cannot
-  -- be continued after it is issued.
-  isDiagnosticErroneous :: a -> Bool
-
-instance IsDiagnosticErroneous DiagnosticSeverity where
-  isDiagnosticErroneous s = s > Warning
-
-instance IsDiagnosticErroneous Diagnostic where
-  isDiagnosticErroneous Diagnostic{_diagnosticSeverity} =
-    isDiagnosticErroneous _diagnosticSeverity
-
-instance IsDiagnosticErroneous [Diagnostic] where
-  isDiagnosticErroneous = any isDiagnosticErroneous
 
 ----------------------------------------------------------------------------------
 -- Source position

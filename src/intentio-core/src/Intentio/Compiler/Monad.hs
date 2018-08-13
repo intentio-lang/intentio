@@ -1,7 +1,7 @@
 module Intentio.Compiler.Monad
   ( -- * Compile context
     CompileCtx(..)
-  , compileDiagnosticsStack
+  , compileDiagnostics
   , compileComponents
   , mkCompileCtx
 
@@ -31,8 +31,11 @@ module Intentio.Compiler.Monad
   , impurify
 
     -- * Methods
+  , currentDiagnosticSeverity
   , pushDiagnostic
   , pushDiagnostics
+  , pushDiagnosticE
+  , pushDiagnosticsE
   )
 where
 
@@ -45,7 +48,8 @@ import           Control.Monad.Trans.Maybe      ( MaybeT(..) )
 import           Control.Monad.State.Strict     ( StateT(..) )
 
 import           Intentio.Diagnostics           ( Diagnostic
-                                                , isDiagnosticErroneous
+                                                , DiagnosticSeverity(..)
+                                                , diagnosticSeverity
                                                 )
 import qualified Intentio.TypeMap              as TM
 
@@ -54,7 +58,7 @@ import qualified Intentio.TypeMap              as TM
 
 -- | Represents state of compilation process
 data CompileCtx = CompileCtx
-  { _compileDiagnosticsStack :: [Diagnostic],
+  { _compileDiagnostics :: Seq Diagnostic,
     _compileComponents :: TM.TypeMap
   } deriving (Show)
 makeLenses ''CompileCtx
@@ -62,7 +66,7 @@ makeLenses ''CompileCtx
 -- | Construct empty compile context
 mkCompileCtx :: CompileCtx
 mkCompileCtx =
-  CompileCtx {_compileDiagnosticsStack = [], _compileComponents = TM.empty}
+  CompileCtx {_compileDiagnostics = empty, _compileComponents = TM.empty}
 
 component :: forall a . Typeable a => Lens' CompileCtx (Maybe a)
 component = compileComponents . TM.at @a
@@ -144,7 +148,7 @@ compileFreshT m = runTupleToEither <$> runCompileFreshT m
 {-# INLINABLE compileFreshT #-}
 
 runTupleToEither :: (Maybe a, CompileCtx) -> Either [Diagnostic] a
-runTupleToEither (Nothing, c) = Left (c ^. compileDiagnosticsStack & reverse)
+runTupleToEither (Nothing, c) = Left (c ^. compileDiagnostics & toList)
 runTupleToEither (Just a , _) = Right a
 {-# INLINABLE runTupleToEither #-}
 
@@ -159,16 +163,36 @@ impurify m = CompileT . MaybeT $ StateT (return . runCompilePure m)
 --------------------------------------------------------------------------------
 -- Methods
 
+currentDiagnosticSeverity :: Monad m => CompileT m DiagnosticSeverity
+currentDiagnosticSeverity =
+  use compileDiagnostics
+    <&> fmap (^. diagnosticSeverity)
+    <&> foldr' max minBound
+
 pushDiagnostic :: Monad m => Diagnostic -> CompileT m ()
-pushDiagnostic d = do
-  compileDiagnosticsStack %= (d :)
-  CompileT . MaybeT . return $ if not (isDiagnosticErroneous d)
-    then Just ()
-    else Nothing
+pushDiagnostic = pushDiagnostic_ DiagnosticError
 
 pushDiagnostics :: (Foldable t, Monad m) => t Diagnostic -> CompileT m ()
-pushDiagnostics d = do
-  compileDiagnosticsStack %= \x -> foldr' (:) x d
-  CompileT . MaybeT . return $ if not (isDiagnosticErroneous (toList d))
-    then Just ()
-    else Nothing
+pushDiagnostics = pushDiagnostics_ DiagnosticError
+
+pushDiagnosticE :: Monad m => Diagnostic -> CompileT m ()
+pushDiagnosticE = pushDiagnostic_ DiagnosticICE
+
+pushDiagnosticsE :: (Foldable t, Monad m) => t Diagnostic -> CompileT m ()
+pushDiagnosticsE = pushDiagnostics_ DiagnosticICE
+
+pushDiagnostic_ :: Monad m => DiagnosticSeverity -> Diagnostic -> CompileT m ()
+pushDiagnostic_ s d = do
+  compileDiagnostics %= (|> d)
+  CompileT . MaybeT . return $ if isErr then Nothing else Just ()
+  where isErr = d ^. diagnosticSeverity >= s
+
+pushDiagnostics_
+  :: (Foldable t, Monad m)
+  => DiagnosticSeverity
+  -> t Diagnostic
+  -> CompileT m ()
+pushDiagnostics_ s d = do
+  compileDiagnostics %= \x -> foldl' (|>) x d
+  CompileT . MaybeT . return $ if any isErr d then Nothing else Just ()
+  where isErr x = x ^. diagnosticSeverity >= s

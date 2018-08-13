@@ -12,6 +12,7 @@ module Intentio.Compiler.Assembly
   , librarySafe
   , program
   , programSafe
+  , mkModuleMap
   , AssemblyConstructError(..)
   , prettyAssemblyConstructError
 
@@ -28,7 +29,7 @@ module Intentio.Compiler.Assembly
   )
 where
 
-import           Intentio.Prelude        hiding ( moduleName )
+import           Intentio.Prelude
 
 import qualified Data.Map.Strict               as M
 
@@ -71,7 +72,7 @@ librarySafe
 librarySafe name modlist = Right $ MkAssembly
   { _assemblyType           = Library
   , _assemblyName           = name
-  , _assemblyModules        = modListToMap modlist
+  , _assemblyModules        = mkModuleMap modlist
   , _assemblyMainModuleName = Nothing
   }
 
@@ -94,10 +95,10 @@ programSafe name main modlist = if M.member main modmap
     , _assemblyMainModuleName = Just main
     }
   else Left MainDoesNotExist
-  where modmap = modListToMap modlist
+  where modmap = mkModuleMap modlist
 
-modListToMap :: Module m => NonEmpty m -> Map ModuleName m
-modListToMap = M.fromList . map (\m -> (_moduleName m, m)) . toList
+mkModuleMap :: Module m => NonEmpty m -> Map ModuleName m
+mkModuleMap = M.fromList . map (\m -> (_moduleName m, m)) . toList
 
 --------------------------------------------------------------------------------
 -- Module class
@@ -115,6 +116,11 @@ moduleItems
   :: (Profunctor p, Contravariant f, Module a) => Optic' p f a [ItemTy a]
 moduleItems = to _moduleItems
 
+instance Module Void where
+  type ItemTy Void = Void
+  _moduleName = unreachable
+  _moduleItems = const []
+
 --------------------------------------------------------------------------------
 -- Item class
 
@@ -123,3 +129,6 @@ class (Eq a, Show a) => Item a where
 
 itemName :: (Profunctor p, Contravariant f, Item a) => Optic' p f a ItemName
 itemName = to _itemName
+
+instance Item Void where
+  _itemName = unreachable

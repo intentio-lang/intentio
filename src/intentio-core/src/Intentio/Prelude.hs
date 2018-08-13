@@ -1,5 +1,6 @@
 module Intentio.Prelude
   ( module X
+  , unreachable
   )
 where
 
@@ -20,6 +21,7 @@ import           Protolude                     as X
                                                 , from
                                                 , to
                                                 , identity
+                                                , moduleName
                                                 )
 
 import           Data.Convertible              as X
@@ -29,3 +31,7 @@ import           Data.Convertible              as X
                                                 )
 
 import           Control.Lens                  as X
+
+-- | A marker for unreachable code paths, throws error when reached.
+unreachable :: HasCallStack => a
+unreachable = error "unreachable code"

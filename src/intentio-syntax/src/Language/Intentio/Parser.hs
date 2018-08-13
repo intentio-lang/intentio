@@ -16,8 +16,6 @@ import           Intentio.Prelude        hiding ( Prefix
                                                 , try
                                                 )
 
-import           System.FilePath                ( takeBaseName )
-
 import           Text.Megaparsec                ( (<?>)
                                                 , between
                                                 , eof
@@ -35,6 +33,8 @@ import           Text.Megaparsec.Expr           ( Operator
                                                 , makeExprParser
                                                 )
 
+import           Intentio.Compiler              ( ModuleName )
+
 import           Language.Intentio.AST
 import           Language.Intentio.Lexer        ( Parser
                                                 , ParserError
@@ -48,11 +48,11 @@ import           Language.Intentio.Token
 -- Parser entry-points
 
 parseModule
-  :: FilePath -- ^ Name of source file.
-  -> Text     -- ^ Input for parser.
+  :: ModuleName -- ^ Name of module.
+  -> FilePath   -- ^ Name of source file.
+  -> Text       -- ^ Input for parser.
   -> Either ParserError ModuleSource
-parseModule filePath = M.parse (mod modName) filePath
-  where modName = takeBaseName filePath
+parseModule modName = M.parse (mod modName)
 
 parseItemDecl
   :: FilePath -- ^ Name of source file.
@@ -69,9 +69,8 @@ parseExpr = M.parse expr
 --------------------------------------------------------------------------------
 -- Core parser productions
 
-mod :: String -> Parser ModuleSource
-mod name = do
-  let _moduleSourceName = toS name
+mod :: Text -> Parser ModuleSource
+mod _moduleSourceName = do
   _moduleSourceItems <- many itemDecl
   _                  <- eof
   return ModuleSource {..}

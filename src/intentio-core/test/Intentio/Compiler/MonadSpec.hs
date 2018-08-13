@@ -1,6 +1,6 @@
 module Intentio.Compiler.MonadSpec where
 
-import           Intentio.Prelude        hiding ( moduleName )
+import           Intentio.Prelude
 
 import           Test.Hspec
 

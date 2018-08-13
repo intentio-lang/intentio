@@ -33,12 +33,11 @@ module Intentio.Compiler.Monad
 
     -- * Methods
   , pushDiagnostic
+  , pushDiagnostics
   )
 where
 
-import           Intentio.Prelude        hiding ( moduleName
-                                                , StateT(..)
-                                                )
+import           Intentio.Prelude        hiding ( StateT(..) )
 
 import           Control.Monad.Fail             ( MonadFail )
 import           Control.Monad.Fix              ( MonadFix )
@@ -169,5 +168,12 @@ pushDiagnostic :: Monad m => Diagnostic -> CompileT m ()
 pushDiagnostic d = do
   compileDiagnosticsStack %= (d :)
   CompileT . MaybeT . return $ if not (isDiagnosticErroneous d)
+    then Just ()
+    else Nothing
+
+pushDiagnostics :: (Foldable t, Monad m) => t Diagnostic -> CompileT m ()
+pushDiagnostics d = do
+  compileDiagnosticsStack %= \x -> foldr' (:) x d
+  CompileT . MaybeT . return $ if not (isDiagnosticErroneous (toList d))
     then Just ()
     else Nothing

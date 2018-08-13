@@ -1,6 +1,6 @@
 module Intentio.Compiler.AssemblySpec where
 
-import           Intentio.Prelude        hiding ( moduleName )
+import           Intentio.Prelude
 
 import           Test.Hspec
 
@@ -19,7 +19,7 @@ spec = parallel $ do
   describe "programSafe" $ do
     it "should build an program assembly given existing main module" $ do
       let mainName = dummyModule ^. moduleName
-      let progM = programSafe "test" mainName (dummyModule :| [])
+      let progM    = programSafe "test" mainName (dummyModule :| [])
       progM `shouldSatisfy` has _Right
       let prog = progM ^?! _Right
       prog ^. assemblyName `shouldBe` "test"

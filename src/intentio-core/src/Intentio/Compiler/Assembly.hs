@@ -9,9 +9,7 @@ module Intentio.Compiler.Assembly
   , assemblyModules
    -- ** Constructing assemblies
   , library
-  , librarySafe
   , program
-  , programSafe
   , mkModuleMap
   , AssemblyConstructError(..)
   , prettyAssemblyConstructError
@@ -60,42 +58,23 @@ prettyAssemblyConstructError :: IsString a => AssemblyConstructError -> a
 prettyAssemblyConstructError MainDoesNotExist = "main module does not exist"
 
 library :: Module m => AssemblyName -> NonEmpty m -> Assembly m
-library n l = case librarySafe n l of
-  Right x -> x
-  Left  e -> error $ prettyAssemblyConstructError e
-
-librarySafe
-  :: Module m
-  => AssemblyName
-  -> NonEmpty m
-  -> Either AssemblyConstructError (Assembly m)
-librarySafe name modlist = Right $ MkAssembly
+library name modlist = MkAssembly
   { _assemblyType           = Library
   , _assemblyName           = name
   , _assemblyModules        = mkModuleMap modlist
   , _assemblyMainModuleName = Nothing
   }
 
-program :: Module m => AssemblyName -> ModuleName -> NonEmpty m -> Assembly m
-program n m l = case programSafe n m l of
-  Right x -> x
-  Left  e -> error $ prettyAssemblyConstructError e
+program :: Module m => AssemblyName -> NonEmpty m -> Assembly m
+program name modlist = MkAssembly
+  { _assemblyType           = Program
+  , _assemblyName           = name
+  , _assemblyModules        = mkModuleMap modlist
+  , _assemblyMainModuleName = Just $ mainMod modlist
+  }
 
-programSafe
-  :: Module m
-  => AssemblyName
-  -> ModuleName
-  -> NonEmpty m
-  -> Either AssemblyConstructError (Assembly m)
-programSafe name main modlist = if M.member main modmap
-  then Right $ MkAssembly
-    { _assemblyType           = Program
-    , _assemblyName           = name
-    , _assemblyModules        = modmap
-    , _assemblyMainModuleName = Just main
-    }
-  else Left MainDoesNotExist
-  where modmap = mkModuleMap modlist
+mainMod :: Module m => NonEmpty m -> ModuleName
+mainMod (main :| _) = main ^. moduleName
 
 mkModuleMap :: Module m => NonEmpty m -> Map ModuleName m
 mkModuleMap = M.fromList . map (\m -> (_moduleName m, m)) . toList

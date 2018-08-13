@@ -62,22 +62,14 @@ makeLenses ''DummyItem
 
 spec :: Spec
 spec = parallel $ do
-  describe "librarySafe" $ do
+  describe "library" $ do
     it "should build an library assembly" $ do
-      let libM = librarySafe "test" (dummyModule :| [])
-      libM `shouldSatisfy` has _Right
-      let lib = libM ^?! _Right
+      let lib = library "test" (dummyModule :| [])
       lib ^. assemblyName `shouldBe` "test"
 
-  describe "programSafe" $ do
-    it "should build an program assembly given existing main module" $ do
+  describe "program" $ do
+    it "should build an program assembly with first module being main" $ do
       let mainName = dummyModule ^. moduleName
-      let progM    = programSafe "test" mainName (dummyModule :| [])
-      progM `shouldSatisfy` has _Right
-      let prog = progM ^?! _Right
+      let prog    = program "test" (dummyModule :| [])
       prog ^. assemblyName `shouldBe` "test"
       prog ^. assemblyMainModuleName `shouldBe` Just mainName
-
-    it "should error if main module is not defined" $ do
-      let progM = programSafe "test" "totally_not_main" (dummyModule :| [])
-      progM `shouldBe` Left MainDoesNotExist

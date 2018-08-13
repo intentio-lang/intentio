@@ -19,6 +19,6 @@ import           Language.Intentio.Parser       ( parseModule
 spec :: Spec
 spec = parallel $ do
   describe "parser" $ do
-    runFileFixtures "parser-module"   (parseModule "<test>")
-    runFileFixtures "parser-itemdecl" (parse (some itemDecl <* eof) "<test>")
-    runFileFixtures "parser-expr"     (parse (expr <* eof) "<test>")
+    runFileFixtures "parser-module"   (parseModule "./somedir/test.ieo")
+    runFileFixtures "parser-itemdecl" (parse (some itemDecl <* eof) "test.ieo")
+    runFileFixtures "parser-expr"     (parse (expr <* eof) "test.ieo")

@@ -11,4 +11,4 @@ import           Language.Intentio.Lexer        ( lex )
 spec :: Spec
 spec = parallel $ do
   describe "lexer" $ do
-    runFileFixtures "lexer" (lex "<test>")
+    runFileFixtures "lexer" (lex "test.ieo")

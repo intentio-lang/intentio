@@ -1,7 +1,8 @@
-Module 
-    { _moduleItems = 
+ModuleSource 
+    { _moduleSourceName = "test"
+    , _moduleSourceItems = 
         [ FunDecl 
-            { _funDeclName = ScopeId "foo"
+            { _itemDeclName = ScopeId "foo"
             , _funDeclParams = FunParams 
                 [ FunParam ( ScopeId "a" )
                 , FunParam ( ScopeId "b" )
@@ -9,7 +10,7 @@ Module
             , _funDeclBody = FunBody ( Block [ IdExpr ( Id ( ScopeId "a" ) ) ] )
             } 
         , FunDecl 
-            { _funDeclName = ScopeId "bar"
+            { _itemDeclName = ScopeId "bar"
             , _funDeclParams = FunParams []
             , _funDeclBody = FunBody 
                 ( Block 
@@ -21,4 +22,4 @@ Module
                 )
             } 
         ] 
-    }
+    } 

@@ -5,9 +5,9 @@ name: intentio-syntax
 <<: *meta
 
 dependencies:
-  - async
   - base
   - bimap
+  - containers
   - convertible
   - filepath
   - intentio-core

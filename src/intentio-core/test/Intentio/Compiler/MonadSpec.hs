@@ -5,63 +5,10 @@ import           Intentio.Prelude
 import           Test.Hspec
 
 import           Intentio.Compiler
-import           Intentio.Compiler.DummyAssembly
 import           Intentio.Diagnostics
-
-type FrobnicatedAssembly = Assembly FrobnicatedModule
-
-newtype FrobnicatedModule = FrobnicatedModule DummyModule
-  deriving (Show, Eq)
-makeWrapped ''FrobnicatedModule
-
-instance Module FrobnicatedModule where
-  type ItemTy FrobnicatedModule = FrobnicatedItem
-  _moduleName = view (_Wrapped . moduleName)
-  _moduleItems = map FrobnicatedItem . view (_Wrapped . moduleItems)
-
-newtype FrobnicatedItem = FrobnicatedItem DummyItem
-  deriving (Show, Eq)
-makeWrapped ''FrobnicatedItem
-
-instance Item FrobnicatedItem where
-  _itemName = view (_Wrapped . itemName)
-
-frobnicate :: DummyAssembly -> CompilePure FrobnicatedAssembly
-frobnicate asm = return $ asm & assemblyModules %~ fmap FrobnicatedModule
-
-addSmiles :: FrobnicatedAssembly -> CompilePure FrobnicatedAssembly
-addSmiles a = return $ a & assemblyName %~ (<> ":)") & assemblyModules %~ fmap
-  (\m ->
-    m
-      &  _Wrapped
-      .  dummyModuleName
-      %~ (<> ":)")
-      &  _Wrapped
-      .  dummyModuleItems
-      %~ fmap (\i -> i & dummyItemName %~ (<> ":)"))
-  )
-
-ioStep :: a -> Compile a
-ioStep = return
 
 spec :: Spec
 spec = parallel $ do
-  describe "frobnicating dummy assembly" $ do
-    it "just frobnicate" $ do
-      let flow = frobnicate
-      let asm = compilePureFresh (flow dummyAssembly1) ^?! _Right
-      asm ^. assemblyName `shouldBe` "dummy_assembly"
-
-    it "frobnicate and add smiles" $ do
-      let flow = frobnicate >=> addSmiles
-      let asm  = compilePureFresh (flow dummyAssembly1) ^?! _Right
-      asm ^. assemblyName `shouldBe` "dummy_assembly:)"
-
-    it "frobnicate and add smiles in IO" $ do
-      let flow = ioStep >=> impurify . frobnicate >=> impurify . addSmiles
-      asm <- compileFresh (flow dummyAssembly1)
-      asm ^?! _Right ^. assemblyName `shouldBe` "dummy_assembly:)"
-
   describe "pushDiagnostic" $ do
     it "warnings do not stop compilation" $ do
       let flow = do

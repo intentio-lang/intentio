@@ -4,6 +4,5 @@ require-stack-version: '>= 1.6'
 
 packages:
   - src/intentio-core
-  - src/intentio-interactive
   - src/intentio-syntax
   - src/intentio-testutil

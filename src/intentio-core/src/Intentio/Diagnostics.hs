@@ -74,14 +74,15 @@ data Diagnostic = Diagnostic
   } deriving (Show, Read, Eq, Ord)
 
 instance DiagnosticPrintable Diagnostic where
-  diagnosticPrint o (Diagnostic s p m) =
-    diagnosticPrint o s <> ": " <> m <> "\n"
-    <> " --> " <> diagnosticPrint o p
+  diagnosticPrint o (Diagnostic sev pos msg) =
+    diagnosticPrint o pos <> ": " <> diagnosticPrint o sev <> ":\n"
+    <> fmtMsg <> "\n"
+    where
+      indent = "   "
+      fmtMsg = indent <> T.replace "\n" ("\n" <> indent) msg
 
 instance DiagnosticPrintable [Diagnostic] where
-  diagnosticPrint o = (<> "\n")
-                      . T.intercalate "\n\n"
-                      . map (diagnosticPrint o)
+  diagnosticPrint o =  T.intercalate "\n" . map (diagnosticPrint o)
 
 diagnosticFor
   :: SourcePosProvider a => DiagnosticSeverity -> a -> Text -> Diagnostic

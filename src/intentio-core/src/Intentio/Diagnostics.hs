@@ -5,6 +5,10 @@ module Intentio.Diagnostics
   , diagnosticPos
   , diagnosticMessage
   , diagnosticFor
+  , cnote
+  , cnoteFor
+  , chint
+  , chintFor
   , cwarning
   , cwarningFor
   , cerror
@@ -83,6 +87,22 @@ diagnosticFor
   :: SourcePosProvider a => DiagnosticSeverity -> a -> Text -> Diagnostic
 diagnosticFor s p m = Diagnostic s (sourcePos p) m
 {-# INLINE diagnosticFor #-}
+
+cnote :: SourcePos -> Text -> Diagnostic
+cnote = Diagnostic DiagnosticNote
+{-# INLINE cnote #-}
+
+cnoteFor :: SourcePosProvider a => a -> Text -> Diagnostic
+cnoteFor = diagnosticFor DiagnosticNote
+{-# INLINE cnoteFor #-}
+
+chint :: SourcePos -> Text -> Diagnostic
+chint = Diagnostic DiagnosticHint
+{-# INLINE chint #-}
+
+chintFor :: SourcePosProvider a => a -> Text -> Diagnostic
+chintFor = diagnosticFor DiagnosticHint
+{-# INLINE chintFor #-}
 
 cwarning :: SourcePos -> Text -> Diagnostic
 cwarning = Diagnostic DiagnosticWarning

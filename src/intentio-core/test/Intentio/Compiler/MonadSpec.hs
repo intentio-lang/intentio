@@ -79,30 +79,6 @@ spec = parallel $ do
       asm <- compileFresh (flow dummyAssembly1)
       asm ^?! _Right ^. assemblyName `shouldBe` "dummy_assembly:)"
 
-  describe "fork" $ do
-    it "runs multiple compilations and returns results in same order" $ do
-      let l    = [1, 2, 3] :: [Int]
-      let flow = fork $ return <$> l
-      let res  = compilePureFresh flow ^?! _Right
-      res `shouldBe` l
-
-    it "collects all warnings from ran compilations" $ do
-      let l          = [1, 2, 3] :: [Int]
-      let flow       = fork $ (return >=> warnings) <$> l
-      let (res, ctx) = runCompilePureFresh flow
-      res `shouldSatisfy` has _Just
-      (ctx ^. compileDiagnosticsStack & length) `shouldBe` 6
-
-    it "stops if one of ran compilations errors" $ do
-      let l = [1, 2, 3] :: [Int]
-      let step = \case
-            2 -> anICE 2
-            x -> warnings () >> return x
-      let flow       = fork $ step <$> l
-      let (res, ctx) = runCompilePureFresh flow
-      res `shouldSatisfy` has _Nothing
-      (ctx ^. compileDiagnosticsStack & length) `shouldSatisfy` (> 1)
-
   describe "diagnostics" $ do
     it "warnings do not stop compilation" $ do
       let flow       = warnings

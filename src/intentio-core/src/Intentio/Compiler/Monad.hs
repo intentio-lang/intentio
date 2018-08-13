@@ -29,7 +29,6 @@ module Intentio.Compiler.Monad
 
     -- * Operations on compilation monad
   , impurify
-  , fork
 
     -- * Methods
   , pushDiagnostic
@@ -156,10 +155,6 @@ runTupleToEither (Just a , _) = Right a
 impurify :: CompilePure a -> Compile a
 impurify m = CompileT . MaybeT $ StateT (return . runCompilePure m)
 {-# INLINABLE impurify #-}
-
--- | Run multiple independent compilations.
-fork :: (Monad m, Traversable t) => t (CompileT m a) -> CompileT m (t a)
-fork = sequence -- TODO: Make this run in parallel
 
 --------------------------------------------------------------------------------
 -- Methods

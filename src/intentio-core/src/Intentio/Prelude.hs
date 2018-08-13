@@ -7,6 +7,7 @@ import           Prelude                       as X
                                                 ( String
                                                 , error
                                                 , fail
+                                                , id
                                                 )
 
 import           Protolude                     as X
@@ -18,6 +19,7 @@ import           Protolude                     as X
                                                 , (<.>)
                                                 , from
                                                 , to
+                                                , identity
                                                 )
 
 import           Data.Convertible              as X

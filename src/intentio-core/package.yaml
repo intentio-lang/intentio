@@ -6,11 +6,13 @@ name: intentio-core
 
 dependencies:
   - base
+  - containers
   - convertible
   - lens
   - mtl
   - protolude
   - text
+  - transformers
 
 library:
   source-dirs: src

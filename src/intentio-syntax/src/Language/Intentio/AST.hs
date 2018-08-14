@@ -4,28 +4,36 @@ import           Intentio.Prelude
 
 import           Data.Convertible               ( convError )
 
+import           Intentio.Compiler.Assembly     ( Module(..)
+                                                , Item(..)
+                                                )
+
 import           Language.Intentio.Token
 
 --------------------------------------------------------------------------------
 -- AST data structures
 
-newtype Assembly = Assembly {
-    _assemblyModules :: [Module]
+data ModuleSource = ModuleSource {
+    _moduleSourceName :: Text,
+    _moduleSourceItems :: [ItemDecl]
   }
   deriving (Eq, Show)
 
-newtype Module = Module {
-    _moduleItems :: [ItemDecl]
-  }
-  deriving (Eq, Show)
+instance Module ModuleSource where
+  type ItemTy ModuleSource = ItemDecl
+  _moduleName = _moduleSourceName
+  _moduleItems = _moduleSourceItems
 
 data ItemDecl
   = FunDecl {
-    _funDeclName :: ScopeId,
+    _itemDeclName :: ScopeId,
     _funDeclParams :: FunParams,
     _funDeclBody :: FunBody
   }
   deriving (Eq, Show)
+
+instance Item ItemDecl where
+  _itemName = (\(ScopeId n) -> n) . _itemDeclName
 
 newtype ModId = ModId Text
   deriving (Eq, Show)
@@ -102,7 +110,6 @@ data UnaryOp
 -- Lenses
 
 makeLenses ''AnyId
-makeLenses ''Assembly
 makeLenses ''Block
 makeLenses ''Expr
 makeLenses ''FunArgs
@@ -111,7 +118,7 @@ makeLenses ''FunParam
 makeLenses ''FunParams
 makeLenses ''ItemDecl
 makeLenses ''ModId
-makeLenses ''Module
+makeLenses ''ModuleSource
 makeLenses ''ScopeId
 
 --------------------------------------------------------------------------------

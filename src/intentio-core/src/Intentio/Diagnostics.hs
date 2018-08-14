@@ -147,6 +147,7 @@ data SourcePos = SourcePos
   } deriving (Show, Read, Eq, Ord)
 
 instance DiagnosticPrintable SourcePos where
+  diagnosticPrint _ (SourcePos "" 0 0) = "?"
   diagnosticPrint _ (SourcePos f l c)
     | null f    = showLC
     | otherwise = toS f <> ":" <> showLC

@@ -101,7 +101,7 @@ instance Monad m => MonadState CompileCtx (CompileT m) where
   {-# INLINABLE put #-}
 
 liftIOE :: (MonadIO m) => IO a -> CompileT m a
-liftIOE m = (CompileT . lift . lift . liftIO $ tryIOError m) >>= perr
+liftIOE m = liftIO (tryIOError m) >>= perr
  where
   perr (Right x ) = return x
   perr (Left  ex) = pushDiagnostic (mkDiag ex) >> unreachable

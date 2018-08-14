@@ -2,6 +2,7 @@ module Intentio.Compiler.MonadSpec where
 
 import           Intentio.Prelude
 
+import           System.IO.Error                ( userError )
 import           Test.Hspec
 
 import           Intentio.Compiler
@@ -9,6 +10,19 @@ import           Intentio.Diagnostics
 
 spec :: Spec
 spec = parallel $ do
+  describe "liftIOE" $ do
+    it "lifting IO computation works correctly" $ do
+      let comp = liftIOE . return $ ()
+      res <- compileFresh comp
+      res `shouldBe` Right ()
+
+    it "lifting IO computation converts IO errors to ICE diagnostics" $ do
+      let comp = void (liftIOE . ioError $ userError "test")
+      (res, ctx) <- runCompileFresh comp
+      res `shouldSatisfy` has _Nothing
+      let diag = ctx ^. compileDiagnostics ^?! _head
+      (diag ^. diagnosticSeverity) `shouldBe` DiagnosticICE
+
   describe "pushDiagnostic" $ do
     it "warnings do not stop compilation" $ do
       let flow = do

@@ -12,6 +12,7 @@ module Intentio.Compiler.Monad
   , Compile
   , CompilePure
   , CompileT
+  , liftIOE
 
     -- * Running compilation
   , runCompile
@@ -46,10 +47,19 @@ import           Control.Monad.Fix              ( MonadFix )
 import           Control.Monad.Trans.Class      ( MonadTrans(..) )
 import           Control.Monad.Trans.Maybe      ( MaybeT(..) )
 import           Control.Monad.State.Strict     ( StateT(..) )
+import           System.IO.Error                ( ioeGetErrorType
+                                                , ioeGetErrorString
+                                                , ioeGetFileName
+                                                , ioeGetLocation
+                                                , tryIOError
+                                                )
 
 import           Intentio.Diagnostics           ( Diagnostic
                                                 , DiagnosticSeverity(..)
+                                                , SourcePos
                                                 , diagnosticSeverity
+                                                , ice
+                                                , sourcePos
                                                 )
 import qualified Intentio.TypeMap              as TM
 
@@ -95,6 +105,14 @@ instance Monad m => MonadState CompileCtx (CompileT m) where
 
   put = CompileT . lift . put
   {-# INLINABLE put #-}
+
+liftIOE :: (MonadIO m) => IO a -> CompileT m a
+liftIOE m = (CompileT . lift . lift . liftIO $ tryIOError m) >>= perr
+ where
+  perr (Right x ) = return x
+  perr (Left  ex) = pushDiagnostic (mkDiag ex) >> unreachable
+
+  mkDiag = ice (sourcePos ()) . show
 
 --------------------------------------------------------------------------------
 -- Running compilation

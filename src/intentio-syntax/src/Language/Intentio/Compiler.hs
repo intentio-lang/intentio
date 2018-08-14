@@ -29,6 +29,7 @@ import           Intentio.Compiler              ( Assembly
                                                 , Compile
                                                 , CompilePure
                                                 , CompileT
+                                                , liftIOE
                                                 , Module(..)
                                                 , ModuleName
                                                 , moduleName
@@ -69,10 +70,20 @@ instance Module SourceText where
   _moduleItems = const []
 
 parseSourceFiles :: Assembly SourceFile -> Compile (Assembly ModuleSource)
-parseSourceFiles = parseAssembly parseSourceFile_
+parseSourceFiles srcAsm = do
+  let srcMl = srcAsm ^. assemblyModules & toList
+  dstRs <- liftIOE $ mapM parseSourceFile_ srcMl
+  dstMl <- parseResultsToCompile dstRs
+  let dstMm = mkModuleMap $ NE.fromList dstMl
+  return $ srcAsm & assemblyModules .~ dstMm
 
 parseSourceTexts :: Assembly SourceText -> CompilePure (Assembly ModuleSource)
-parseSourceTexts = parseAssembly (Identity . parseSourceText_)
+parseSourceTexts srcAsm = do
+  let srcMl = srcAsm ^. assemblyModules & toList
+  let dstRs = fmap parseSourceText_ srcMl
+  dstMl <- parseResultsToCompile dstRs
+  let dstMm = mkModuleMap $ NE.fromList dstMl
+  return $ srcAsm & assemblyModules .~ dstMm
 
 readSourceFile :: SourceFile -> Compile SourceText
 readSourceFile = liftIO . readSourceFile_
@@ -120,18 +131,6 @@ toDiag parserError = headDiag <| S.fromList stackDiags
     SourcePos sourceName (unPos sourceLine) (unPos sourceColumn)
 
   unPos p = fromIntegral $ MPP.unPos p - 1
-
-parseAssembly
-  :: (Module a, Module b, Monad m)
-  => (a -> m (Either ParserError b))
-  -> Assembly a
-  -> CompileT m (Assembly b)
-parseAssembly f srcAsm = do
-  let srcMl = srcAsm ^. assemblyModules & toList
-  dstRs <- lift $ mapM f srcMl
-  dstMl <- parseResultsToCompile dstRs
-  let dstMm = mkModuleMap $ NE.fromList dstMl
-  return $ srcAsm & assemblyModules .~ dstMm
 
 parseResultsToCompile :: Monad m => [Either ParserError a] -> CompileT m [a]
 parseResultsToCompile = unFold . foldr' bucket (Right [])

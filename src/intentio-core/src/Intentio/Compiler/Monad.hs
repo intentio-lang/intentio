@@ -47,16 +47,10 @@ import           Control.Monad.Fix              ( MonadFix )
 import           Control.Monad.Trans.Class      ( MonadTrans(..) )
 import           Control.Monad.Trans.Maybe      ( MaybeT(..) )
 import           Control.Monad.State.Strict     ( StateT(..) )
-import           System.IO.Error                ( ioeGetErrorType
-                                                , ioeGetErrorString
-                                                , ioeGetFileName
-                                                , ioeGetLocation
-                                                , tryIOError
-                                                )
+import           System.IO.Error                ( tryIOError )
 
 import           Intentio.Diagnostics           ( Diagnostic
                                                 , DiagnosticSeverity(..)
-                                                , SourcePos
                                                 , diagnosticSeverity
                                                 , ice
                                                 , sourcePos

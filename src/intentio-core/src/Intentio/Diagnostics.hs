@@ -65,7 +65,7 @@ instance DiagnosticPrintable DiagnosticSeverity where
   diagnosticPrint _ DiagnosticHint = "hint"
   diagnosticPrint _ DiagnosticWarning = "warning"
   diagnosticPrint _ DiagnosticError = "error"
-  diagnosticPrint _ DiagnosticICE = "ICE"
+  diagnosticPrint _ DiagnosticICE = "internal compiler error"
 
 data Diagnostic = Diagnostic
   { _diagnosticSeverity :: DiagnosticSeverity

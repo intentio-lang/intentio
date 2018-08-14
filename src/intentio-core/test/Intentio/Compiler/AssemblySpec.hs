@@ -18,7 +18,7 @@ dummyAssembly = dummyAssembly' (dummyModule :| [])
 -- | Constructs library 'DummyAssembly' named @dummy_assembly@ with specified
 -- list of dummy modules.
 dummyAssembly' :: NonEmpty DummyModule -> DummyAssembly
-dummyAssembly' = library "dummy_assembly"
+dummyAssembly' = mkAssembly Library "dummy_assembly" "dummy_assembly"
 
 -- | A library 'DummyAssembly' named @dummy_assembly@ with single `DummyModule'
 -- named @dummy_module@ containing one 'DummyItem' named @dummy_item@.
@@ -62,14 +62,16 @@ makeLenses ''DummyItem
 
 spec :: Spec
 spec = parallel $ do
-  describe "library" $ do
+  describe "mkAssembly Library" $ do
     it "should build an library assembly" $ do
-      let lib = library "test" (dummyModule :| [])
+      let lib = mkAssembly Library "test" "out" (dummyModule :| [])
       lib ^. assemblyName `shouldBe` "test"
+      lib ^. assemblyOutputPath `shouldBe` "out"
 
-  describe "program" $ do
+  describe "mkAssembly Program" $ do
     it "should build an program assembly with first module being main" $ do
       let mainName = dummyModule ^. moduleName
-      let prog    = program "test" (dummyModule :| [])
+      let prog    = mkAssembly Program "test" "out" (dummyModule :| [])
       prog ^. assemblyName `shouldBe` "test"
+      prog ^. assemblyOutputPath `shouldBe` "out"
       prog ^. assemblyMainModuleName `shouldBe` Just mainName

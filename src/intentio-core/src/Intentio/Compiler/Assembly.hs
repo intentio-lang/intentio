@@ -3,13 +3,15 @@ module Intentio.Compiler.Assembly
     Assembly
   , AssemblyName
   , AssemblyType(..)
+  , showAssemblyTypeAbbr
+  , fromAssemblyTypeAbbr
   , assemblyType
   , assemblyName
+  , assemblyOutputPath
   , assemblyMainModuleName
   , assemblyModules
    -- ** Constructing assemblies
-  , library
-  , program
+  , mkAssembly
   , mkModuleMap
   , AssemblyConstructError(..)
   , prettyAssemblyConstructError
@@ -41,10 +43,20 @@ type ItemName = Text
 data AssemblyType = Program | Library
   deriving (Show, Eq, Ord)
 
+showAssemblyTypeAbbr :: IsString a => AssemblyType -> a
+showAssemblyTypeAbbr Program = "bin"
+showAssemblyTypeAbbr Library = "lib"
+
+fromAssemblyTypeAbbr :: (IsString a, Eq a) => a -> Maybe AssemblyType
+fromAssemblyTypeAbbr "bin" = Just Program
+fromAssemblyTypeAbbr "lib" = Just Library
+fromAssemblyTypeAbbr _     = Nothing
+
 data Assembly m
     = MkAssembly
     { _assemblyType           :: AssemblyType
     , _assemblyName           :: AssemblyName
+    , _assemblyOutputPath     :: FilePath
     , _assemblyModules        :: Map ModuleName m
     , _assemblyMainModuleName :: Maybe ModuleName
     }
@@ -57,24 +69,25 @@ data AssemblyConstructError = MainDoesNotExist
 prettyAssemblyConstructError :: IsString a => AssemblyConstructError -> a
 prettyAssemblyConstructError MainDoesNotExist = "main module does not exist"
 
-library :: Module m => AssemblyName -> NonEmpty m -> Assembly m
-library name modlist = MkAssembly
-  { _assemblyType           = Library
-  , _assemblyName           = name
+mkAssembly
+  :: Module m
+  => AssemblyType
+  -> AssemblyName
+  -> FilePath
+  -> NonEmpty m
+  -> Assembly m
+mkAssembly _assemblyType _assemblyName _assemblyOutputPath modlist = MkAssembly
+  { _assemblyType
+  , _assemblyName
+  , _assemblyOutputPath
   , _assemblyModules        = mkModuleMap modlist
-  , _assemblyMainModuleName = Nothing
+  , _assemblyMainModuleName
   }
+ where
+  _assemblyMainModuleName = mainMod _assemblyType modlist
 
-program :: Module m => AssemblyName -> NonEmpty m -> Assembly m
-program name modlist = MkAssembly
-  { _assemblyType           = Program
-  , _assemblyName           = name
-  , _assemblyModules        = mkModuleMap modlist
-  , _assemblyMainModuleName = Just $ mainMod modlist
-  }
-
-mainMod :: Module m => NonEmpty m -> ModuleName
-mainMod (main :| _) = main ^. moduleName
+  mainMod Program (main :| _) = Just $ main ^. moduleName
+  mainMod _       _           = Nothing
 
 mkModuleMap :: Module m => NonEmpty m -> Map ModuleName m
 mkModuleMap = M.fromList . map (\m -> (_moduleName m, m)) . toList

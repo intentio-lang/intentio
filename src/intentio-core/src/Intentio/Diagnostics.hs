@@ -82,7 +82,10 @@ instance DiagnosticPrintable Diagnostic where
       fmtMsg = indent <> T.replace "\n" ("\n" <> indent) msg
 
 instance DiagnosticPrintable [Diagnostic] where
-  diagnosticPrint o =  T.intercalate "\n" . map (diagnosticPrint o)
+  diagnosticPrint o = T.intercalate "\n" . map (diagnosticPrint o)
+
+instance DiagnosticPrintable (Seq Diagnostic) where
+  diagnosticPrint o = diagnosticPrint o . toList
 
 diagnosticFor
   :: SourcePosProvider a => DiagnosticSeverity -> a -> Text -> Diagnostic

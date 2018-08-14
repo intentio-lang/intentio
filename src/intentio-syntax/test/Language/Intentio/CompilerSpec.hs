@@ -1,4 +1,4 @@
-module Language.Intentio.CompileSpec where
+module Language.Intentio.CompilerSpec where
 
 import           Intentio.Prelude
 
@@ -8,7 +8,7 @@ import           Test.Hspec
 import           Intentio.Compiler
 import           Intentio.Diagnostics
 
-import           Language.Intentio.Compile
+import           Language.Intentio.Compiler
 
 goodfileText :: Text
 goodfileText = "fun f(a) {}"

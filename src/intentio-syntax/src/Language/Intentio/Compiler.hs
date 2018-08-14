@@ -1,4 +1,4 @@
-module Language.Intentio.Compile
+module Language.Intentio.Compiler
   ( SourceFile(..)
   , sourceFilePath
   , SourceText(..)

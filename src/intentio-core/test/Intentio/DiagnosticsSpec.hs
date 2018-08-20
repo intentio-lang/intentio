@@ -14,7 +14,7 @@ spec = parallel $ do
         diagnosticShow (SourcePos "test" 0 0) `shouldBe` "test:1:1"
 
       it "should show ? for nullary positon" $ do
-        diagnosticShow (sourcePos ()) `shouldBe` "?"
+        diagnosticShow (_sourcePos ()) `shouldBe` "?"
 
       it "should not include file name if empty" $ do
         diagnosticShow (SourcePos "" 4 0) `shouldBe` "5:1"

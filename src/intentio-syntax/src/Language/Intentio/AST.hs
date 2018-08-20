@@ -23,7 +23,7 @@ data ModuleSource = ModuleSource {
   deriving (Eq, Show)
 
 instance SourcePosProvider ModuleSource where
-  sourcePos _ = undefined -- TODO:
+  _sourcePos _ = undefined -- TODO:
 
 instance Module ModuleSource where
   type ItemTy ModuleSource = ItemDecl
@@ -39,7 +39,7 @@ data ItemDecl
   deriving (Eq, Show)
 
 instance SourcePosProvider ItemDecl where
-  sourcePos _ = undefined -- TODO:
+  _sourcePos _ = undefined -- TODO:
 
 instance Item ItemDecl where
   _itemName = ItemName . (\(ScopeId n) -> n) . _itemDeclName

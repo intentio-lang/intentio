@@ -36,7 +36,7 @@ data DummyModule
   deriving (Show, Eq)
 
 instance SourcePosProvider DummyModule where
-  sourcePos _ = sourcePos ()
+  _sourcePos _ = _sourcePos ()
 
 instance Module DummyModule where
   type ItemTy DummyModule = DummyItem
@@ -56,7 +56,7 @@ newtype DummyItem = DummyItem { _dummyItemName :: ItemName }
   deriving (Show, Eq)
 
 instance SourcePosProvider DummyItem where
-  sourcePos _ = sourcePos ()
+  _sourcePos _ = _sourcePos ()
 
 instance Item DummyItem where
   _itemName = _dummyItemName

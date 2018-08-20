@@ -52,7 +52,7 @@ import           System.IO.Error                ( tryIOError )
 import           Intentio.Diagnostics           ( Diagnostic
                                                 , DiagnosticSeverity(..)
                                                 , diagnosticSeverity
-                                                , ice
+                                                , iceFor
                                                 , sourcePos
                                                 )
 import qualified Intentio.TypeMap              as TM
@@ -106,7 +106,7 @@ liftIOE m = liftIO (tryIOError m) >>= perr
   perr (Right x ) = return x
   perr (Left  ex) = pushDiagnostic (mkDiag ex) >> unreachable
 
-  mkDiag = ice (sourcePos ()) . show
+  mkDiag = iceFor () . show
 
 --------------------------------------------------------------------------------
 -- Running compilation

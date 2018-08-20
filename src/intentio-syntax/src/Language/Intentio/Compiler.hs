@@ -62,7 +62,7 @@ makeLenses ''SourceFile
 makeLenses ''SourceText
 
 instance SourcePosProvider SourceFile where
-  sourcePos SourceFile { _sourceFilePath } = SourcePos _sourceFilePath 0 0
+  _sourcePos SourceFile { _sourceFilePath = p } = SourcePos p 0 0
 
 instance Module SourceFile where
   type ItemTy SourceFile = Void
@@ -70,8 +70,7 @@ instance Module SourceFile where
   _moduleItems = const []
 
 instance SourcePosProvider SourceText where
-  sourcePos SourceText { _sourceTextFilePath } =
-    SourcePos _sourceTextFilePath 0 0
+  _sourcePos SourceText { _sourceTextFilePath = p } = SourcePos p 0 0
 
 instance Module SourceText where
   type ItemTy SourceText = Void

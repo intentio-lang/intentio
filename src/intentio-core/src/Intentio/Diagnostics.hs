@@ -28,6 +28,7 @@ module Intentio.Diagnostics
   , sourceLine
   , sourceColumn
   , SourcePosProvider(..)
+  , sourcePos
   )
 where
 
@@ -89,7 +90,7 @@ instance DiagnosticPrintable (Seq Diagnostic) where
 
 diagnosticFor
   :: SourcePosProvider a => DiagnosticSeverity -> a -> Text -> Diagnostic
-diagnosticFor s p m = Diagnostic s (sourcePos p) m
+diagnosticFor s p m = Diagnostic s (_sourcePos p) m
 {-# INLINE diagnosticFor #-}
 
 cnote :: SourcePos -> Text -> Diagnostic
@@ -157,20 +158,25 @@ instance DiagnosticPrintable SourcePos where
     where showLC = show (l + 1) <> ":" <> show (c + 1)
 
 class SourcePosProvider a where
-  -- | Construct source position for given item
-  sourcePos :: a -> SourcePos
+  -- | Get source position of given item
+  _sourcePos :: a -> SourcePos
+
+sourcePos
+  :: (Profunctor p, Contravariant f, SourcePosProvider a)
+  => Optic' p f a SourcePos
+sourcePos = to _sourcePos
 
 instance SourcePosProvider () where
-  sourcePos () = SourcePos "" 0 0
-  {-# INLINABLE sourcePos #-}
+  _sourcePos () = SourcePos "" 0 0
+  {-# INLINABLE _sourcePos #-}
 
 instance SourcePosProvider Void where
-  sourcePos _ = SourcePos "" 0 0
-  {-# INLINABLE sourcePos #-}
+  _sourcePos _ = SourcePos "" 0 0
+  {-# INLINABLE _sourcePos #-}
 
 instance SourcePosProvider SourcePos where
-  sourcePos = id
-  {-# INLINE sourcePos #-}
+  _sourcePos = id
+  {-# INLINE _sourcePos #-}
 
 ----------------------------------------------------------------------------------
 -- Lenses

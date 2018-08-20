@@ -1,9 +1,9 @@
-resolver: lts-11.2
+resolver: lts-12.5
 
 require-stack-version: '>= 1.6'
 
 packages:
   - src/intentio-core
-  - src/intentio-interactive
+  - src/intentio-driver
   - src/intentio-syntax
   - src/intentio-testutil

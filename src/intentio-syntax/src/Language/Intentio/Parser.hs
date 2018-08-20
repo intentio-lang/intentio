@@ -33,6 +33,8 @@ import           Text.Megaparsec.Expr           ( Operator
                                                 , makeExprParser
                                                 )
 
+import           Intentio.Compiler              ( ModuleName )
+
 import           Language.Intentio.AST
 import           Language.Intentio.Lexer        ( Parser
                                                 , ParserError
@@ -46,31 +48,32 @@ import           Language.Intentio.Token
 -- Parser entry-points
 
 parseModule
-  :: String -- ^ Name of source file.
-  -> Text   -- ^ Input for parser.
-  -> Either ParserError Module
-parseModule = M.parse mod
+  :: ModuleName -- ^ Name of module.
+  -> FilePath   -- ^ Name of source file.
+  -> Text       -- ^ Input for parser.
+  -> Either ParserError ModuleSource
+parseModule modName = M.parse (mod modName)
 
 parseItemDecl
-  :: String -- ^ Name of source file.
-  -> Text   -- ^ Input for parser.
+  :: FilePath -- ^ Name of source file.
+  -> Text     -- ^ Input for parser.
   -> Either ParserError ItemDecl
 parseItemDecl = M.parse itemDecl
 
 parseExpr
-  :: String -- ^ Name of source file.
-  -> Text   -- ^ Input for parser.
+  :: FilePath -- ^ Name of source file.
+  -> Text     -- ^ Input for parser.
   -> Either ParserError Expr
 parseExpr = M.parse expr
 
 --------------------------------------------------------------------------------
 -- Core parser productions
 
-mod :: Parser Module
-mod = do
-  _moduleItems <- many itemDecl
-  _            <- eof
-  return Module {..}
+mod :: Text -> Parser ModuleSource
+mod _moduleSourceName = do
+  _moduleSourceItems <- many itemDecl
+  _                  <- eof
+  return ModuleSource {..}
 
 itemDecl :: Parser ItemDecl
 itemDecl = funDecl
@@ -103,7 +106,7 @@ anyId = try qid <|> try id
 funDecl :: Parser ItemDecl
 funDecl = do
   _              <- tok TKwFun
-  _funDeclName   <- scopeId
+  _itemDeclName  <- scopeId
   _funDeclParams <- params
   _funDeclBody   <- body
   return FunDecl {..}

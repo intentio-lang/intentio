@@ -1,0 +1,31 @@
+_common: !include "../package-common.yaml"
+
+name: intentio-driver
+
+<<: *meta
+
+dependencies:
+  - base
+  - filepath
+  - intentio-core
+  - intentio-syntax
+  - optparse-applicative
+  - pretty-simple
+
+library:
+  source-dirs: src
+
+executables:
+  intentioc:
+    main: Main.hs
+    source-dirs: app
+    dependencies:
+      - intentio-driver
+
+tests:
+  intentio-driver-test:
+    main: Spec.hs
+    source-dirs: test
+    dependencies:
+      - intentio-driver
+      - hspec

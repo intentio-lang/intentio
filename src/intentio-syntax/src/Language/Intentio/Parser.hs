@@ -33,7 +33,7 @@ import           Text.Megaparsec.Expr           ( Operator
                                                 , makeExprParser
                                                 )
 
-import           Intentio.Compiler              ( ModuleName )
+import           Intentio.Compiler              ( ModuleName(..) )
 
 import           Language.Intentio.AST
 import           Language.Intentio.Lexer        ( Parser
@@ -52,7 +52,7 @@ parseModule
   -> FilePath   -- ^ Name of source file.
   -> Text       -- ^ Input for parser.
   -> Either ParserError ModuleSource
-parseModule modName = M.parse (mod modName)
+parseModule (ModuleName modName) = M.parse (mod modName)
 
 parseItemDecl
   :: FilePath -- ^ Name of source file.

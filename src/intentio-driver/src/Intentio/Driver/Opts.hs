@@ -29,6 +29,7 @@ import           Options.Applicative            ( Parser
 import           System.FilePath                ( takeBaseName )
 
 import           Intentio.Compiler              ( Assembly
+                                                , AssemblyName(..)
                                                 , AssemblyType(..)
                                                 , showAssemblyTypeAbbr
                                                 , fromAssemblyTypeAbbr
@@ -91,7 +92,8 @@ opts = info (helper <*> options) fullDesc
 mkAssemblyFromOpts :: Opts -> Assembly SourceFile
 mkAssemblyFromOpts o = mkAssembly (assemblyType o) name (outputPath o) modlist
  where
-  name    = fromMaybe (toS . takeBaseName . mainModule $ o) (assemblyName o)
+  name    = AssemblyName $ fromMaybe defName (assemblyName o)
+  defName = toS . takeBaseName . mainModule $ o
   modlist = SourceFile <$> mainModule o :| otherModules o
 
 buildInputAssembly :: IO (Assembly SourceFile)

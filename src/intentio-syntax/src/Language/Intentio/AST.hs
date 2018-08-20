@@ -5,7 +5,9 @@ import           Intentio.Prelude
 import           Data.Convertible               ( convError )
 
 import           Intentio.Compiler.Assembly     ( Module(..)
+                                                , ModuleName(..)
                                                 , Item(..)
+                                                , ItemName(..)
                                                 )
 
 import           Language.Intentio.Token
@@ -21,7 +23,7 @@ data ModuleSource = ModuleSource {
 
 instance Module ModuleSource where
   type ItemTy ModuleSource = ItemDecl
-  _moduleName = _moduleSourceName
+  _moduleName = ModuleName . _moduleSourceName
   _moduleItems = _moduleSourceItems
 
 data ItemDecl
@@ -33,7 +35,7 @@ data ItemDecl
   deriving (Eq, Show)
 
 instance Item ItemDecl where
-  _itemName = (\(ScopeId n) -> n) . _itemDeclName
+  _itemName = ItemName . (\(ScopeId n) -> n) . _itemDeclName
 
 newtype ModId = ModId Text
   deriving (Eq, Show)

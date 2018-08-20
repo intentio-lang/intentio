@@ -31,7 +31,7 @@ import           Intentio.Compiler              ( Assembly
                                                 , CompileT
                                                 , liftIOE
                                                 , Module(..)
-                                                , ModuleName
+                                                , ModuleName(..)
                                                 , moduleName
                                                 , impurify
                                                 , pushDiagnostics
@@ -51,18 +51,19 @@ newtype SourceFile = SourceFile { _sourceFilePath :: FilePath }
   deriving (Show, Eq, Ord)
 makeLenses ''SourceFile
 
-instance Module SourceFile where
-  type ItemTy SourceFile = Void
-  _moduleName = toS . takeBaseName . _sourceFilePath
-  _moduleItems = const []
-
 data SourceText = SourceText
   { _sourceTextModuleName :: ModuleName
   , _sourceTextFilePath :: FilePath
   , _sourceTextContent :: Text
   }
   deriving (Show, Eq)
+
 makeLenses ''SourceText
+
+instance Module SourceFile where
+  type ItemTy SourceFile = Void
+  _moduleName = filePathToModName . _sourceFilePath
+  _moduleItems = const []
 
 instance Module SourceText where
   type ItemTy SourceText = Void
@@ -102,7 +103,7 @@ parseSourceText = toCompile . parseSourceText_
 readSourceFile_ :: SourceFile -> IO SourceText
 readSourceFile_ f = do
   let _sourceTextFilePath   = f ^. sourceFilePath
-  let _sourceTextModuleName = toS . takeBaseName $ _sourceTextFilePath
+  let _sourceTextModuleName = filePathToModName _sourceTextFilePath
   _sourceTextContent <- readFile _sourceTextFilePath
   return $ SourceText {..}
 
@@ -113,6 +114,9 @@ parseSourceText_ :: SourceText -> Either ParserError ModuleSource
 parseSourceText_ f = parseModule (f ^. moduleName)
                                  (f ^. sourceTextFilePath)
                                  (f ^. sourceTextContent)
+
+filePathToModName :: FilePath -> ModuleName
+filePathToModName = ModuleName . toS . takeBaseName
 
 toDiag :: ParserError -> Seq Diagnostic
 toDiag parserError = headDiag <| S.fromList stackDiags

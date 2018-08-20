@@ -9,6 +9,7 @@ import           Text.Megaparsec                ( eof
                                                 , some
                                                 )
 
+import           Intentio.Compiler.Assembly     ( ModuleName(..) )
 import           Intentio.TestUtil.Fixture      ( runFileFixtures )
 
 import           Language.Intentio.Parser       ( parseModule
@@ -19,6 +20,6 @@ import           Language.Intentio.Parser       ( parseModule
 spec :: Spec
 spec = parallel $ do
   describe "parser" $ do
-    runFileFixtures "parser-module"   (parseModule "test" "test.ieo")
+    runFileFixtures "parser-module" (parseModule (ModuleName "test") "test.ieo")
     runFileFixtures "parser-itemdecl" (parse (some itemDecl <* eof) "test.ieo")
-    runFileFixtures "parser-expr"     (parse (expr <* eof) "test.ieo")
+    runFileFixtures "parser-expr" (parse (expr <* eof) "test.ieo")

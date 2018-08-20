@@ -1,7 +1,8 @@
 module Intentio.Compiler.Assembly
   (-- * Assembly data structure
     Assembly
-  , AssemblyName
+  , AssemblyName(..)
+  , unAssemblyName
   , AssemblyType(..)
   , showAssemblyTypeAbbr
   , fromAssemblyTypeAbbr
@@ -17,13 +18,15 @@ module Intentio.Compiler.Assembly
   , prettyAssemblyConstructError
 
    -- * Module type class
-  , ModuleName
+  , ModuleName(..)
+  , unModuleName
   , Module(..)
   , moduleName
   , moduleItems
 
    -- * Item type class
-  , ItemName
+  , ItemName(..)
+  , unItemName
   , Item(..)
   , itemName
   )
@@ -33,9 +36,21 @@ import           Intentio.Prelude
 
 import qualified Data.Map.Strict               as M
 
-type AssemblyName = Text
-type ModuleName = Text
-type ItemName = Text
+newtype AssemblyName = AssemblyName { _unAssemblyName :: Text }
+  deriving (Show, Eq, Ord, Hashable)
+
+newtype ModuleName = ModuleName { _unModuleName :: Text }
+  deriving (Show, Eq, Ord, Hashable)
+
+newtype ItemName = ItemName { _unItemName :: Text }
+  deriving (Show, Eq, Ord, Hashable)
+
+makeLenses ''AssemblyName
+makeWrapped ''AssemblyName
+makeLenses ''ModuleName
+makeWrapped ''ModuleName
+makeLenses ''ItemName
+makeWrapped ''ItemName
 
 --------------------------------------------------------------------------------
 -- Assembly data structure

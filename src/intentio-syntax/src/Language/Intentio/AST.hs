@@ -9,6 +9,7 @@ import           Intentio.Compiler.Assembly     ( Module(..)
                                                 , Item(..)
                                                 , ItemName(..)
                                                 )
+import           Intentio.Diagnostics           ( SourcePosProvider(..) )
 
 import           Language.Intentio.Token
 
@@ -20,6 +21,9 @@ data ModuleSource = ModuleSource {
     _moduleSourceItems :: [ItemDecl]
   }
   deriving (Eq, Show)
+
+instance SourcePosProvider ModuleSource where
+  sourcePos _ = undefined -- TODO:
 
 instance Module ModuleSource where
   type ItemTy ModuleSource = ItemDecl
@@ -33,6 +37,9 @@ data ItemDecl
     _funDeclBody :: FunBody
   }
   deriving (Eq, Show)
+
+instance SourcePosProvider ItemDecl where
+  sourcePos _ = undefined -- TODO:
 
 instance Item ItemDecl where
   _itemName = ItemName . (\(ScopeId n) -> n) . _itemDeclName

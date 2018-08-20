@@ -36,6 +36,8 @@ import           Intentio.Prelude
 
 import qualified Data.Map.Strict               as M
 
+import           Intentio.Diagnostics           ( SourcePosProvider )
+
 newtype AssemblyName = AssemblyName { _unAssemblyName :: Text }
   deriving (Show, Eq, Ord, Hashable)
 
@@ -110,7 +112,7 @@ mkModuleMap = M.fromList . map (\m -> (_moduleName m, m)) . toList
 --------------------------------------------------------------------------------
 -- Module class
 
-class (Eq a, Show a, Item (ItemTy a)) => Module a where
+class (Eq a, Show a, SourcePosProvider a, Item (ItemTy a)) => Module a where
   type ItemTy a
   _moduleName :: a -> ModuleName
   _moduleItems :: a -> [ItemTy a]
@@ -131,7 +133,7 @@ instance Module Void where
 --------------------------------------------------------------------------------
 -- Item class
 
-class (Eq a, Show a) => Item a where
+class (Eq a, Show a, SourcePosProvider a) => Item a where
   _itemName :: a -> ItemName
 
 itemName :: (Profunctor p, Contravariant f, Item a) => Optic' p f a ItemName

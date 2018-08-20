@@ -164,6 +164,10 @@ instance SourcePosProvider () where
   sourcePos () = SourcePos "" 0 0
   {-# INLINABLE sourcePos #-}
 
+instance SourcePosProvider Void where
+  sourcePos _ = SourcePos "" 0 0
+  {-# INLINABLE sourcePos #-}
+
 instance SourcePosProvider SourcePos where
   sourcePos = id
   {-# INLINE sourcePos #-}

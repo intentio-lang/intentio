@@ -5,6 +5,7 @@ import           Intentio.Prelude
 import           Test.Hspec
 
 import           Intentio.Compiler
+import           Intentio.Diagnostics
 
 -- | An 'Assembly' that does not do anything special. Useful for testing
 -- or as a seed in complex compilation flows.
@@ -18,7 +19,8 @@ dummyAssembly = dummyAssembly' (dummyModule :| [])
 -- | Constructs library 'DummyAssembly' named @dummy_assembly@ with specified
 -- list of dummy modules.
 dummyAssembly' :: NonEmpty DummyModule -> DummyAssembly
-dummyAssembly' = mkAssembly Library (AssemblyName "dummy_assembly") "dummy_assembly"
+dummyAssembly' =
+  mkAssembly Library (AssemblyName "dummy_assembly") "dummy_assembly"
 
 -- | A library 'DummyAssembly' named @dummy_assembly@ with single `DummyModule'
 -- named @dummy_module@ containing one 'DummyItem' named @dummy_item@.
@@ -32,6 +34,9 @@ data DummyModule
     , _dummyModuleItems :: [DummyItem]
     }
   deriving (Show, Eq)
+
+instance SourcePosProvider DummyModule where
+  sourcePos _ = sourcePos ()
 
 instance Module DummyModule where
   type ItemTy DummyModule = DummyItem
@@ -49,6 +54,9 @@ dummyModule' = DummyModule (ModuleName "dummy_module")
 -- | An 'Item' that does not do anything special.
 newtype DummyItem = DummyItem { _dummyItemName :: ItemName }
   deriving (Show, Eq)
+
+instance SourcePosProvider DummyItem where
+  sourcePos _ = sourcePos ()
 
 instance Item DummyItem where
   _itemName = _dummyItemName
@@ -73,7 +81,7 @@ spec = parallel $ do
   describe "mkAssembly Program" $ do
     it "should build an program assembly with first module being main" $ do
       let mainName = dummyModule ^. moduleName
-      let prog    = mkAssembly Program aname "out" (dummyModule :| [])
+      let prog     = mkAssembly Program aname "out" (dummyModule :| [])
       prog ^. assemblyName `shouldBe` aname
       prog ^. assemblyOutputPath `shouldBe` "out"
       prog ^. assemblyMainModuleName `shouldBe` Just mainName

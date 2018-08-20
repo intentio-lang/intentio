@@ -38,6 +38,7 @@ import           Intentio.Compiler              ( Assembly
                                                 )
 import           Intentio.Diagnostics           ( Diagnostic
                                                 , SourcePos(..)
+                                                , SourcePosProvider(..)
                                                 , cerror
                                                 , cnote
                                                 )
@@ -49,7 +50,6 @@ import           Language.Intentio.Parser       ( ParserError
 
 newtype SourceFile = SourceFile { _sourceFilePath :: FilePath }
   deriving (Show, Eq, Ord)
-makeLenses ''SourceFile
 
 data SourceText = SourceText
   { _sourceTextModuleName :: ModuleName
@@ -58,12 +58,20 @@ data SourceText = SourceText
   }
   deriving (Show, Eq)
 
+makeLenses ''SourceFile
 makeLenses ''SourceText
+
+instance SourcePosProvider SourceFile where
+  sourcePos SourceFile { _sourceFilePath } = SourcePos _sourceFilePath 0 0
 
 instance Module SourceFile where
   type ItemTy SourceFile = Void
   _moduleName = filePathToModName . _sourceFilePath
   _moduleItems = const []
+
+instance SourcePosProvider SourceText where
+  sourcePos SourceText { _sourceTextFilePath } =
+    SourcePos _sourceTextFilePath 0 0
 
 instance Module SourceText where
   type ItemTy SourceText = Void

@@ -1,0 +1,22 @@
+_common: !include "../package-common.yaml"
+
+name: intentio-hir
+
+<<: *meta
+
+dependencies:
+  - base
+  - containers
+  - intentio-core
+  - intentio-syntax
+
+library:
+  source-dirs: src
+
+tests:
+  intentio-hir-test:
+    main: Spec.hs
+    source-dirs: test
+    dependencies:
+      - intentio-hir
+      - hspec

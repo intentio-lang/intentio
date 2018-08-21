@@ -5,6 +5,7 @@ name: intentio-core
 <<: *meta
 
 dependencies:
+  - aeson
   - base
   - containers
   - convertible

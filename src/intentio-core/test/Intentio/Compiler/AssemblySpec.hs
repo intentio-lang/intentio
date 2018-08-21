@@ -59,7 +59,7 @@ instance SourcePosProvider DummyItem where
   _sourcePos _ = _sourcePos ()
 
 instance Item DummyItem where
-  _itemName = _dummyItemName
+  _itemName = Just . _dummyItemName
 
 -- | A 'DummyItem' named @dummy_item@.
 dummyItem :: DummyItem

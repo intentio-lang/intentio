@@ -25,3 +25,4 @@ tests:
     dependencies:
       - intentio-core
       - hspec
+      - QuickCheck

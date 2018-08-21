@@ -37,6 +37,9 @@ import           Intentio.Prelude        hiding ( sourceFile
                                                 , sourceColumn
                                                 )
 
+import           Data.Aeson                     ( ToJSON(..)
+                                                , FromJSON(..)
+                                                )
 import qualified Data.Text                     as T
 
 ----------------------------------------------------------------------------------
@@ -148,7 +151,15 @@ data SourcePos = SourcePos
   { _sourceFile   :: FilePath       -- ^ Source file name
   , _sourceLine   :: !LineNumber    -- ^ Line number
   , _sourceColumn :: !ColumnNumber  -- ^ Column number
-  } deriving (Show, Read, Eq, Ord)
+  } deriving (Show, Read, Eq, Ord, Generic)
+
+instance ToJSON SourcePos where
+  toJSON (SourcePos f l c) = toJSON (f, l, c)
+
+instance FromJSON SourcePos where
+  parseJSON v = do
+    (f, l, c) <- parseJSON v
+    return $ SourcePos f l c
 
 instance DiagnosticPrintable SourcePos where
   diagnosticPrint _ (SourcePos "" 0 0) = "?"

@@ -44,6 +44,9 @@ import           Data.Convertible              as X
                                                 , safeConvert
                                                 )
 
+import           GHC.Exts                      as X
+                                                ( IsList(fromList, fromListN) )
+
 -- | A marker for unreachable code paths, throws error when reached.
 unreachable :: HasCallStack => a
 unreachable = error "unreachable code"

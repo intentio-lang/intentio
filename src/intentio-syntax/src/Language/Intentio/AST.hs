@@ -42,7 +42,7 @@ instance SourcePosProvider ItemDecl where
   _sourcePos _ = undefined -- TODO:
 
 instance Item ItemDecl where
-  _itemName = ItemName . (\(ScopeId n) -> n) . _itemDeclName
+  _itemName = Just . ItemName . (\(ScopeId n) -> n) . _itemDeclName
 
 newtype ModId = ModId Text
   deriving (Eq, Show)
@@ -92,7 +92,10 @@ data Literal
   | CharString Text
   | RawString Text
   | RegexString Text
-  deriving (Eq, Show)
+  deriving (Eq, Show, Generic)
+
+instance ToJSON Literal
+instance FromJSON Literal
 
 data BinOp
   = BinAdd

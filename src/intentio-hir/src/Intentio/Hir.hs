@@ -227,7 +227,7 @@ makeLenses ''BinOpKind
 makePrisms ''BinOpKind
 
 moduleItem :: ItemId -> Traversal' Module Item
-moduleItem (ItemId i) = Intentio.Hir.moduleItems . ix i
+moduleItem (ItemId i) = moduleItems . ix i
 
 moduleBody :: BodyId -> Traversal' Module Body
 moduleBody (BodyId i) = moduleBodies . ix i

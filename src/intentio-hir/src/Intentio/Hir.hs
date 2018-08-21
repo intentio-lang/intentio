@@ -51,7 +51,7 @@ instance C.Module Module where
     toList $ (\w -> i ^?! ix (w ^. _Wrapped)) <$> n
 
 data Item = Item
-  { _itemName    :: ItemName
+  { _itemName       :: ItemName
   , _itemId         :: ItemId
   , _itemSourcePos  :: SourcePos
   , _itemKind       :: ItemKind

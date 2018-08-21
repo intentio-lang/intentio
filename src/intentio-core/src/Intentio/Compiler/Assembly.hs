@@ -113,8 +113,15 @@ mkModuleMap = M.fromList . map (\m -> (_moduleName m, m)) . toList
 -- Module class
 
 class (Eq a, Show a, SourcePosProvider a, Item (ItemTy a)) => Module a where
+  -- | A type of items declared by this module type.
   type ItemTy a
+
+  -- | Name of this module.
   _moduleName :: a -> ModuleName
+
+  -- | A list of items declared in this module.
+  --
+  -- Items should be in same order as in input source code.
   _moduleItems :: a -> [ItemTy a]
 
 moduleName
@@ -134,6 +141,7 @@ instance Module Void where
 -- Item class
 
 class (Eq a, Show a, SourcePosProvider a) => Item a where
+  -- | Name of this item, visible to outer world.
   _itemName :: a -> ItemName
 
 itemName :: (Profunctor p, Contravariant f, Item a) => Optic' p f a ItemName

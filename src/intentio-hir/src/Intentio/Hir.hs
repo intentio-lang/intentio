@@ -71,7 +71,8 @@ data ItemKind
 
 data Body = Body
   { _bodyParams  :: [Param]
-  , _bodyVars    :: [Var]
+  , _bodyVars    :: IM.IntMap Var
+  , _bodyVarIds  :: [VarId]
   , _bodyValue   :: Expr
   }
   deriving (Show, Eq)
@@ -230,3 +231,6 @@ moduleItem (ItemId i) = Intentio.Hir.moduleItems . ix i
 
 moduleBody :: BodyId -> Traversal' Module Body
 moduleBody (BodyId i) = moduleBodies . ix i
+
+bodyVar :: VarId -> Traversal' Body Var
+bodyVar (VarId i) = bodyVars . ix i

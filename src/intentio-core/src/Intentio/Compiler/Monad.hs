@@ -37,6 +37,8 @@ module Intentio.Compiler.Monad
   , pushDiagnostics
   , pushDiagnosticE
   , pushDiagnosticsE
+  , pushIce
+  , pushIceFor
   )
 where
 
@@ -52,7 +54,10 @@ import           System.IO.Error                ( tryIOError )
 import           Intentio.Diagnostics           ( Diagnostic
                                                 , DiagnosticSeverity(..)
                                                 , diagnosticSeverity
+                                                , ice
                                                 , iceFor
+                                                , SourcePos
+                                                , HasSourcePos
                                                 )
 import qualified Intentio.TypeMap              as TM
 
@@ -191,6 +196,13 @@ pushDiagnosticE = pushDiagnostic_ DiagnosticICE
 
 pushDiagnosticsE :: (Foldable t, Monad m) => t Diagnostic -> CompileT m ()
 pushDiagnosticsE = pushDiagnostics_ DiagnosticICE
+
+pushIce :: forall a m . (Monad m) => SourcePos -> Text -> CompileT m a
+pushIce s t = pushDiagnostic (ice s t) >> unreachable
+
+pushIceFor
+  :: forall a m s . (Monad m, HasSourcePos s) => s -> Text -> CompileT m a
+pushIceFor s t = pushDiagnostic (iceFor s t) >> unreachable
 
 pushDiagnostic_ :: Monad m => DiagnosticSeverity -> Diagnostic -> CompileT m ()
 pushDiagnostic_ s d = do

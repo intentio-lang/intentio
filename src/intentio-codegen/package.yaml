@@ -5,9 +5,14 @@ name: intentio-codegen
 <<: *meta
 
 dependencies:
+  - aeson
   - base
+  - containers
   - intentio-core
-  - language-c
+  - intentio-hir
+  - language-c-quote
+  - mainland-pretty
+  - text
 
 library:
   source-dirs: src
@@ -19,3 +24,4 @@ tests:
     dependencies:
       - intentio-codegen
       - hspec
+      - QuickCheck

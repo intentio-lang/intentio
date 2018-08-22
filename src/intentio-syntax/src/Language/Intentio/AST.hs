@@ -9,7 +9,7 @@ import           Intentio.Compiler.Assembly     ( Module(..)
                                                 , Item(..)
                                                 , ItemName(..)
                                                 )
-import           Intentio.Diagnostics           ( SourcePosProvider(..) )
+import           Intentio.Diagnostics           ( HasSourcePos(..) )
 
 import           Language.Intentio.Token
 
@@ -22,7 +22,7 @@ data ModuleSource = ModuleSource {
   }
   deriving (Eq, Show)
 
-instance SourcePosProvider ModuleSource where
+instance HasSourcePos ModuleSource where
   _sourcePos _ = undefined -- TODO:
 
 instance Module ModuleSource where
@@ -38,7 +38,7 @@ data ItemDecl
   }
   deriving (Eq, Show)
 
-instance SourcePosProvider ItemDecl where
+instance HasSourcePos ItemDecl where
   _sourcePos _ = undefined -- TODO:
 
 instance Item ItemDecl where

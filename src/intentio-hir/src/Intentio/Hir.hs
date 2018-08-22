@@ -11,7 +11,7 @@ import qualified Data.Map.Strict               as M
 
 import qualified Intentio.Compiler             as C
 import           Intentio.Diagnostics           ( SourcePos(..)
-                                                , SourcePosProvider(..)
+                                                , HasSourcePos(..)
                                                 )
 
 import           Intentio.Compiler             as X
@@ -51,7 +51,7 @@ data Module = Module
 instance ToJSON Module
 instance FromJSON Module
 
-instance SourcePosProvider Module where
+instance HasSourcePos Module where
   _sourcePos = _moduleSourcePos
 
 instance C.Module Module where
@@ -71,7 +71,7 @@ data Item = Item
 instance ToJSON Item
 instance FromJSON Item
 
-instance SourcePosProvider Item where
+instance HasSourcePos Item where
   _sourcePos = _itemSourcePos
 
 instance C.Item Item where
@@ -96,7 +96,7 @@ data Body = Body
 instance ToJSON Body
 instance FromJSON Body
 
-instance SourcePosProvider Body where
+instance HasSourcePos Body where
   _sourcePos = _sourcePos . _bodyValue
 
 data Var = Var
@@ -108,7 +108,7 @@ data Var = Var
 instance ToJSON Var
 instance FromJSON Var
 
-instance SourcePosProvider Var where
+instance HasSourcePos Var where
   _sourcePos = _sourcePos . _varIdent
 
 newtype Param = Param { _paramVarId :: VarId }
@@ -123,7 +123,7 @@ data Expr = Expr
 instance ToJSON Expr
 instance FromJSON Expr
 
-instance SourcePosProvider Expr where
+instance HasSourcePos Expr where
   _sourcePos = _exprSourcePos
 
 data ExprKind
@@ -151,7 +151,7 @@ data Ident = Ident
 instance ToJSON Ident
 instance FromJSON Ident
 
-instance SourcePosProvider Ident where
+instance HasSourcePos Ident where
   _sourcePos = _identSourcePos
 
 data Block = Block
@@ -163,7 +163,7 @@ data Block = Block
 instance ToJSON Block
 instance FromJSON Block
 
-instance SourcePosProvider Block where
+instance HasSourcePos Block where
   _sourcePos = _blockSourcePos
 
 data Path = Path
@@ -175,7 +175,7 @@ data Path = Path
 instance ToJSON Path
 instance FromJSON Path
 
-instance SourcePosProvider Path where
+instance HasSourcePos Path where
   _sourcePos = _pathSourcePos
 
 data PathKind

@@ -41,7 +41,7 @@ import           Data.Aeson                     ( ToJSON(..)
                                                 )
 import qualified Data.Map.Strict               as M
 
-import           Intentio.Diagnostics           ( SourcePosProvider )
+import           Intentio.Diagnostics           ( HasSourcePos )
 
 newtype AssemblyName = AssemblyName { _unAssemblyName :: Text }
   deriving (Show, Eq, Ord, Hashable, Generic)
@@ -147,7 +147,7 @@ mkModuleMap = M.fromList . map (\m -> (_moduleName m, m)) . toList
 --------------------------------------------------------------------------------
 -- Module class
 
-class (Eq a, Show a, SourcePosProvider a, Item (ItemTy a)) => Module a where
+class (Eq a, Show a, HasSourcePos a, Item (ItemTy a)) => Module a where
   -- | A type of items declared by this module type.
   type ItemTy a
 
@@ -175,7 +175,7 @@ instance Module Void where
 --------------------------------------------------------------------------------
 -- Item class
 
-class (Eq a, Show a, SourcePosProvider a) => Item a where
+class (Eq a, Show a, HasSourcePos a) => Item a where
   -- | Name of this item, visible to outer world.
   _itemName :: a -> Maybe ItemName
 

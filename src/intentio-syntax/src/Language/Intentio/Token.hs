@@ -74,12 +74,18 @@ data TokenType
   | TRawString
   | TRegexString
 
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord, Show, Generic)
+
+instance ToJSON TokenType
+instance FromJSON TokenType
 
 data Token = Token {
     _ty :: TokenType,
     _text :: Text
   }
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord, Show, Generic)
+
+instance ToJSON Token
+instance FromJSON Token
 
 makeLenses ''Token

@@ -53,7 +53,6 @@ import           Intentio.Diagnostics           ( Diagnostic
                                                 , DiagnosticSeverity(..)
                                                 , diagnosticSeverity
                                                 , iceFor
-                                                , sourcePos
                                                 )
 import qualified Intentio.TypeMap              as TM
 

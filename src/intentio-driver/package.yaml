@@ -5,12 +5,12 @@ name: intentio-driver
 <<: *meta
 
 dependencies:
+  - aeson
   - base
   - filepath
   - intentio-core
   - intentio-syntax
   - optparse-applicative
-  - pretty-simple
 
 library:
   source-dirs: src

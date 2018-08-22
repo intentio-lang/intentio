@@ -27,7 +27,7 @@ module Intentio.Diagnostics
   , sourceFile
   , sourceLine
   , sourceColumn
-  , SourcePosProvider(..)
+  , HasSourcePos(..)
   , sourcePos
   )
 where
@@ -37,6 +37,9 @@ import           Intentio.Prelude        hiding ( sourceFile
                                                 , sourceColumn
                                                 )
 
+import           Data.Aeson                     ( ToJSON(..)
+                                                , FromJSON(..)
+                                                )
 import qualified Data.Text                     as T
 
 ----------------------------------------------------------------------------------
@@ -89,7 +92,7 @@ instance DiagnosticPrintable (Seq Diagnostic) where
   diagnosticPrint o = diagnosticPrint o . toList
 
 diagnosticFor
-  :: SourcePosProvider a => DiagnosticSeverity -> a -> Text -> Diagnostic
+  :: HasSourcePos a => DiagnosticSeverity -> a -> Text -> Diagnostic
 diagnosticFor s p m = Diagnostic s (_sourcePos p) m
 {-# INLINE diagnosticFor #-}
 
@@ -97,7 +100,7 @@ cnote :: SourcePos -> Text -> Diagnostic
 cnote = Diagnostic DiagnosticNote
 {-# INLINE cnote #-}
 
-cnoteFor :: SourcePosProvider a => a -> Text -> Diagnostic
+cnoteFor :: HasSourcePos a => a -> Text -> Diagnostic
 cnoteFor = diagnosticFor DiagnosticNote
 {-# INLINE cnoteFor #-}
 
@@ -105,7 +108,7 @@ chint :: SourcePos -> Text -> Diagnostic
 chint = Diagnostic DiagnosticHint
 {-# INLINE chint #-}
 
-chintFor :: SourcePosProvider a => a -> Text -> Diagnostic
+chintFor :: HasSourcePos a => a -> Text -> Diagnostic
 chintFor = diagnosticFor DiagnosticHint
 {-# INLINE chintFor #-}
 
@@ -113,7 +116,7 @@ cwarning :: SourcePos -> Text -> Diagnostic
 cwarning = Diagnostic DiagnosticWarning
 {-# INLINE cwarning #-}
 
-cwarningFor :: SourcePosProvider a => a -> Text -> Diagnostic
+cwarningFor :: HasSourcePos a => a -> Text -> Diagnostic
 cwarningFor = diagnosticFor DiagnosticWarning
 {-# INLINE cwarningFor #-}
 
@@ -121,7 +124,7 @@ cerror :: SourcePos -> Text -> Diagnostic
 cerror = Diagnostic DiagnosticError
 {-# INLINE cerror #-}
 
-cerrorFor :: SourcePosProvider a => a -> Text -> Diagnostic
+cerrorFor :: HasSourcePos a => a -> Text -> Diagnostic
 cerrorFor = diagnosticFor DiagnosticError
 {-# INLINE cerrorFor #-}
 
@@ -129,7 +132,7 @@ ice :: SourcePos -> Text -> Diagnostic
 ice = Diagnostic DiagnosticICE
 {-# INLINE ice #-}
 
-iceFor :: SourcePosProvider a => a -> Text -> Diagnostic
+iceFor :: HasSourcePos a => a -> Text -> Diagnostic
 iceFor = diagnosticFor DiagnosticICE
 {-# INLINE iceFor #-}
 
@@ -148,7 +151,15 @@ data SourcePos = SourcePos
   { _sourceFile   :: FilePath       -- ^ Source file name
   , _sourceLine   :: !LineNumber    -- ^ Line number
   , _sourceColumn :: !ColumnNumber  -- ^ Column number
-  } deriving (Show, Read, Eq, Ord)
+  } deriving (Show, Read, Eq, Ord, Generic)
+
+instance ToJSON SourcePos where
+  toJSON (SourcePos f l c) = toJSON (f, l, c)
+
+instance FromJSON SourcePos where
+  parseJSON v = do
+    (f, l, c) <- parseJSON v
+    return $ SourcePos f l c
 
 instance DiagnosticPrintable SourcePos where
   diagnosticPrint _ (SourcePos "" 0 0) = "?"
@@ -157,24 +168,24 @@ instance DiagnosticPrintable SourcePos where
     | otherwise = toS f <> ":" <> showLC
     where showLC = show (l + 1) <> ":" <> show (c + 1)
 
-class SourcePosProvider a where
+class HasSourcePos a where
   -- | Get source position of given item
   _sourcePos :: a -> SourcePos
 
 sourcePos
-  :: (Profunctor p, Contravariant f, SourcePosProvider a)
+  :: (Profunctor p, Contravariant f, HasSourcePos a)
   => Optic' p f a SourcePos
 sourcePos = to _sourcePos
 
-instance SourcePosProvider () where
+instance HasSourcePos () where
   _sourcePos () = SourcePos "" 0 0
   {-# INLINABLE _sourcePos #-}
 
-instance SourcePosProvider Void where
+instance HasSourcePos Void where
   _sourcePos _ = SourcePos "" 0 0
   {-# INLINABLE _sourcePos #-}
 
-instance SourcePosProvider SourcePos where
+instance HasSourcePos SourcePos where
   _sourcePos = id
   {-# INLINE _sourcePos #-}
 

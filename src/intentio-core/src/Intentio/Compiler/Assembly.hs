@@ -34,18 +34,53 @@ where
 
 import           Intentio.Prelude
 
+import           Data.Aeson                     ( ToJSON(..)
+                                                , FromJSON(..)
+                                                , ToJSONKey
+                                                , FromJSONKey
+                                                )
 import qualified Data.Map.Strict               as M
 
-import           Intentio.Diagnostics           ( SourcePosProvider )
+import           Intentio.Diagnostics           ( HasSourcePos )
 
 newtype AssemblyName = AssemblyName { _unAssemblyName :: Text }
-  deriving (Show, Eq, Ord, Hashable)
+  deriving (Show, Eq, Ord, Hashable, Generic)
+
+instance ToJSON AssemblyName where
+  toJSON = toJSON . _unAssemblyName
+  toEncoding = toEncoding . _unAssemblyName
+
+instance FromJSON AssemblyName where
+  parseJSON v = AssemblyName <$> parseJSON v
+
+instance ToJSONKey AssemblyName
+instance FromJSONKey AssemblyName
 
 newtype ModuleName = ModuleName { _unModuleName :: Text }
-  deriving (Show, Eq, Ord, Hashable)
+  deriving (Show, Eq, Ord, Hashable, Generic)
+
+instance ToJSON ModuleName where
+  toJSON = toJSON . _unModuleName
+  toEncoding = toEncoding . _unModuleName
+
+instance FromJSON ModuleName where
+  parseJSON v = ModuleName <$> parseJSON v
+
+instance ToJSONKey ModuleName
+instance FromJSONKey ModuleName
 
 newtype ItemName = ItemName { _unItemName :: Text }
-  deriving (Show, Eq, Ord, Hashable)
+  deriving (Show, Eq, Ord, Hashable, Generic)
+
+instance ToJSON ItemName where
+  toJSON = toJSON . _unItemName
+  toEncoding = toEncoding . _unItemName
+
+instance FromJSON ItemName where
+  parseJSON v = ItemName <$> parseJSON v
+
+instance ToJSONKey ItemName
+instance FromJSONKey ItemName
 
 makeLenses ''AssemblyName
 makeWrapped ''AssemblyName
@@ -58,7 +93,10 @@ makeWrapped ''ItemName
 -- Assembly data structure
 
 data AssemblyType = Program | Library
-  deriving (Show, Eq, Ord)
+  deriving (Show, Eq, Ord, Generic)
+
+instance ToJSON AssemblyType
+instance FromJSON AssemblyType
 
 showAssemblyTypeAbbr :: IsString a => AssemblyType -> a
 showAssemblyTypeAbbr Program = "bin"
@@ -77,8 +115,12 @@ data Assembly m
     , _assemblyModules        :: Map ModuleName m
     , _assemblyMainModuleName :: Maybe ModuleName
     }
-  deriving (Show, Eq)
+  deriving (Show, Eq, Generic)
+
 makeLenses ''Assembly
+
+instance ToJSON m => ToJSON (Assembly m)
+instance FromJSON m => FromJSON (Assembly m)
 
 data AssemblyConstructError = MainDoesNotExist
   deriving (Show, Eq, Ord)
@@ -112,9 +154,16 @@ mkModuleMap = M.fromList . map (\m -> (_moduleName m, m)) . toList
 --------------------------------------------------------------------------------
 -- Module class
 
-class (Eq a, Show a, SourcePosProvider a, Item (ItemTy a)) => Module a where
+class (Eq a, Show a, HasSourcePos a, Item (ItemTy a)) => Module a where
+  -- | A type of items declared by this module type.
   type ItemTy a
+
+  -- | Name of this module.
   _moduleName :: a -> ModuleName
+
+  -- | A list of items declared in this module.
+  --
+  -- Items should be in same order as in input source code.
   _moduleItems :: a -> [ItemTy a]
 
 moduleName
@@ -128,15 +177,17 @@ moduleItems = to _moduleItems
 instance Module Void where
   type ItemTy Void = Void
   _moduleName = unreachable
-  _moduleItems = const []
+  _moduleItems = unreachable
 
 --------------------------------------------------------------------------------
 -- Item class
 
-class (Eq a, Show a, SourcePosProvider a) => Item a where
-  _itemName :: a -> ItemName
+class (Eq a, Show a, HasSourcePos a) => Item a where
+  -- | Name of this item, visible to outer world.
+  _itemName :: a -> Maybe ItemName
 
-itemName :: (Profunctor p, Contravariant f, Item a) => Optic' p f a ItemName
+itemName
+  :: (Profunctor p, Contravariant f, Item a) => Optic' p f a (Maybe ItemName)
 itemName = to _itemName
 
 instance Item Void where

@@ -2,7 +2,6 @@ module Language.Intentio.CompilerSpec where
 
 import           Intentio.Prelude
 
-import           Data.List.NonEmpty             ( fromList )
 import           Test.Hspec
 
 import           Intentio.Compiler

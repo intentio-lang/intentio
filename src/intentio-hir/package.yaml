@@ -1,28 +1,23 @@
 _common: !include "../package-common.yaml"
 
-name: intentio-core
+name: intentio-hir
 
 <<: *meta
 
 dependencies:
-  - aeson
   - base
   - containers
-  - convertible
-  - lens
-  - mtl
-  - protolude
-  - text
-  - transformers
+  - intentio-core
+  - intentio-syntax
 
 library:
   source-dirs: src
 
 tests:
-  intentio-core-test:
+  intentio-hir-test:
     main: Spec.hs
     source-dirs: test
     dependencies:
-      - intentio-core
+      - aeson
+      - intentio-hir
       - hspec
-      - QuickCheck

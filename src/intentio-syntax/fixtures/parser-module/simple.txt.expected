@@ -1,25 +1,38 @@
-ModuleSource 
-    { _moduleSourceName = "test"
-    , _moduleSourceItems = 
-        [ FunDecl 
-            { _itemDeclName = ScopeId "foo"
-            , _funDeclParams = FunParams 
-                [ FunParam ( ScopeId "a" )
-                , FunParam ( ScopeId "b" )
-                ] 
-            , _funDeclBody = FunBody ( Block [ IdExpr ( Id ( ScopeId "a" ) ) ] )
-            } 
-        , FunDecl 
-            { _itemDeclName = ScopeId "bar"
-            , _funDeclParams = FunParams []
-            , _funDeclBody = FunBody 
-                ( Block 
-                    [ LetDeclExpr 
-                        { _letDeclName = ScopeId "x"
-                        , _letDeclVal = LitExpr ( Integer "4" )
-                        } 
-                    ]
-                )
-            } 
-        ] 
-    } 
+{
+  "_moduleSourceItems": [
+    {
+      "_funDeclBody": [
+        {
+          "contents": {
+            "contents": "a",
+            "tag": "Id"
+          },
+          "tag": "IdExpr"
+        }
+      ],
+      "_funDeclParams": [
+        "a",
+        "b"
+      ],
+      "_itemDeclName": "foo"
+    },
+    {
+      "_funDeclBody": [
+        {
+          "_letDeclName": "x",
+          "_letDeclVal": {
+            "contents": {
+              "contents": "4",
+              "tag": "Integer"
+            },
+            "tag": "LitExpr"
+          },
+          "tag": "LetDeclExpr"
+        }
+      ],
+      "_funDeclParams": [],
+      "_itemDeclName": "bar"
+    }
+  ],
+  "_moduleSourceName": "test"
+}

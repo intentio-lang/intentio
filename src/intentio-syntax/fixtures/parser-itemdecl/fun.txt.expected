@@ -1,19 +1,46 @@
-[ FunDecl 
-    { _itemDeclName = ScopeId "foo"
-    , _funDeclParams = FunParams 
-        [ FunParam ( ScopeId "a" )
-        , FunParam ( ScopeId "b" )
-        ] 
-    , _funDeclBody = FunBody ( Block [ IdExpr ( Id ( ScopeId "a" ) ) ] )
-    } 
-, FunDecl 
-    { _itemDeclName = ScopeId "id"
-    , _funDeclParams = FunParams [ FunParam ( ScopeId "x" ) ]
-    , _funDeclBody = FunBody ( Block [ IdExpr ( Id ( ScopeId "x" ) ) ] )
-    } 
-, FunDecl 
-    { _itemDeclName = ScopeId "constant"
-    , _funDeclParams = FunParams []
-    , _funDeclBody = FunBody ( Block [ LitExpr ( Integer "92" ) ] )
-    } 
-] 
+[
+  {
+    "_funDeclBody": [
+      {
+        "contents": {
+          "contents": "a",
+          "tag": "Id"
+        },
+        "tag": "IdExpr"
+      }
+    ],
+    "_funDeclParams": [
+      "a",
+      "b"
+    ],
+    "_itemDeclName": "foo"
+  },
+  {
+    "_funDeclBody": [
+      {
+        "contents": {
+          "contents": "x",
+          "tag": "Id"
+        },
+        "tag": "IdExpr"
+      }
+    ],
+    "_funDeclParams": [
+      "x"
+    ],
+    "_itemDeclName": "id"
+  },
+  {
+    "_funDeclBody": [
+      {
+        "contents": {
+          "contents": "92",
+          "tag": "Integer"
+        },
+        "tag": "LitExpr"
+      }
+    ],
+    "_funDeclParams": [],
+    "_itemDeclName": "constant"
+  }
+]

@@ -1,10 +1,38 @@
-WhileExpr 
-    { _whileCondition = BlockExpr 
-        ( Block 
-            [ IdExpr ( Id ( ScopeId "a" ) )
-            , IdExpr ( Id ( ScopeId "b" ) )
-            , IdExpr ( Id ( ScopeId "c" ) )
-            ] 
-        )
-    , _whileBody = Block [ IdExpr ( Id ( ScopeId "x" ) ) ]
-    } 
+{
+  "_whileBody": [
+    {
+      "contents": {
+        "contents": "x",
+        "tag": "Id"
+      },
+      "tag": "IdExpr"
+    }
+  ],
+  "_whileCondition": {
+    "contents": [
+      {
+        "contents": {
+          "contents": "a",
+          "tag": "Id"
+        },
+        "tag": "IdExpr"
+      },
+      {
+        "contents": {
+          "contents": "b",
+          "tag": "Id"
+        },
+        "tag": "IdExpr"
+      },
+      {
+        "contents": {
+          "contents": "c",
+          "tag": "Id"
+        },
+        "tag": "IdExpr"
+      }
+    ],
+    "tag": "BlockExpr"
+  },
+  "tag": "WhileExpr"
+}

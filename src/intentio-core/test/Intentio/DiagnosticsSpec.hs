@@ -2,7 +2,11 @@ module Intentio.DiagnosticsSpec where
 
 import           Intentio.Prelude
 
+import           Data.Aeson                     ( encode
+                                                , decode
+                                                )
 import           Test.Hspec
+import           Test.QuickCheck
 
 import           Intentio.Diagnostics
 
@@ -21,3 +25,6 @@ spec = parallel $ do
 
       it "should increment numbers by one" $ do
         diagnosticShow (SourcePos "file" 4 0) `shouldBe` "file:5:1"
+
+    it "should be JSON-serializable" . property $ \f l c ->
+      let p = SourcePos f l c in (decode . encode) p == Just p

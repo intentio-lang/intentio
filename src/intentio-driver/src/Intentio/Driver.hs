@@ -2,10 +2,10 @@ module Intentio.Driver where
 
 import           Intentio.Prelude
 
+import qualified Data.Aeson
 import           System.Exit                    ( exitSuccess
                                                 , exitFailure
                                                 )
-import           Text.Pretty.Simple             ( pPrint )
 
 import           Intentio.Compiler              ( Assembly
                                                 , Module
@@ -44,8 +44,8 @@ runCompiler = liftIOE buildInputAssembly >>= compilerPipeline
 --------------------------------------------------------------------------------
 -- Helpers
 
-traceStep :: (Module a, Show a) => Assembly a -> Compile (Assembly a)
+traceStep :: (Module a, ToJSON a) => Assembly a -> Compile (Assembly a)
 traceStep a = traceStep_ a >> return a
 
-traceStep_ :: (Module a, Show a) => Assembly a -> Compile ()
-traceStep_ = pPrint
+traceStep_ :: (Module a, ToJSON a) => Assembly a -> Compile ()
+traceStep_ = putStrLn . Data.Aeson.encode

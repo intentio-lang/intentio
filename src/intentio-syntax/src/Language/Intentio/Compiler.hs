@@ -38,7 +38,7 @@ import           Intentio.Compiler              ( Assembly
                                                 )
 import           Intentio.Diagnostics           ( Diagnostic
                                                 , SourcePos(..)
-                                                , SourcePosProvider(..)
+                                                , HasSourcePos(..)
                                                 , cerror
                                                 , cnote
                                                 )
@@ -61,7 +61,7 @@ data SourceText = SourceText
 makeLenses ''SourceFile
 makeLenses ''SourceText
 
-instance SourcePosProvider SourceFile where
+instance HasSourcePos SourceFile where
   _sourcePos SourceFile { _sourceFilePath = p } = SourcePos p 0 0
 
 instance Module SourceFile where
@@ -69,7 +69,7 @@ instance Module SourceFile where
   _moduleName = filePathToModName . _sourceFilePath
   _moduleItems = const []
 
-instance SourcePosProvider SourceText where
+instance HasSourcePos SourceText where
   _sourcePos SourceText { _sourceTextFilePath = p } = SourcePos p 0 0
 
 instance Module SourceText where

@@ -24,13 +24,28 @@ import           Protolude                     as X
                                                 , moduleName
                                                 )
 
+import           Control.Arrow                 as X
+                                                ( (>>>)
+                                                , (<<<)
+                                                )
+
+import           Control.Lens                  as X
+
+import           Data.Aeson                    as X
+                                                ( ToJSON
+                                                , FromJSON
+                                                , ToJSONKey
+                                                , FromJSONKey
+                                                )
+
 import           Data.Convertible              as X
                                                 ( Convertible
                                                 , convert
                                                 , safeConvert
                                                 )
 
-import           Control.Lens                  as X
+import           GHC.Exts                      as X
+                                                ( IsList(fromList, fromListN) )
 
 -- | A marker for unreachable code paths, throws error when reached.
 unreachable :: HasCallStack => a

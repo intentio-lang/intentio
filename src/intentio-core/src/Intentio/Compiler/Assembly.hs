@@ -93,7 +93,10 @@ makeWrapped ''ItemName
 -- Assembly data structure
 
 data AssemblyType = Program | Library
-  deriving (Show, Eq, Ord)
+  deriving (Show, Eq, Ord, Generic)
+
+instance ToJSON AssemblyType
+instance FromJSON AssemblyType
 
 showAssemblyTypeAbbr :: IsString a => AssemblyType -> a
 showAssemblyTypeAbbr Program = "bin"
@@ -112,8 +115,12 @@ data Assembly m
     , _assemblyModules        :: Map ModuleName m
     , _assemblyMainModuleName :: Maybe ModuleName
     }
-  deriving (Show, Eq)
+  deriving (Show, Eq, Generic)
+
 makeLenses ''Assembly
+
+instance ToJSON m => ToJSON (Assembly m)
+instance FromJSON m => FromJSON (Assembly m)
 
 data AssemblyConstructError = MainDoesNotExist
   deriving (Show, Eq, Ord)

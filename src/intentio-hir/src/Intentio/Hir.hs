@@ -34,8 +34,9 @@ newtype VarId = VarId IM.Key
   deriving (Show, Eq, Ord, Hashable, Enum, Bounded, Generic, ToJSON, FromJSON)
 
 data Module = Module
-  { _moduleName       :: ModuleName
-  , _moduleSourcePos  :: SourcePos
+  { _moduleSourcePos  :: SourcePos
+
+  , _moduleName       :: ModuleName
 
   , _moduleExports    :: [ItemId]
 
@@ -61,9 +62,9 @@ instance C.Module Module where
     toList $ (\w -> i ^?! ix (w ^. _Wrapped)) <$> n
 
 data Item = Item
-  { _itemName       :: Maybe ItemName
+  { _itemSourcePos  :: SourcePos
   , _itemId         :: ItemId
-  , _itemSourcePos  :: SourcePos
+  , _itemName       :: Maybe ItemName
   , _itemKind       :: ItemKind
   }
   deriving (Show, Eq, Generic)
@@ -143,8 +144,8 @@ instance ToJSON ExprKind
 instance FromJSON ExprKind
 
 data Ident = Ident
-  { _identName      :: Text
-  , _identSourcePos :: SourcePos
+  { _identSourcePos :: SourcePos
+  , _identName      :: Text
   }
   deriving (Show, Eq, Generic)
 
@@ -155,8 +156,8 @@ instance HasSourcePos Ident where
   _sourcePos = _identSourcePos
 
 data Block = Block
-  { _blockExprs     :: [Expr]
-  , _blockSourcePos :: SourcePos
+  { _blockSourcePos :: SourcePos
+  , _blockExprs     :: [Expr]
   }
   deriving (Show, Eq, Generic)
 

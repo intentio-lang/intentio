@@ -19,6 +19,5 @@ tests:
     source-dirs: test
     dependencies:
       - aeson
-      - aeson-pretty
       - intentio-hir
       - hspec

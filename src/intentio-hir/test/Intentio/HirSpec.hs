@@ -2,8 +2,9 @@ module Intentio.HirSpec where
 
 import           Intentio.Prelude
 
-import           Data.Aeson                     ( decode )
-import           Data.Aeson.Encode.Pretty       ( encodePretty )
+import           Data.Aeson                     ( decode
+                                                , encode
+                                                )
 import           Test.Hspec
 
 import           Intentio.Diagnostics
@@ -19,8 +20,8 @@ import           Intentio.Hir
 --     }
 -- @
 idModule :: Module
-idModule = Module (ModuleName "id")
-                  (SourcePos "id.ieo" 0 0)
+idModule = Module (SourcePos "id.ieo" 0 0)
+                  (ModuleName "id")
                   [ItemId 1]
                   items
                   [ItemId 0, ItemId 1]
@@ -30,15 +31,15 @@ idModule = Module (ModuleName "id")
  where
   items = fromList
     [ ( 0
-      , Item Nothing
+      , Item (SourcePos "id.ieo" 5 0)
              (ItemId 0)
-             (SourcePos "id.ieo" 5 0)
+             Nothing
              (ImportItem (ModuleName "some") (ItemName "_unused"))
       )
     , ( 1
-      , Item (Just $ ItemName "id")
+      , Item (SourcePos "id.ieo" 10 0)
              (ItemId 1)
-             (SourcePos "id.ieo" 10 0)
+             (Just $ ItemName "id")
              (FnItem (BodyId 0))
       )
     ]
@@ -46,7 +47,7 @@ idModule = Module (ModuleName "id")
     [ ( 0
       , Body
         [Param (VarId 0)]
-        (fromList [(0, Var (VarId 0) (Ident "x" (SourcePos "id.ieo" 10 10)))])
+        (fromList [(0, Var (VarId 0) (Ident (SourcePos "id.ieo" 10 10) "x"))])
         [VarId 0]
         (Expr
           (SourcePos "id.ieo" 10 0)
@@ -64,5 +65,4 @@ spec :: Spec
 spec = parallel $ do
   describe "HIR data structure" $ do
     it "should be JSON serializable" $ do
-      -- putStrLn $ encodePretty idModule
-      (decode . encodePretty) idModule `shouldBe` Just idModule
+      (decode . encode) idModule `shouldBe` Just idModule

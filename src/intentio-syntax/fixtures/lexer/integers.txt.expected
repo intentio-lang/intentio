@@ -1,65 +1,66 @@
-[ Token 
-    { _ty = TInteger
-    , _text = "0"
-    } 
-, Token 
-    { _ty = TInteger
-    , _text = "1"
-    } 
-, Token 
-    { _ty = TInteger
-    , _text = "10"
-    } 
-, Token 
-    { _ty = TInteger
-    , _text = "10_0"
-    } 
-, Token 
-    { _ty = TInteger
-    , _text = "10_"
-    } 
-, Token 
-    { _ty = TInteger
-    , _text = "10___"
-    } 
-, Token 
-    { _ty = TInteger
-    , _text = "0b111000"
-    } 
-, Token 
-    { _ty = TInteger
-    , _text = "0B111000"
-    } 
-, Token 
-    { _ty = TInteger
-    , _text = "0b111_000"
-    } 
-, Token 
-    { _ty = TInteger
-    , _text = "0b111_000_"
-    } 
-, Token 
-    { _ty = TInteger
-    , _text = "0o01234567"
-    } 
-, Token 
-    { _ty = TInteger
-    , _text = "0O01234567"
-    } 
-, Token 
-    { _ty = TInteger
-    , _text = "0o0123_4567__"
-    } 
-, Token 
-    { _ty = TInteger
-    , _text = "0x0123456789abcdefABCDEF"
-    } 
-, Token 
-    { _ty = TInteger
-    , _text = "0X0123456789abcdefABCDEF"
-    } 
-, Token 
-    { _ty = TInteger
-    , _text = "0x0123456789_abcdef_ABCDEF_"
-    } 
-] 
+[
+  {
+    "_text": "0",
+    "_ty": "TInteger"
+  },
+  {
+    "_text": "1",
+    "_ty": "TInteger"
+  },
+  {
+    "_text": "10",
+    "_ty": "TInteger"
+  },
+  {
+    "_text": "10_0",
+    "_ty": "TInteger"
+  },
+  {
+    "_text": "10_",
+    "_ty": "TInteger"
+  },
+  {
+    "_text": "10___",
+    "_ty": "TInteger"
+  },
+  {
+    "_text": "0b111000",
+    "_ty": "TInteger"
+  },
+  {
+    "_text": "0B111000",
+    "_ty": "TInteger"
+  },
+  {
+    "_text": "0b111_000",
+    "_ty": "TInteger"
+  },
+  {
+    "_text": "0b111_000_",
+    "_ty": "TInteger"
+  },
+  {
+    "_text": "0o01234567",
+    "_ty": "TInteger"
+  },
+  {
+    "_text": "0O01234567",
+    "_ty": "TInteger"
+  },
+  {
+    "_text": "0o0123_4567__",
+    "_ty": "TInteger"
+  },
+  {
+    "_text": "0x0123456789abcdefABCDEF",
+    "_ty": "TInteger"
+  },
+  {
+    "_text": "0X0123456789abcdefABCDEF",
+    "_ty": "TInteger"
+  },
+  {
+    "_text": "0x0123456789_abcdef_ABCDEF_",
+    "_ty": "TInteger"
+  }
+]

@@ -1,117 +1,118 @@
-[ Token 
-    { _ty = TIdent
-    , _text = "_ignored"
-    } 
-, Token 
-    { _ty = TIdent
-    , _text = "intentio"
-    } 
-, Token 
-    { _ty = TIdent
-    , _text = "inte_ntio'"
-    } 
-, Token 
-    { _ty = TIdent
-    , _text = "qëllim"
-    } 
-, Token 
-    { _ty = TIdent
-    , _text = "意向"
-    } 
-, Token 
-    { _ty = TIdent
-    , _text = "მიზანი"
-    } 
-, Token 
-    { _ty = TIdent
-    , _text = "इरादा"
-    } 
-, Token 
-    { _ty = TIdent
-    , _text = "_इरादा_"
-    } 
-, Token 
-    { _ty = TIdent
-    , _text = "इरादा'"
-    } 
-, Token 
-    { _ty = TIdent
-    , _text = "funny_ident"
-    } 
-, Token 
-    { _ty = TKwFun
-    , _text = "fun"
-    } 
-, Token 
-    { _ty = TIdent
-    , _text = "ident"
-    } 
-, Token 
-    { _ty = TIdent
-    , _text = "identfun"
-    } 
-, Token 
-    { _ty = TIdent
-    , _text = "ident_fun"
-    } 
-, Token 
-    { _ty = TIdent
-    , _text = "ident"
-    } 
-, Token 
-    { _ty = TKwFun
-    , _text = "fun"
-    } 
-, Token 
-    { _ty = TIdent
-    , _text = "a"
-    } 
-, Token 
-    { _ty = TOpAdd
-    , _text = "+"
-    } 
-, Token 
-    { _ty = TIdent
-    , _text = "b"
-    } 
-, Token 
-    { _ty = TIdent
-    , _text = "a"
-    } 
-, Token 
-    { _ty = TOpAdd
-    , _text = "+"
-    } 
-, Token 
-    { _ty = TIdent
-    , _text = "b"
-    } 
-, Token 
-    { _ty = TKwFun
-    , _text = "fun"
-    } 
-, Token 
-    { _ty = TOpAdd
-    , _text = "+"
-    } 
-, Token 
-    { _ty = TIdent
-    , _text = "a"
-    } 
-, Token 
-    { _ty = TIdent
-    , _text = "a"
-    } 
-, Token 
-    { _ty = TOpEq
-    , _text = "="
-    } 
-, Token 
-    { _ty = TOpEq
-    , _text = "="
-    } 
-, Token 
-    { _ty = TIdent
-    , _text = "a"
-    } 
-] 
+[
+  {
+    "_text": "_ignored",
+    "_ty": "TIdent"
+  },
+  {
+    "_text": "intentio",
+    "_ty": "TIdent"
+  },
+  {
+    "_text": "inte_ntio'",
+    "_ty": "TIdent"
+  },
+  {
+    "_text": "qëllim",
+    "_ty": "TIdent"
+  },
+  {
+    "_text": "意向",
+    "_ty": "TIdent"
+  },
+  {
+    "_text": "მიზანი",
+    "_ty": "TIdent"
+  },
+  {
+    "_text": "इरादा",
+    "_ty": "TIdent"
+  },
+  {
+    "_text": "_इरादा_",
+    "_ty": "TIdent"
+  },
+  {
+    "_text": "इरादा'",
+    "_ty": "TIdent"
+  },
+  {
+    "_text": "funny_ident",
+    "_ty": "TIdent"
+  },
+  {
+    "_text": "fun",
+    "_ty": "TKwFun"
+  },
+  {
+    "_text": "ident",
+    "_ty": "TIdent"
+  },
+  {
+    "_text": "identfun",
+    "_ty": "TIdent"
+  },
+  {
+    "_text": "ident_fun",
+    "_ty": "TIdent"
+  },
+  {
+    "_text": "ident",
+    "_ty": "TIdent"
+  },
+  {
+    "_text": "fun",
+    "_ty": "TKwFun"
+  },
+  {
+    "_text": "a",
+    "_ty": "TIdent"
+  },
+  {
+    "_text": "+",
+    "_ty": "TOpAdd"
+  },
+  {
+    "_text": "b",
+    "_ty": "TIdent"
+  },
+  {
+    "_text": "a",
+    "_ty": "TIdent"
+  },
+  {
+    "_text": "+",
+    "_ty": "TOpAdd"
+  },
+  {
+    "_text": "b",
+    "_ty": "TIdent"
+  },
+  {
+    "_text": "fun",
+    "_ty": "TKwFun"
+  },
+  {
+    "_text": "+",
+    "_ty": "TOpAdd"
+  },
+  {
+    "_text": "a",
+    "_ty": "TIdent"
+  },
+  {
+    "_text": "a",
+    "_ty": "TIdent"
+  },
+  {
+    "_text": "=",
+    "_ty": "TOpEq"
+  },
+  {
+    "_text": "=",
+    "_ty": "TOpEq"
+  },
+  {
+    "_text": "a",
+    "_ty": "TIdent"
+  }
+]

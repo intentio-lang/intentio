@@ -20,10 +20,13 @@ data ModuleSource = ModuleSource {
     _moduleSourceName :: Text,
     _moduleSourceItems :: [ItemDecl]
   }
-  deriving (Eq, Show)
+  deriving (Show, Eq, Generic)
 
 instance HasSourcePos ModuleSource where
   _sourcePos _ = undefined -- TODO:
+
+instance ToJSON ModuleSource
+instance FromJSON ModuleSource
 
 instance Module ModuleSource where
   type ItemTy ModuleSource = ItemDecl
@@ -36,33 +39,39 @@ data ItemDecl
     _funDeclParams :: FunParams,
     _funDeclBody :: FunBody
   }
-  deriving (Eq, Show)
+  deriving (Show, Eq, Generic)
 
 instance HasSourcePos ItemDecl where
   _sourcePos _ = undefined -- TODO:
+
+instance ToJSON ItemDecl
+instance FromJSON ItemDecl
 
 instance Item ItemDecl where
   _itemName = Just . ItemName . (\(ScopeId n) -> n) . _itemDeclName
 
 newtype ModId = ModId Text
-  deriving (Eq, Show)
+  deriving (Show, Eq, Generic, ToJSON, FromJSON)
 
 newtype ScopeId = ScopeId Text
-  deriving (Eq, Show)
+  deriving (Show, Eq, Generic, ToJSON, FromJSON)
 
 data AnyId
   = Qid ModId ScopeId
   | Id ScopeId
-  deriving (Eq, Show)
+  deriving (Show, Eq, Generic)
+
+instance ToJSON AnyId
+instance FromJSON AnyId
 
 newtype FunParams = FunParams [FunParam]
-  deriving (Eq, Show)
+  deriving (Show, Eq, Generic, ToJSON, FromJSON)
 
 newtype FunParam = FunParam ScopeId
-  deriving (Eq, Show)
+  deriving (Show, Eq, Generic, ToJSON, FromJSON)
 
 newtype FunBody = FunBody Block
-  deriving (Eq, Show)
+  deriving (Show, Eq, Generic, ToJSON, FromJSON)
 
 data Expr
   = BinExpr BinOp Expr Expr
@@ -77,13 +86,16 @@ data Expr
   | UnaryExpr UnaryOp Expr
   | ParenExpr Expr
   | ReturnExpr (Maybe Expr)
-  deriving (Eq, Show)
+  deriving (Show, Eq, Generic)
+
+instance ToJSON Expr
+instance FromJSON Expr
 
 newtype FunArgs = FunArgs [Expr]
-  deriving (Eq, Show)
+  deriving (Show, Eq, Generic, ToJSON, FromJSON)
 
 newtype Block = Block [Expr]
-  deriving (Eq, Show)
+  deriving (Show, Eq, Generic, ToJSON, FromJSON)
 
 data Literal
   = Integer Text
@@ -92,7 +104,7 @@ data Literal
   | CharString Text
   | RawString Text
   | RegexString Text
-  deriving (Eq, Show, Generic)
+  deriving (Show, Eq, Generic)
 
 instance ToJSON Literal
 instance FromJSON Literal
@@ -110,13 +122,19 @@ data BinOp
   | BinNeq
   | BinOr
   | BinSub
-  deriving (Eq, Show)
+  deriving (Show, Eq, Generic)
+
+instance ToJSON BinOp
+instance FromJSON BinOp
 
 data UnaryOp
   = UnaryAdd
   | UnaryNot
   | UnarySub
-  deriving (Eq, Show)
+  deriving (Show, Eq, Generic)
+
+instance ToJSON UnaryOp
+instance FromJSON UnaryOp
 
 --------------------------------------------------------------------------------
 -- Lenses

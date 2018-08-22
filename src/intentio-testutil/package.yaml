@@ -5,13 +5,14 @@ name: intentio-testutil
 <<: *meta
 
 dependencies:
+  - aeson
+  - aeson-pretty
   - base
   - directory
   - filepath
   - hspec
   - intentio-core
   - megaparsec
-  - pretty-simple
   - text
 
 library:

@@ -1,7 +1,6 @@
-{-# LANGUAGE UndecidableInstances #-}
-
 module Intentio.TestUtil.Fixture
   ( Fixture(..)
+  , FixtureMaterializable(..)
   , runFixture
   , runFixtures
   , runFileFixtures
@@ -10,20 +9,16 @@ where
 
 import           Intentio.Prelude
 
-import qualified Data.Text.Lazy                as TL
-
+import           Data.Aeson.Encode.Pretty       ( encodePretty' )
+import qualified Data.Aeson.Encode.Pretty      as AEP
 import           System.Directory
 import           System.FilePath
-
 import           Test.Hspec
-
 import           Text.Megaparsec.Error          ( ParseError
                                                 , ShowErrorComponent
                                                 , ShowToken
                                                 , parseErrorPretty
                                                 )
-
-import           Text.Pretty.Simple             ( pShowNoColor )
 
 --------------------------------------------------------------------------------
 -- Fixture type class.
@@ -37,11 +32,15 @@ class Fixture f where
 class FixtureMaterializable a where
   fixtureMaterialize :: a -> Text
 
-instance (ShowErrorComponent e, Ord t, ShowToken t, Show r) =>
+instance (ShowErrorComponent e, Ord t, ShowToken t, ToJSON r) =>
   FixtureMaterializable (Either (ParseError t e) r)
  where
   fixtureMaterialize (Left l) = "[ERROR]\n" <> toS (parseErrorPretty l)
-  fixtureMaterialize (Right r) = TL.toStrict . pShowNoColor $ r
+  fixtureMaterialize (Right r) = toS . encodePretty' conf $ r
+    where conf = AEP.defConfig { AEP.confIndent = AEP.Spaces 2
+                               , AEP.confCompare = AEP.compare
+                               , AEP.confTrailingNewline = True
+                               }
 
 --------------------------------------------------------------------------------
 -- Fixture-based test framework.

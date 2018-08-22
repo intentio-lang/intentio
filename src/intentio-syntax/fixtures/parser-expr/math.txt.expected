@@ -1,12 +1,316 @@
-BlockExpr 
-    ( Block 
-        [ BinExpr BinSub ( BinExpr BinAdd ( LitExpr ( Integer "3" ) ) ( BinExpr BinMul ( LitExpr ( Integer "4" ) ) ( LitExpr ( Integer "5" ) ) ) ) ( BinExpr BinDiv ( ParenExpr ( BinExpr BinAdd ( LitExpr ( Integer "8" ) ) ( LitExpr ( Integer "1" ) ) ) ) ( LitExpr ( Integer "3" ) ) )
-        , UnaryExpr UnaryAdd ( LitExpr ( Integer "3" ) )
-        , UnaryExpr UnarySub ( ParenExpr ( BinExpr BinAdd ( LitExpr ( Integer "2" ) ) ( LitExpr ( Integer "2" ) ) ) )
-        , UnaryExpr UnaryAdd ( FunCallExpr ( IdExpr ( Id ( ScopeId "foo" ) ) ) ( FunArgs [] ) )
-        , BinExpr BinAnd ( UnaryExpr UnarySub ( LitExpr ( Integer "2" ) ) ) ( FunCallExpr ( IdExpr ( Id ( ScopeId "bar" ) ) ) ( FunArgs [] ) )
-        , BinExpr BinOr ( BinExpr BinAnd ( UnaryExpr UnaryNot ( IdExpr ( Id ( ScopeId "x" ) ) ) ) ( IdExpr ( Id ( ScopeId "b" ) ) ) ) ( UnaryExpr UnaryNot ( IdExpr ( Id ( ScopeId "c" ) ) ) )
-        , BinExpr BinEqEq ( LitExpr ( Integer "2" ) ) ( BinExpr BinAdd ( LitExpr ( Integer "1" ) ) ( LitExpr ( Integer "1" ) ) )
-        , BinExpr BinAnd ( BinExpr BinGtEq ( BinExpr BinMul ( LitExpr ( Integer "6" ) ) ( LitExpr ( Integer "5" ) ) ) ( LitExpr ( Integer "0" ) ) ) ( BinExpr BinLtEq ( UnaryExpr UnaryNot ( LitExpr ( Integer "2" ) ) ) ( LitExpr ( Integer "9" ) ) )
-        ] 
-    )
+{
+  "contents": [
+    {
+      "contents": [
+        "BinSub",
+        {
+          "contents": [
+            "BinAdd",
+            {
+              "contents": {
+                "contents": "3",
+                "tag": "Integer"
+              },
+              "tag": "LitExpr"
+            },
+            {
+              "contents": [
+                "BinMul",
+                {
+                  "contents": {
+                    "contents": "4",
+                    "tag": "Integer"
+                  },
+                  "tag": "LitExpr"
+                },
+                {
+                  "contents": {
+                    "contents": "5",
+                    "tag": "Integer"
+                  },
+                  "tag": "LitExpr"
+                }
+              ],
+              "tag": "BinExpr"
+            }
+          ],
+          "tag": "BinExpr"
+        },
+        {
+          "contents": [
+            "BinDiv",
+            {
+              "contents": {
+                "contents": [
+                  "BinAdd",
+                  {
+                    "contents": {
+                      "contents": "8",
+                      "tag": "Integer"
+                    },
+                    "tag": "LitExpr"
+                  },
+                  {
+                    "contents": {
+                      "contents": "1",
+                      "tag": "Integer"
+                    },
+                    "tag": "LitExpr"
+                  }
+                ],
+                "tag": "BinExpr"
+              },
+              "tag": "ParenExpr"
+            },
+            {
+              "contents": {
+                "contents": "3",
+                "tag": "Integer"
+              },
+              "tag": "LitExpr"
+            }
+          ],
+          "tag": "BinExpr"
+        }
+      ],
+      "tag": "BinExpr"
+    },
+    {
+      "contents": [
+        "UnaryAdd",
+        {
+          "contents": {
+            "contents": "3",
+            "tag": "Integer"
+          },
+          "tag": "LitExpr"
+        }
+      ],
+      "tag": "UnaryExpr"
+    },
+    {
+      "contents": [
+        "UnarySub",
+        {
+          "contents": {
+            "contents": [
+              "BinAdd",
+              {
+                "contents": {
+                  "contents": "2",
+                  "tag": "Integer"
+                },
+                "tag": "LitExpr"
+              },
+              {
+                "contents": {
+                  "contents": "2",
+                  "tag": "Integer"
+                },
+                "tag": "LitExpr"
+              }
+            ],
+            "tag": "BinExpr"
+          },
+          "tag": "ParenExpr"
+        }
+      ],
+      "tag": "UnaryExpr"
+    },
+    {
+      "contents": [
+        "UnaryAdd",
+        {
+          "contents": [
+            {
+              "contents": {
+                "contents": "foo",
+                "tag": "Id"
+              },
+              "tag": "IdExpr"
+            },
+            []
+          ],
+          "tag": "FunCallExpr"
+        }
+      ],
+      "tag": "UnaryExpr"
+    },
+    {
+      "contents": [
+        "BinAnd",
+        {
+          "contents": [
+            "UnarySub",
+            {
+              "contents": {
+                "contents": "2",
+                "tag": "Integer"
+              },
+              "tag": "LitExpr"
+            }
+          ],
+          "tag": "UnaryExpr"
+        },
+        {
+          "contents": [
+            {
+              "contents": {
+                "contents": "bar",
+                "tag": "Id"
+              },
+              "tag": "IdExpr"
+            },
+            []
+          ],
+          "tag": "FunCallExpr"
+        }
+      ],
+      "tag": "BinExpr"
+    },
+    {
+      "contents": [
+        "BinOr",
+        {
+          "contents": [
+            "BinAnd",
+            {
+              "contents": [
+                "UnaryNot",
+                {
+                  "contents": {
+                    "contents": "x",
+                    "tag": "Id"
+                  },
+                  "tag": "IdExpr"
+                }
+              ],
+              "tag": "UnaryExpr"
+            },
+            {
+              "contents": {
+                "contents": "b",
+                "tag": "Id"
+              },
+              "tag": "IdExpr"
+            }
+          ],
+          "tag": "BinExpr"
+        },
+        {
+          "contents": [
+            "UnaryNot",
+            {
+              "contents": {
+                "contents": "c",
+                "tag": "Id"
+              },
+              "tag": "IdExpr"
+            }
+          ],
+          "tag": "UnaryExpr"
+        }
+      ],
+      "tag": "BinExpr"
+    },
+    {
+      "contents": [
+        "BinEqEq",
+        {
+          "contents": {
+            "contents": "2",
+            "tag": "Integer"
+          },
+          "tag": "LitExpr"
+        },
+        {
+          "contents": [
+            "BinAdd",
+            {
+              "contents": {
+                "contents": "1",
+                "tag": "Integer"
+              },
+              "tag": "LitExpr"
+            },
+            {
+              "contents": {
+                "contents": "1",
+                "tag": "Integer"
+              },
+              "tag": "LitExpr"
+            }
+          ],
+          "tag": "BinExpr"
+        }
+      ],
+      "tag": "BinExpr"
+    },
+    {
+      "contents": [
+        "BinAnd",
+        {
+          "contents": [
+            "BinGtEq",
+            {
+              "contents": [
+                "BinMul",
+                {
+                  "contents": {
+                    "contents": "6",
+                    "tag": "Integer"
+                  },
+                  "tag": "LitExpr"
+                },
+                {
+                  "contents": {
+                    "contents": "5",
+                    "tag": "Integer"
+                  },
+                  "tag": "LitExpr"
+                }
+              ],
+              "tag": "BinExpr"
+            },
+            {
+              "contents": {
+                "contents": "0",
+                "tag": "Integer"
+              },
+              "tag": "LitExpr"
+            }
+          ],
+          "tag": "BinExpr"
+        },
+        {
+          "contents": [
+            "BinLtEq",
+            {
+              "contents": [
+                "UnaryNot",
+                {
+                  "contents": {
+                    "contents": "2",
+                    "tag": "Integer"
+                  },
+                  "tag": "LitExpr"
+                }
+              ],
+              "tag": "UnaryExpr"
+            },
+            {
+              "contents": {
+                "contents": "9",
+                "tag": "Integer"
+              },
+              "tag": "LitExpr"
+            }
+          ],
+          "tag": "BinExpr"
+        }
+      ],
+      "tag": "BinExpr"
+    }
+  ],
+  "tag": "BlockExpr"
+}

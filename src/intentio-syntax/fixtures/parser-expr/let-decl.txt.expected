@@ -1,4 +1,11 @@
-LetDeclExpr 
-    { _letDeclName = ScopeId "e"
-    , _letDeclVal = LitExpr ( RawString "r#"my sweet "string""#" )
-    } 
+{
+  "_letDeclName": "e",
+  "_letDeclVal": {
+    "contents": {
+      "contents": "r#\"my sweet \"string\"\"#",
+      "tag": "RawString"
+    },
+    "tag": "LitExpr"
+  },
+  "tag": "LetDeclExpr"
+}

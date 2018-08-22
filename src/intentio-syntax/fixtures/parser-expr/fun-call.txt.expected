@@ -1,20 +1,127 @@
-BlockExpr 
-    ( Block 
-        [ FunCallExpr ( IdExpr ( Id ( ScopeId "foo" ) ) ) 
-            ( FunArgs 
-                [ LitExpr ( Integer "1" )
-                , LitExpr ( Integer "2" )
-                , LitExpr ( Integer "3" )
-                ] 
-            )
-        , FunCallExpr ( IdExpr ( Id ( ScopeId "foo" ) ) ) ( FunArgs [] )
-        , FunCallExpr ( IdExpr ( Id ( ScopeId "foo" ) ) ) 
-            ( FunArgs 
-                [ IdExpr ( Id ( ScopeId "a" ) )
-                , IdExpr ( Id ( ScopeId "b" ) )
-                ] 
-            )
-        , FunCallExpr ( IdExpr ( Qid ( ModId "mod" ) ( ScopeId "fn" ) ) ) ( FunArgs [ FunCallExpr ( IdExpr ( Id ( ScopeId "foo" ) ) ) ( FunArgs [] ) ] )
-        , FunCallExpr ( ParenExpr ( IdExpr ( Id ( ScopeId "boo" ) ) ) ) ( FunArgs [] )
-        ] 
-    )
+{
+  "contents": [
+    {
+      "contents": [
+        {
+          "contents": {
+            "contents": "foo",
+            "tag": "Id"
+          },
+          "tag": "IdExpr"
+        },
+        [
+          {
+            "contents": {
+              "contents": "1",
+              "tag": "Integer"
+            },
+            "tag": "LitExpr"
+          },
+          {
+            "contents": {
+              "contents": "2",
+              "tag": "Integer"
+            },
+            "tag": "LitExpr"
+          },
+          {
+            "contents": {
+              "contents": "3",
+              "tag": "Integer"
+            },
+            "tag": "LitExpr"
+          }
+        ]
+      ],
+      "tag": "FunCallExpr"
+    },
+    {
+      "contents": [
+        {
+          "contents": {
+            "contents": "foo",
+            "tag": "Id"
+          },
+          "tag": "IdExpr"
+        },
+        []
+      ],
+      "tag": "FunCallExpr"
+    },
+    {
+      "contents": [
+        {
+          "contents": {
+            "contents": "foo",
+            "tag": "Id"
+          },
+          "tag": "IdExpr"
+        },
+        [
+          {
+            "contents": {
+              "contents": "a",
+              "tag": "Id"
+            },
+            "tag": "IdExpr"
+          },
+          {
+            "contents": {
+              "contents": "b",
+              "tag": "Id"
+            },
+            "tag": "IdExpr"
+          }
+        ]
+      ],
+      "tag": "FunCallExpr"
+    },
+    {
+      "contents": [
+        {
+          "contents": {
+            "contents": [
+              "mod",
+              "fn"
+            ],
+            "tag": "Qid"
+          },
+          "tag": "IdExpr"
+        },
+        [
+          {
+            "contents": [
+              {
+                "contents": {
+                  "contents": "foo",
+                  "tag": "Id"
+                },
+                "tag": "IdExpr"
+              },
+              []
+            ],
+            "tag": "FunCallExpr"
+          }
+        ]
+      ],
+      "tag": "FunCallExpr"
+    },
+    {
+      "contents": [
+        {
+          "contents": {
+            "contents": {
+              "contents": "boo",
+              "tag": "Id"
+            },
+            "tag": "IdExpr"
+          },
+          "tag": "ParenExpr"
+        },
+        []
+      ],
+      "tag": "FunCallExpr"
+    }
+  ],
+  "tag": "BlockExpr"
+}

@@ -1,6 +1,19 @@
-BlockExpr 
-    ( Block 
-        [ ReturnExpr Nothing
-        , ReturnExpr ( Just ( IdExpr ( Id ( ScopeId "a" ) ) ) )
-        ] 
-    )
+{
+  "contents": [
+    {
+      "contents": null,
+      "tag": "ReturnExpr"
+    },
+    {
+      "contents": {
+        "contents": {
+          "contents": "a",
+          "tag": "Id"
+        },
+        "tag": "IdExpr"
+      },
+      "tag": "ReturnExpr"
+    }
+  ],
+  "tag": "BlockExpr"
+}

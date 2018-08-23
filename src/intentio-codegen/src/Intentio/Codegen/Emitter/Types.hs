@@ -19,13 +19,26 @@ import           Intentio.Diagnostics           ( SourcePos
                                                 , HasSourcePos(..)
                                                 )
 
+--------------------------------------------------------------------------------
+-- CModule data structure
+
+-- | Type tag representing a C header (@*.h@) file.
 data CModuleHeader
+
+-- | Type tag representing a C source (@*.c@) file.
 data CModuleSource
 
-data CModuleDef t = CModuleDef
-  { _cModuleDefSourcePos    :: SourcePos
-  , _cModuleDefName         :: ModuleName
-  , _cModuleDefDefinitions  :: [C.Definition]
+-- | A particular Intentio to C translation unit.
+--
+-- Type parameter @t@ describes whether this is header or source module.
+-- @t@ is either 'CModuleHeader' or 'CModuleSource'.
+data CModuleDef t = CModuleDef {
+    -- | Intentio source file of this module
+    _cModuleDefSourcePos    :: SourcePos,
+    -- | Intentio module name
+    _cModuleDefName         :: ModuleName,
+    -- | List of top level C definitions
+    _cModuleDefDefinitions  :: [C.Definition]
   }
   deriving (Show, Eq, Generic)
 

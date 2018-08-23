@@ -13,8 +13,11 @@ import           Intentio.Prelude
 
 import           Control.Monad.Writer           ( tell )
 import qualified Data.List                     as List
+import qualified GHC.Generics                  as G
 import qualified Language.C.Quote              as C
-import           Language.C.Quote.C             ( citem
+import           Language.C.Quote.C             ( cexp
+                                                , citem
+                                                , citems
                                                 , cparam
                                                 , cunit
                                                 , cty
@@ -140,7 +143,7 @@ emitFnParam param = do
   return [cparam| $ty:iobjPtr $id:v |]
 
 emitFnBody :: BEmit [C.BlockItem]
-emitFnBody = toList <$> execWriterT (emitFnVars >> emitFnStmts)
+emitFnBody = toList <$> execWriterT (emitFnVars >> emitFnBodyValue)
 
 emitFnVars :: WriterT (Seq C.BlockItem) BEmit ()
 emitFnVars = do
@@ -154,8 +157,50 @@ emitFnVars = do
 emitFnVar :: H.Var -> BEmit C.BlockItem
 emitFnVar var = return [citem| $ty:iobjPtr $id:v ; |] where v = cVarName var
 
-emitFnStmts :: WriterT (Seq C.BlockItem) BEmit ()
-emitFnStmts = return ()
+emitFnBodyValue :: WriterT (Seq C.BlockItem) BEmit ()
+emitFnBodyValue = view (_3 . H.bodyValue) >>= emitTopLevelExpr
+
+--------------------------------------------------------------------------------
+-- Expression emitter
+
+emitTopLevelExpr :: H.Expr -> WriterT (Seq C.BlockItem) BEmit ()
+emitTopLevelExpr expr = case expr ^. H.exprKind of
+  H.PathExpr{}       -> wrap
+  H.LiteralExpr{}    -> wrap
+  H.UnaryExpr{}      -> wrap
+  H.BinExpr{}        -> wrap
+  H.CallExpr{}       -> wrap
+  H.AssignExpr{}     -> wrap
+
+  H.BlockExpr _      -> lift . lift $ pushIceFor expr "block expr in inner expr"
+  H.WhileExpr _ _    -> lift . lift $ pushIceFor expr "while expr in inner expr"
+  H.IfExpr _ _ _     -> lift . lift $ pushIceFor expr "if expr in inner expr"
+
+  H.ReturnExpr inner -> do
+    e <- lift $ emitExpr inner
+    tell $ fromList [citems| return $e ; |]
+ where
+  wrap = do
+    e <- lift $ emitExpr expr
+    tell $ fromList [citems| $e; |]
+
+emitExpr :: H.Expr -> BEmit C.Exp
+emitExpr expr = case expr ^. H.exprKind of
+  H.PathExpr    path -> emitPathExpr path
+  H.LiteralExpr _    -> lift $ pushIceFor expr "literal expr in inner expr"
+  H.BlockExpr   _    -> lift $ pushIceFor expr "block expr in inner expr"
+  H.UnaryExpr _ _    -> lift $ pushIceFor expr "unary expr in inner expr"
+  H.BinExpr _ _ _    -> lift $ pushIceFor expr "binary expr in inner expr"
+  H.CallExpr  _ _    -> lift $ pushIceFor expr "call expr in inner expr"
+  H.WhileExpr _ _    -> lift $ pushIceFor expr "while expr in inner expr"
+  H.IfExpr _ _ _     -> lift $ pushIceFor expr "if expr in inner expr"
+  H.AssignExpr _ _   -> lift $ pushIceFor expr "assign expr in inner expr"
+  H.ReturnExpr _     -> lift $ pushIceFor expr "return expr in inner expr"
+
+emitPathExpr :: H.Path -> BEmit C.Exp
+emitPathExpr path = case path ^. H.pathKind of
+  H.Local  varId -> getVarById varId <&> cVarName <&> (\v -> [cexp| $id:v |])
+  H.Global _     -> lift $ pushIceFor path "TODO: global path expr"
 
 --------------------------------------------------------------------------------
 -- Helpers
@@ -195,7 +240,7 @@ getVarById varId = do
     Nothing -> lift $ pushIceFor body $ "Bad HIR: miss var " <> show varId
 
 getItemName :: H.Item -> MEmit String
-getItemName item = ask >>= return . toS . (flip cItemName) item
+getItemName item = ask <&> flip cItemName item <&> toS
 
 getParamVar :: H.Param -> BEmit H.Var
 getParamVar param = do

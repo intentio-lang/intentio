@@ -9,7 +9,6 @@ where
 
 import           Intentio.Prelude
 
-import qualified Data.Text                     as T
 import           Text.PrettyPrint.Mainland      ( putDocLn
                                                 , hPutDocLn
                                                 )
@@ -23,16 +22,11 @@ import           Intentio.Compiler              ( Assembly
                                                 )
 
 import           Intentio.Codegen.Emitter.Types ( CModuleDef
-                                                , cModuleDefFileName
                                                 , cModuleDefDefinitions
                                                 )
 
 printCAssembly :: Assembly (CModuleDef t) -> Compile ()
-printCAssembly = mapModulesM_ f
- where
-  f m = do
-    putText . header . toS $ m ^. cModuleDefFileName
-    printCModule m
+printCAssembly = mapModulesM_ printCModule
 
 printCModule :: CModuleDef t -> Compile ()
 printCModule = liftIOE . printCModule'
@@ -45,10 +39,3 @@ hPrintCModule h = liftIOE . hPrintCModule' h
 
 hPrintCModule' :: Handle -> CModuleDef t -> IO ()
 hPrintCModule' h m = hPutDocLn h . ppr $ m ^. cModuleDefDefinitions
-
-header :: Text -> Text
-header t = sp <> hd <> sp
- where
-  sp = "//" <> ln <> "\n"
-  hd = "// File: " <> t <> "\n"
-  ln = T.replicate 77 "-"

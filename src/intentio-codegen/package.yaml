@@ -13,6 +13,7 @@ dependencies:
   - language-c-quote
   - mainland-pretty
   - mtl
+  - neat-interpolation
   - text
 
 library:

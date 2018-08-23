@@ -9,3 +9,10 @@ packages:
   - src/intentio-hir
   - src/intentio-syntax
   - src/intentio-testutil
+
+extra-deps:
+  - haskell-exp-parser-0.1.1
+
+flags:
+  language-c-quote:
+    full-haskell-antiquotes: false

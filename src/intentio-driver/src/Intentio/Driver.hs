@@ -7,14 +7,19 @@ import           System.Exit                    ( exitSuccess
                                                 , exitFailure
                                                 )
 
+import           Intentio.Codegen               ( emitCAssembly
+                                                , printCAssembly
+                                                )
 import           Intentio.Compiler              ( Assembly
                                                 , Module
                                                 , Compile
+                                                , impurify
                                                 , liftIOE
                                                 , compileDiagnostics
                                                 , runCompileFresh
                                                 )
 import           Intentio.Diagnostics           ( diagnosticShow )
+import           Intentio.Hir.Compiler          ( readHirDumpFiles )
 import           Language.Intentio.Compiler     ( SourceFile
                                                 , parseSourceFiles
                                                 )
@@ -25,7 +30,9 @@ import           Intentio.Driver.Opts           ( buildInputAssembly )
 -- Compiler pipeline
 
 compilerPipeline :: Assembly SourceFile -> Compile ()
-compilerPipeline = parseSourceFiles >=> traceStep_
+-- compilerPipeline = parseSourceFiles >=> traceStep_
+compilerPipeline =
+  readHirDumpFiles >=> (impurify . emitCAssembly) >=> printCAssembly
 
 --------------------------------------------------------------------------------
 -- Main function
@@ -44,8 +51,14 @@ runCompiler = liftIOE buildInputAssembly >>= compilerPipeline
 --------------------------------------------------------------------------------
 -- Helpers
 
-traceStep :: (Module a, ToJSON a) => Assembly a -> Compile (Assembly a)
+traceStep :: (Module a, Show a) => Assembly a -> Compile (Assembly a)
 traceStep a = traceStep_ a >> return a
 
-traceStep_ :: (Module a, ToJSON a) => Assembly a -> Compile ()
-traceStep_ = putStrLn . Data.Aeson.encode
+traceStep_ :: (Module a, Show a) => Assembly a -> Compile ()
+traceStep_ = putText . show
+
+traceStepJSON :: (Module a, ToJSON a) => Assembly a -> Compile (Assembly a)
+traceStepJSON a = traceStepJSON_ a >> return a
+
+traceStepJSON_ :: (Module a, ToJSON a) => Assembly a -> Compile ()
+traceStepJSON_ = putStrLn . Data.Aeson.encode

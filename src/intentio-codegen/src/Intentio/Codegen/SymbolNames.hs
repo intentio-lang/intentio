@@ -1,7 +1,8 @@
+{-# LANGUAGE AllowAmbiguousTypes #-}
+
 module Intentio.Codegen.SymbolNames
-  ( moduleFileNameBase
-  , moduleFileNameC
-  , moduleFileNameH
+  ( GetCModuleFileName(..)
+  , cModuleFileNameBase
   , mangle
   , sanitize
   )
@@ -20,14 +21,19 @@ import           Numeric                        ( showHex )
 
 import           Intentio.Compiler              ( ModuleName(..) )
 
-moduleFileNameBase :: ModuleName -> FilePath
-moduleFileNameBase (ModuleName modName) = toS $ sanitize modName
+import Intentio.Codegen.Emitter.Types (CModuleHeader, CModuleSource)
 
-moduleFileNameC :: ModuleName -> FilePath
-moduleFileNameC m = moduleFileNameBase m <> ".c"
+cModuleFileNameBase :: ModuleName -> FilePath
+cModuleFileNameBase (ModuleName modName) = toS $ sanitize modName
 
-moduleFileNameH :: ModuleName -> FilePath
-moduleFileNameH m = moduleFileNameBase m <> ".h"
+class GetCModuleFileName t where
+  cModuleFileName :: ModuleName -> FilePath
+
+instance GetCModuleFileName CModuleSource where
+  cModuleFileName m = cModuleFileNameBase m <> ".c"
+
+instance GetCModuleFileName CModuleHeader where
+  cModuleFileName m = cModuleFileNameBase m <> ".h"
 
 mangle :: [Text] -> Text
 mangle ps = "_ZN" <> T.concat (fmap f ps) <> "E"

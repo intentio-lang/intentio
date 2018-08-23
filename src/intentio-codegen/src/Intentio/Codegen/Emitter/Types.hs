@@ -3,8 +3,10 @@ module Intentio.Codegen.Emitter.Types
   , CModuleSource
   , CModuleDef(..)
   , cModuleDefSourcePos
-  , cModuleDefName
+  , cModuleDefIntentioName
+  , cModuleDefFileName
   , cModuleDefDefinitions
+  , cModuleEraseType
   )
 where
 
@@ -12,7 +14,7 @@ import           Intentio.Prelude
 
 import qualified Language.C.Quote              as C
 
-import           Intentio.Compiler              ( ModuleName
+import           Intentio.Compiler              ( ModuleName(..)
                                                 , Module(..)
                                                 )
 import           Intentio.Diagnostics           ( SourcePos
@@ -35,8 +37,10 @@ data CModuleSource
 data CModuleDef t = CModuleDef {
     -- | Intentio source file of this module
     _cModuleDefSourcePos    :: SourcePos,
-    -- | Intentio module name
-    _cModuleDefName         :: ModuleName,
+    -- | Input Intentio module name
+    _cModuleDefIntentioName :: ModuleName,
+    -- | Output module file name
+    _cModuleDefFileName     :: FilePath,
     -- | List of top level C definitions
     _cModuleDefDefinitions  :: [C.Definition]
   }
@@ -49,5 +53,8 @@ instance HasSourcePos (CModuleDef t) where
 
 instance Module (CModuleDef t) where
   type ItemTy (CModuleDef t) = Void
-  _moduleName = _cModuleDefName
+  _moduleName = ModuleName . toS . _cModuleDefFileName
   _moduleItems = const []
+
+cModuleEraseType :: CModuleDef a -> CModuleDef b
+cModuleEraseType (CModuleDef a b c d) = CModuleDef a b c d

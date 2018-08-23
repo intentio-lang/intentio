@@ -1,7 +1,8 @@
 {-# LANGUAGE QuasiQuotes #-}
 
 module Intentio.Codegen.Emitter.Core
-  ( emitCModuleHeader
+  ( emitCAssembly
+  , emitCModuleHeader
   , emitCModuleSource
   , emitItemHeader
   , emitItemSource
@@ -14,6 +15,10 @@ import qualified Language.C.Quote              as C
 import           Language.C.Quote.C             ( cunit )
 
 import           Intentio.Compiler              ( ModuleName(..)
+                                                , Assembly
+                                                , assemblyModules
+                                                , assemblyMainModuleName
+                                                , mkModuleMap
                                                 , CompilePure
                                                 , pushIceFor
                                                 )
@@ -22,8 +27,9 @@ import qualified Intentio.Hir                  as H
 import           Intentio.Codegen.Emitter.Types ( CModuleHeader
                                                 , CModuleSource
                                                 , CModuleDef(..)
+                                                , cModuleEraseType
                                                 )
-import           Intentio.Codegen.SymbolNames   ( moduleFileNameH )
+import           Intentio.Codegen.SymbolNames   ( GetCModuleFileName(..) )
 
 --------------------------------------------------------------------------------
 -- Emitter monad
@@ -33,6 +39,22 @@ type MEmit = Emit H.Module
 
 --------------------------------------------------------------------------------
 -- Emitter entry points
+
+emitCAssembly :: Assembly H.Module -> CompilePure (Assembly (CModuleDef Void))
+emitCAssembly asm = do
+  let modules = asm ^. assemblyModules
+  cmodules <- mkModuleMap . fromList . concat <$> mapM emit modules
+  asm
+    & (assemblyModules .~ cmodules)
+    & (assemblyMainModuleName %~ fmap mkMainName)
+    & return
+ where
+  mkMainName = ModuleName . toS . cModuleFileName @CModuleSource
+
+  emit modul = do
+    header <- cModuleEraseType <$> emitCModuleHeader modul
+    source <- cModuleEraseType <$> emitCModuleSource modul
+    return [header, source]
 
 emitCModuleHeader :: H.Module -> CompilePure (CModuleDef CModuleHeader)
 emitCModuleHeader = runReaderT (emitCModule' emitItemHeader')
@@ -65,7 +87,7 @@ emitItemSource' itemId = do
 
 emitImportItem :: ModuleName -> MEmit [C.Definition]
 emitImportItem modName = return [cunit| $esc:("#include " <> f) |]
-  where f = "\"" <> moduleFileNameH modName <> "\""
+  where f = "\"" <> cModuleFileName @CModuleHeader modName <> "\""
 
 emitFnHeader :: H.Item -> H.BodyId -> MEmit [C.Definition]
 emitFnHeader _ _ = return [cunit| int f(int x); |]
@@ -76,12 +98,17 @@ emitFnItem _ _ = return [cunit| int f(int x) { return x; } |]
 --------------------------------------------------------------------------------
 -- Helpers
 
-emitCModule' :: (H.ItemId -> MEmit [C.Definition]) -> MEmit (CModuleDef t)
+emitCModule'
+  :: forall t
+   . GetCModuleFileName t
+  => (H.ItemId -> MEmit [C.Definition])
+  -> MEmit (CModuleDef t)
 emitCModule' f = do
-  _cModuleDefSourcePos   <- view H.moduleSourcePos
-  _cModuleDefName        <- view H.moduleName
-  ids                    <- view H.moduleItemIds
-  _cModuleDefDefinitions <- concat <$> mapM f ids
+  _cModuleDefSourcePos    <- view H.moduleSourcePos
+  _cModuleDefIntentioName <- view H.moduleName
+  _cModuleDefFileName     <- cModuleFileName @t <$> view H.moduleName
+  ids                     <- view H.moduleItemIds
+  _cModuleDefDefinitions  <- concat <$> mapM f ids
   return CModuleDef {..}
 
 getItemById :: H.ItemId -> MEmit H.Item

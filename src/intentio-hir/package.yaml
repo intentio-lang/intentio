@@ -5,6 +5,7 @@ name: intentio-hir
 <<: *meta
 
 dependencies:
+  - aeson
   - base
   - containers
   - intentio-core

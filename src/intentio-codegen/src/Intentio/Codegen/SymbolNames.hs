@@ -3,25 +3,25 @@
 module Intentio.Codegen.SymbolNames
   ( GetCModuleFileName(..)
   , cModuleFileNameBase
-  , mangle
-  , sanitize
+  , cItemName
+  , cVarName
   )
 where
 
 import           Intentio.Prelude
 
-import           Data.Char                      ( isAlphaNum
-                                                , isAsciiLower
-                                                , isAsciiUpper
-                                                , isDigit
-                                                , ord
+import           Intentio.Compiler              ( ModuleName(..)
+                                                , moduleName
                                                 )
-import qualified Data.Text                     as T
-import           Numeric                        ( showHex )
+import qualified Intentio.Hir                  as H
 
-import           Intentio.Compiler              ( ModuleName(..) )
-
-import Intentio.Codegen.Emitter.Types (CModuleHeader, CModuleSource)
+import           Intentio.Codegen.Emitter.Types ( CModuleHeader
+                                                , CModuleSource
+                                                )
+import           Intentio.Codegen.SymbolNames.Mangling
+                                                ( mangle
+                                                , sanitize
+                                                )
 
 cModuleFileNameBase :: ModuleName -> FilePath
 cModuleFileNameBase (ModuleName modName) = toS $ sanitize modName
@@ -35,30 +35,12 @@ instance GetCModuleFileName CModuleSource where
 instance GetCModuleFileName CModuleHeader where
   cModuleFileName m = cModuleFileNameBase m <> ".h"
 
-mangle :: [Text] -> Text
-mangle ps = "_ZN" <> T.concat (fmap f ps) <> "E"
-  where f p = let s = sanitize p in show (T.length s) <> s
-
-sanitize :: Text -> Text
-sanitize = underscoreQualify . T.concatMap f
+cItemName :: H.Module -> H.Item -> Text
+cItemName modul item = mangle [modul ^. moduleName . _Wrapped, iname]
  where
-  f '@' = "$SP$"
-  f '*' = "$BP$"
-  f '&' = "$RF$"
-  f '<' = "$LT$"
-  f '>' = "$GT$"
-  f '(' = "$LP$"
-  f ')' = "$RP$"
-  f ',' = "$C$"
-  f '_' = "_"
-  f '.' = "."
-  f '$' = "$"
-  f c | isAsciiLower c = T.singleton c
-      | isAsciiUpper c = T.singleton c
-      | isDigit c      = T.singleton c
-      | otherwise      = toS $ showHex (ord c) "$" <> "$"
+  iname = case item ^. H.itemName of
+    Just name -> name ^. _Wrapped
+    Nothing   -> "$" <> (item ^. H.itemId . _Wrapped & show)
 
-  underscoreQualify "" = ""
-  underscoreQualify s@(T.head -> c) | c == '_'     = s
-                                    | isAlphaNum c = s
-                                    | otherwise    = T.cons '_' s
+cVarName :: H.Var -> String
+cVarName var = var ^. H.varIdent . H.identName & sanitize & toS

@@ -1,4 +1,4 @@
-module Intentio.Codegen.SymbolNamesSpec where
+module Intentio.Codegen.SymbolNames.ManglingSpec where
 
 import           Intentio.Prelude
 
@@ -10,7 +10,7 @@ import qualified Data.Text                     as T
 import           Test.Hspec
 import           Test.QuickCheck
 
-import           Intentio.Codegen.SymbolNames
+import           Intentio.Codegen.SymbolNames.Mangling
 
 isGasSymbolChar :: Char -> Bool
 isGasSymbolChar c | isAsciiLower c           = True

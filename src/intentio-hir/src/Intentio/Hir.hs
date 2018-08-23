@@ -287,3 +287,10 @@ moduleBody (BodyId i) = moduleBodies . ix i
 
 bodyVar :: VarId -> Traversal' Body Var
 bodyVar (VarId i) = bodyVars . ix i
+
+--------------------------------------------------------------------------------
+-- Helper accessors
+
+findParamVar :: Body -> Param -> Maybe Var
+findParamVar body param = body ^. bodyVars ^? ix i
+  where i = param ^. paramVarId . _Wrapped

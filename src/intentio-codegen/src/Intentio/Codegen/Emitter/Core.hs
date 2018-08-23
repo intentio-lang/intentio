@@ -11,8 +11,13 @@ where
 
 import           Intentio.Prelude
 
+import           Control.Monad.Reader           ( withReaderT )
 import qualified Language.C.Quote              as C
-import           Language.C.Quote.C             ( cunit )
+import           Language.C.Quote.C             ( citems
+                                                , cparam
+                                                , cunit
+                                                , cty
+                                                )
 
 import           Intentio.Compiler              ( ModuleName(..)
                                                 , Assembly
@@ -28,13 +33,27 @@ import           Intentio.Codegen.Emitter.Types ( CModuleHeader
                                                 , CModuleDef(..)
                                                 , cModuleEraseType
                                                 )
-import           Intentio.Codegen.SymbolNames   ( GetCModuleFileName(..) )
+import           Intentio.Codegen.SymbolNames   ( GetCModuleFileName(..)
+                                                , cItemName
+                                                , cVarName
+                                                )
 
 --------------------------------------------------------------------------------
 -- Emitter monad
 
 type Emit r = ReaderT r CompilePure
 type MEmit = Emit H.Module
+type IEmit = Emit (H.Module, H.Item)
+type BEmit = Emit (H.Module, H.Item, H.Body)
+
+withI :: H.Item -> IEmit a -> MEmit a
+withI i = withReaderT $ \m -> (m, i)
+
+withB :: H.Body -> BEmit a -> IEmit a
+withB b = withReaderT $ \(m, i) -> (m, i, b)
+
+withIB :: H.Item -> H.Body -> BEmit a -> MEmit a
+withIB i b = withReaderT $ \m -> (m, i, b)
 
 --------------------------------------------------------------------------------
 -- Emitter entry points
@@ -64,7 +83,16 @@ emitItemSource :: H.Module -> H.ItemId -> CompilePure [C.Definition]
 emitItemSource modul itemId = runReaderT (emitItemSource' itemId) modul
 
 --------------------------------------------------------------------------------
--- Header emitter functions
+-- Constants
+
+iobjTy :: C.Type
+iobjTy = [cty| typename IntObject |]
+
+iobjPtr :: C.Type
+iobjPtr = [cty| $ty:iobjTy * |]
+
+--------------------------------------------------------------------------------
+-- Main item emitter
 
 emitItemHeader' :: H.ItemId -> MEmit [C.Definition]
 emitItemHeader' itemId = do
@@ -72,12 +100,6 @@ emitItemHeader' itemId = do
   case item ^. H.itemKind of
     H.ImportItem _ _ -> return []
     H.FnItem bodyId  -> emitFnHeader item bodyId
-
-emitFnHeader :: H.Item -> H.BodyId -> MEmit [C.Definition]
-emitFnHeader _ _ = return [cunit| int f(int x); |]
-
---------------------------------------------------------------------------------
--- Source emitter functions
 
 emitItemSource' :: H.ItemId -> MEmit [C.Definition]
 emitItemSource' itemId = do
@@ -90,11 +112,34 @@ emitImportItem :: ModuleName -> MEmit [C.Definition]
 emitImportItem modName = return [cunit| $esc:f |]
   where f = "#include \"" <> cModuleFileName @CModuleHeader modName <> "\""
 
-emitFnItem :: H.Item -> H.BodyId -> MEmit [C.Definition]
-emitFnItem _ _ = return [cunit| int f(int x) { return x; } |]
-
 --------------------------------------------------------------------------------
--- Shared emitter functions
+-- Function declaration emitter
+
+emitFnHeader :: H.Item -> H.BodyId -> MEmit [C.Definition]
+emitFnHeader item bodyId = do
+  fname   <- getItemName item
+  body    <- getBodyById bodyId
+  fparams <- withIB item body emitFnParams
+  return [cunit| $ty:iobjPtr $id:fname ($params:fparams) ; |]
+
+emitFnItem :: H.Item -> H.BodyId -> MEmit [C.Definition]
+emitFnItem item bodyId = do
+  fname   <- getItemName item
+  body    <- getBodyById bodyId
+  fparams <- withIB item body emitFnParams
+  fbody   <- withIB item body emitFnBody
+  return [cunit| $ty:iobjPtr $id:fname ($params:fparams) { $items:fbody } |]
+
+emitFnParams :: BEmit [C.Param]
+emitFnParams = view (_3 . H.bodyParams) >>= mapM emitFnParam
+
+emitFnParam :: H.Param -> BEmit C.Param
+emitFnParam param = do
+  v <- cVarName <$> getParamVar param
+  return [cparam| $ty:iobjPtr $id:v |]
+
+emitFnBody :: BEmit [C.BlockItem]
+emitFnBody = return [citems| return x; |]
 
 --------------------------------------------------------------------------------
 -- Helpers
@@ -117,4 +162,22 @@ getItemById itemId = do
   modul <- ask
   case modul ^? H.moduleItem itemId of
     Just x  -> return x
-    Nothing -> lift $ pushIceFor modul $ "Unknown item " <> show itemId
+    Nothing -> lift $ pushIceFor modul $ "Bad HIR: miss item " <> show itemId
+
+getBodyById :: H.BodyId -> MEmit H.Body
+getBodyById bodyId = do
+  modul <- ask
+  case modul ^? H.moduleBody bodyId of
+    Just x  -> return x
+    Nothing -> lift $ pushIceFor modul $ "Bad HIR: miss body " <> show bodyId
+
+getItemName :: H.Item -> MEmit String
+getItemName item = ask >>= return . toS . (flip cItemName) item
+
+getParamVar :: H.Param -> BEmit H.Var
+getParamVar param = do
+  item <- view _2
+  body <- view _3
+  case H.findParamVar body param of
+    Just v  -> return v
+    Nothing -> lift $ pushIceFor item $ "Bad HIR: miss param " <> show param

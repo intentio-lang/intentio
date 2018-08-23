@@ -12,6 +12,7 @@ dependencies:
   - intentio-hir
   - language-c-quote
   - mainland-pretty
+  - mtl
   - text
 
 library:

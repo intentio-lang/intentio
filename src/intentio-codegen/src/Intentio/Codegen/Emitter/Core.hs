@@ -11,9 +11,10 @@ where
 
 import           Intentio.Prelude
 
-import           Control.Monad.Reader           ( withReaderT )
+import           Control.Monad.Writer           ( tell )
+import qualified Data.List                     as List
 import qualified Language.C.Quote              as C
-import           Language.C.Quote.C             ( citems
+import           Language.C.Quote.C             ( citem
                                                 , cparam
                                                 , cunit
                                                 , cty
@@ -47,13 +48,13 @@ type IEmit = Emit (H.Module, H.Item)
 type BEmit = Emit (H.Module, H.Item, H.Body)
 
 withI :: H.Item -> IEmit a -> MEmit a
-withI i = withReaderT $ \m -> (m, i)
+withI i = withReaderT (, i)
 
 withB :: H.Body -> BEmit a -> IEmit a
 withB b = withReaderT $ \(m, i) -> (m, i, b)
 
 withIB :: H.Item -> H.Body -> BEmit a -> MEmit a
-withIB i b = withReaderT $ \m -> (m, i, b)
+withIB i b = withReaderT (, i, b)
 
 --------------------------------------------------------------------------------
 -- Emitter entry points
@@ -139,7 +140,22 @@ emitFnParam param = do
   return [cparam| $ty:iobjPtr $id:v |]
 
 emitFnBody :: BEmit [C.BlockItem]
-emitFnBody = return [citems| return x; |]
+emitFnBody = toList <$> execWriterT (emitFnVars >> emitFnStmts)
+
+emitFnVars :: WriterT (Seq C.BlockItem) BEmit ()
+emitFnVars = do
+  body <- view _3
+  let paramVarIds    = body ^. H.bodyParams <&> view _Wrapped
+  let allVarIds      = body ^. H.bodyVarIds
+  let nonParamVarIds = allVarIds List.\\ paramVarIds
+  forM_ nonParamVarIds
+    $ \i -> lift (getVarById i) >>= lift . emitFnVar >>= tell . pure
+
+emitFnVar :: H.Var -> BEmit C.BlockItem
+emitFnVar var = return [citem| $ty:iobjPtr $id:v ; |] where v = cVarName var
+
+emitFnStmts :: WriterT (Seq C.BlockItem) BEmit ()
+emitFnStmts = return ()
 
 --------------------------------------------------------------------------------
 -- Helpers
@@ -170,6 +186,13 @@ getBodyById bodyId = do
   case modul ^? H.moduleBody bodyId of
     Just x  -> return x
     Nothing -> lift $ pushIceFor modul $ "Bad HIR: miss body " <> show bodyId
+
+getVarById :: H.VarId -> BEmit H.Var
+getVarById varId = do
+  body <- view _3
+  case body ^? H.bodyVar varId of
+    Just x  -> return x
+    Nothing -> lift $ pushIceFor body $ "Bad HIR: miss var " <> show varId
 
 getItemName :: H.Item -> MEmit String
 getItemName item = ask >>= return . toS . (flip cItemName) item

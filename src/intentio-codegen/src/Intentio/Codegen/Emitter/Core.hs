@@ -16,9 +16,8 @@ import           Language.C.Quote.C             ( cunit )
 
 import           Intentio.Compiler              ( ModuleName(..)
                                                 , Assembly
-                                                , assemblyModules
                                                 , assemblyMainModuleName
-                                                , mkModuleMap
+                                                , concatMapModulesM
                                                 , CompilePure
                                                 , pushIceFor
                                                 )
@@ -41,14 +40,10 @@ type MEmit = Emit H.Module
 -- Emitter entry points
 
 emitCAssembly :: Assembly H.Module -> CompilePure (Assembly (CModuleDef Void))
-emitCAssembly asm = do
-  let modules = asm ^. assemblyModules
-  cmodules <- mkModuleMap . fromList . concat <$> mapM emit modules
-  asm
-    & (assemblyModules .~ cmodules)
-    & (assemblyMainModuleName %~ fmap mkMainName)
-    & return
+emitCAssembly = fmap addMainName . concatMapModulesM emit
  where
+  addMainName asm = asm & (assemblyMainModuleName %~ fmap mkMainName)
+
   mkMainName = ModuleName . toS . cModuleFileName @CModuleSource
 
   emit modul = do
@@ -69,7 +64,7 @@ emitItemSource :: H.Module -> H.ItemId -> CompilePure [C.Definition]
 emitItemSource modul itemId = runReaderT (emitItemSource' itemId) modul
 
 --------------------------------------------------------------------------------
--- Emitter functions
+-- Header emitter functions
 
 emitItemHeader' :: H.ItemId -> MEmit [C.Definition]
 emitItemHeader' itemId = do
@@ -77,6 +72,12 @@ emitItemHeader' itemId = do
   case item ^. H.itemKind of
     H.ImportItem _ _ -> return []
     H.FnItem bodyId  -> emitFnHeader item bodyId
+
+emitFnHeader :: H.Item -> H.BodyId -> MEmit [C.Definition]
+emitFnHeader _ _ = return [cunit| int f(int x); |]
+
+--------------------------------------------------------------------------------
+-- Source emitter functions
 
 emitItemSource' :: H.ItemId -> MEmit [C.Definition]
 emitItemSource' itemId = do
@@ -86,14 +87,14 @@ emitItemSource' itemId = do
     H.FnItem bodyId        -> emitFnItem item bodyId
 
 emitImportItem :: ModuleName -> MEmit [C.Definition]
-emitImportItem modName = return [cunit| $esc:("#include " <> f) |]
-  where f = "\"" <> cModuleFileName @CModuleHeader modName <> "\""
-
-emitFnHeader :: H.Item -> H.BodyId -> MEmit [C.Definition]
-emitFnHeader _ _ = return [cunit| int f(int x); |]
+emitImportItem modName = return [cunit| $esc:f |]
+  where f = "#include \"" <> cModuleFileName @CModuleHeader modName <> "\""
 
 emitFnItem :: H.Item -> H.BodyId -> MEmit [C.Definition]
 emitFnItem _ _ = return [cunit| int f(int x) { return x; } |]
+
+--------------------------------------------------------------------------------
+-- Shared emitter functions
 
 --------------------------------------------------------------------------------
 -- Helpers

@@ -1,9 +1,9 @@
 module Intentio.Codegen
-  ( someFunc
+  ( emitCAssembly
+  , printCAssembly
   )
 where
 
-import           Intentio.Prelude
-
-someFunc :: IO ()
-someFunc = putText "intentio-codegen"
+import           Intentio.Codegen.Emitter       ( emitCAssembly
+                                                , printCAssembly
+                                                )

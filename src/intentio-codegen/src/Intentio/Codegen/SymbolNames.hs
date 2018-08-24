@@ -4,6 +4,7 @@ module Intentio.Codegen.SymbolNames
   ( GetCModuleFileName(..)
   , cModuleFileNameBase
   , cItemName
+  , cImportedItemName
   , cVarName
   )
 where
@@ -36,11 +37,16 @@ instance GetCModuleFileName CModuleHeader where
   cModuleFileName m = cModuleFileNameBase m <> ".h"
 
 cItemName :: H.Module -> H.Item -> Text
-cItemName modul item = mangle [modul ^. moduleName . _Wrapped, iname]
+cItemName modul item = cItemName' (modul ^. moduleName) iname
  where
-  iname = case item ^. H.itemName of
-    Just name -> name ^. _Wrapped
-    Nothing   -> "$" <> (item ^. H.itemId . _Wrapped & show)
+  iname   = fromMaybe unnamed (item ^. H.itemName)
+  unnamed = H.ItemName $ "$" <> (item ^. H.itemId . _Wrapped & show)
+
+cImportedItemName :: H.ModuleName -> H.ItemName -> Text
+cImportedItemName = cItemName'
+
+cItemName' :: H.ModuleName -> H.ItemName -> Text
+cItemName' modul item = mangle [modul ^. _Wrapped, item ^. _Wrapped]
 
 cVarName :: H.Var -> String
 cVarName var = var ^. H.varIdent . H.identName & sanitize & toS

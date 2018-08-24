@@ -40,6 +40,7 @@ import           Intentio.Codegen.Emitter.Types ( CModuleHeader
                                                 )
 import           Intentio.Codegen.SymbolNames   ( GetCModuleFileName(..)
                                                 , cItemName
+                                                , cImportedItemName
                                                 , cVarName
                                                 )
 
@@ -59,6 +60,15 @@ withB b = withReaderT $ \(m, i) -> (m, i, b)
 
 withIB :: H.Item -> H.Body -> BEmit a -> MEmit a
 withIB i b = withReaderT (, i, b)
+
+unI :: MEmit a -> IEmit a
+unI = withReaderT $ view _1
+
+unB :: IEmit a -> BEmit a
+unB = withReaderT $ \(m, i, _) -> (m, i)
+
+unIB :: MEmit a -> BEmit a
+unIB = withReaderT $ view _1
 
 --------------------------------------------------------------------------------
 -- Emitter entry points
@@ -122,14 +132,14 @@ emitImportItem modName = return [cunit| $esc:f |]
 
 emitFnHeader :: H.Item -> H.BodyId -> MEmit [C.Definition]
 emitFnHeader item bodyId = do
-  fname   <- getItemName item
+  fname   <- getCItemName item
   body    <- getBodyById bodyId
   fparams <- withIB item body emitFnParams
   return [cunit| $ty:iobjPtr $id:fname ($params:fparams) ; |]
 
 emitFnItem :: H.Item -> H.BodyId -> MEmit [C.Definition]
 emitFnItem item bodyId = do
-  fname   <- getItemName item
+  fname   <- getCItemName item
   body    <- getBodyById bodyId
   fparams <- withIB item body emitFnParams
   fbody   <- withIB item body emitFnBody
@@ -201,8 +211,9 @@ emitExpr expr = case expr ^. H.exprKind of
 
 emitPathExpr :: H.Path -> BEmit C.Exp
 emitPathExpr path = case path ^. H.pathKind of
-  H.Local  varId -> getVarById varId <&> cVarName <&> (\v -> [cexp| $id:v |])
-  H.Global _     -> lift $ pushIceFor path "TODO: global path expr"
+  H.Local  varId  -> getVarById varId <&> cVarName <&> mkExp
+  H.Global itemId -> unIB (getItemById itemId >>= getCItemName) <&> mkExp
+  where mkExp v = [cexp| $id:v |]
 
 --------------------------------------------------------------------------------
 -- Helpers
@@ -258,8 +269,10 @@ getVarById varId = do
     Just x  -> return x
     Nothing -> lift $ pushIceFor body $ "Bad HIR: miss var " <> show varId
 
-getItemName :: H.Item -> MEmit String
-getItemName item = ask <&> flip cItemName item <&> toS
+getCItemName :: H.Item -> MEmit String
+getCItemName item = case item ^. H.itemKind of
+  H.ImportItem m i -> cImportedItemName m i & toS & return
+  _                -> ask <&> flip cItemName item <&> toS
 
 getParamVar :: H.Param -> BEmit H.Var
 getParamVar param = do

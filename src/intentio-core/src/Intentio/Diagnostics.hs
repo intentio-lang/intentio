@@ -91,8 +91,7 @@ instance DiagnosticPrintable [Diagnostic] where
 instance DiagnosticPrintable (Seq Diagnostic) where
   diagnosticPrint o = diagnosticPrint o . toList
 
-diagnosticFor
-  :: HasSourcePos a => DiagnosticSeverity -> a -> Text -> Diagnostic
+diagnosticFor :: HasSourcePos a => DiagnosticSeverity -> a -> Text -> Diagnostic
 diagnosticFor s p m = Diagnostic s (_sourcePos p) m
 {-# INLINE diagnosticFor #-}
 
@@ -173,8 +172,7 @@ class HasSourcePos a where
   _sourcePos :: a -> SourcePos
 
 sourcePos
-  :: (Profunctor p, Contravariant f, HasSourcePos a)
-  => Optic' p f a SourcePos
+  :: (Profunctor p, Contravariant f, HasSourcePos a) => Optic' p f a SourcePos
 sourcePos = to _sourcePos
 
 instance HasSourcePos () where

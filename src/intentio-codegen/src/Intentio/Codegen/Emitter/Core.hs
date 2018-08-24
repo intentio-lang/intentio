@@ -173,9 +173,9 @@ emitTopLevelExpr expr = case expr ^. H.exprKind of
   H.CallExpr{}       -> wrap
   H.AssignExpr{}     -> wrap
 
-  H.BlockExpr _      -> lift . lift $ pushIceFor expr "block expr in inner expr"
-  H.WhileExpr _ _    -> lift . lift $ pushIceFor expr "while expr in inner expr"
-  H.IfExpr _ _ _     -> lift . lift $ pushIceFor expr "if expr in inner expr"
+  H.BlockExpr _      -> lift . lift $ pushIceFor expr "TODO: block expr"
+  H.WhileExpr _ _    -> lift . lift $ pushIceFor expr "TODO: while expr"
+  H.IfExpr _ _ _     -> lift . lift $ pushIceFor expr "TODO: if expr"
 
   H.ReturnExpr inner -> do
     e <- lift $ emitExpr inner
@@ -188,15 +188,16 @@ emitTopLevelExpr expr = case expr ^. H.exprKind of
 emitExpr :: H.Expr -> BEmit C.Exp
 emitExpr expr = case expr ^. H.exprKind of
   H.PathExpr    path -> emitPathExpr path
-  H.LiteralExpr _    -> lift $ pushIceFor expr "literal expr in inner expr"
-  H.BlockExpr   _    -> lift $ pushIceFor expr "block expr in inner expr"
-  H.UnaryExpr _ _    -> lift $ pushIceFor expr "unary expr in inner expr"
-  H.BinExpr _ _ _    -> lift $ pushIceFor expr "binary expr in inner expr"
-  H.CallExpr  _ _    -> lift $ pushIceFor expr "call expr in inner expr"
-  H.WhileExpr _ _    -> lift $ pushIceFor expr "while expr in inner expr"
-  H.IfExpr _ _ _     -> lift $ pushIceFor expr "if expr in inner expr"
-  H.AssignExpr _ _   -> lift $ pushIceFor expr "assign expr in inner expr"
-  H.ReturnExpr _     -> lift $ pushIceFor expr "return expr in inner expr"
+  H.LiteralExpr _    -> lift $ pushIceFor expr "TODO: literal expr"
+  H.UnaryExpr _ _    -> lift $ pushIceFor expr "TODO: unary expr"
+  H.BinExpr _ _ _    -> lift $ pushIceFor expr "TODO: binary expr"
+  H.CallExpr   _ _   -> lift $ pushIceFor expr "TODO: call expr"
+  H.AssignExpr _ _   -> lift $ pushIceFor expr "TODO: assign expr"
+
+  H.BlockExpr{}      -> lift $ pushIceFor expr "HirImp Bug: block in inner"
+  H.WhileExpr{}      -> lift $ pushIceFor expr "HirImp Bug: while in inner"
+  H.IfExpr{}         -> lift $ pushIceFor expr "HirImp Bug: if in inner"
+  H.ReturnExpr{}     -> lift $ pushIceFor expr "HirImp Bug: return in inner"
 
 emitPathExpr :: H.Path -> BEmit C.Exp
 emitPathExpr path = case path ^. H.pathKind of

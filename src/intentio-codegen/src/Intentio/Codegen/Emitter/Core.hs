@@ -183,7 +183,8 @@ emitTopLevelExpr expr = case expr ^. H.exprKind of
   H.CallExpr{}       -> wrap
   H.AssignExpr{}     -> wrap
 
-  H.BlockExpr _      -> lift . lift $ pushIceFor expr "TODO: block expr"
+  H.BlockExpr block  -> mapM_ emitTopLevelExpr (block ^. H.blockExprs)
+
   H.WhileExpr _ _    -> lift . lift $ pushIceFor expr "TODO: while expr"
   H.IfExpr _ _ _     -> lift . lift $ pushIceFor expr "TODO: if expr"
 

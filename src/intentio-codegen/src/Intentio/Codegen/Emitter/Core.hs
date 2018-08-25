@@ -101,7 +101,7 @@ emitItemSource modul itemId = runReaderT (emitItemSource' itemId) modul
 -- Constants
 
 iobjTy :: C.Type
-iobjTy = [cty| typename IntObject |]
+iobjTy = [cty| typename IeoObject |]
 
 iobjPtr :: C.Type
 iobjPtr = [cty| $ty:iobjTy * |]

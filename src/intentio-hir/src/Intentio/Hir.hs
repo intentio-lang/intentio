@@ -18,8 +18,6 @@ import           Intentio.Compiler             as X
                                                 ( ModuleName(..)
                                                 , ItemName(..)
                                                 )
-import           Language.Intentio.AST         as X
-                                                ( Literal )
 
 --------------------------------------------------------------------------------
 -- HIR data structures
@@ -154,6 +152,18 @@ instance FromJSON Ident
 
 instance HasSourcePos Ident where
   _sourcePos = _identSourcePos
+
+data Literal
+  = IntegerLit Integer
+  | FloatLit Double
+  | StringLit Text
+  | CharLit Char
+  | RegexLit Text
+  | NoneLit
+  deriving (Show, Eq, Generic)
+
+instance ToJSON Literal
+instance FromJSON Literal
 
 data Block = Block
   { _blockSourcePos :: SourcePos

@@ -100,11 +100,11 @@ emitItemSource modul itemId = runReaderT (emitItemSource' itemId) modul
 --------------------------------------------------------------------------------
 -- Constants
 
-iobjTy :: C.Type
-iobjTy = [cty| typename IeoObject |]
+tyIeoObj :: C.Type
+tyIeoObj = [cty| typename IeoObject |]
 
-iobjPtr :: C.Type
-iobjPtr = [cty| $ty:iobjTy * |]
+tyPIeoObj :: C.Type
+tyPIeoObj = [cty| $ty:tyIeoObj * |]
 
 --------------------------------------------------------------------------------
 -- Main item emitter
@@ -135,7 +135,7 @@ emitFnHeader item bodyId = do
   fname   <- getCItemName item
   body    <- getBodyById bodyId
   fparams <- withIB item body emitFnParams
-  return [cunit| $ty:iobjPtr $id:fname ($params:fparams) ; |]
+  return [cunit| $ty:tyPIeoObj $id:fname ($params:fparams) ; |]
 
 emitFnItem :: H.Item -> H.BodyId -> MEmit [C.Definition]
 emitFnItem item bodyId = do
@@ -143,7 +143,7 @@ emitFnItem item bodyId = do
   body    <- getBodyById bodyId
   fparams <- withIB item body emitFnParams
   fbody   <- withIB item body emitFnBody
-  return [cunit| $ty:iobjPtr $id:fname ($params:fparams) { $items:fbody } |]
+  return [cunit| $ty:tyPIeoObj $id:fname ($params:fparams) { $items:fbody } |]
 
 emitFnParams :: BEmit [C.Param]
 emitFnParams = view (_3 . H.bodyParams) >>= mapM emitFnParam
@@ -151,7 +151,7 @@ emitFnParams = view (_3 . H.bodyParams) >>= mapM emitFnParam
 emitFnParam :: H.Param -> BEmit C.Param
 emitFnParam param = do
   v <- cVarName <$> getParamVar param
-  return [cparam| $ty:iobjPtr $id:v |]
+  return [cparam| $ty:tyPIeoObj $id:v |]
 
 emitFnBody :: BEmit [C.BlockItem]
 emitFnBody = toList <$> execWriterT (emitFnVars >> emitFnBodyValue)
@@ -166,7 +166,7 @@ emitFnVars = do
     $ \i -> lift (getVarById i) >>= lift . emitFnVar >>= tell . pure
 
 emitFnVar :: H.Var -> BEmit C.BlockItem
-emitFnVar var = return [citem| $ty:iobjPtr $id:v ; |] where v = cVarName var
+emitFnVar var = return [citem| $ty:tyPIeoObj $id:v ; |] where v = cVarName var
 
 emitFnBodyValue :: WriterT (Seq C.BlockItem) BEmit ()
 emitFnBodyValue = view (_3 . H.bodyValue) >>= emitTopLevelExpr

@@ -177,17 +177,17 @@ emitFnBodyValue = view (_3 . H.bodyValue) >>= emitTopLevelExpr
 
 emitTopLevelExpr :: H.Expr -> WriterT (Seq C.BlockItem) BEmit ()
 emitTopLevelExpr expr = case expr ^. H.exprKind of
-  H.PathExpr{}       -> wrap
+  H.PathExpr{}   -> wrap
   H.LitExpr{}    -> wrap
-  H.UnaryExpr{}      -> wrap
-  H.BinExpr{}        -> wrap
-  H.CallExpr{}       -> wrap
-  H.AssignExpr{}     -> wrap
+  H.UnExpr{}     -> wrap
+  H.BinExpr{}    -> wrap
+  H.CallExpr{}   -> wrap
+  H.AssignExpr{} -> wrap
 
-  H.BlockExpr block  -> mapM_ emitTopLevelExpr (block ^. H.blockExprs)
+  H.BlockExpr block -> mapM_ emitTopLevelExpr (block ^. H.blockExprs)
 
-  H.WhileExpr _ _    -> lift . lift $ pushIceFor expr "TODO: while expr"
-  H.IfExpr _ _ _     -> lift . lift $ pushIceFor expr "TODO: if expr"
+  H.WhileExpr _ _ -> lift . lift $ pushIceFor expr "TODO: while expr"
+  H.IfExpr _ _ _  -> lift . lift $ pushIceFor expr "TODO: if expr"
 
   H.ReturnExpr inner -> do
     e <- lift $ emitExpr inner
@@ -200,9 +200,9 @@ emitTopLevelExpr expr = case expr ^. H.exprKind of
 emitExpr :: H.Expr -> BEmit C.Exp
 emitExpr expr = case expr ^. H.exprKind of
   H.PathExpr    path        -> emitPathExpr path
-  H.LitExpr lit             -> emitLitExpr lit
-  H.UnaryExpr   op expr     -> lift $ pushIceFor expr "TODO: unary expr"
-  H.BinExpr     op lhs rhs  -> lift $ pushIceFor expr "TODO: binary expr"
+  H.LitExpr     lit         -> emitLitExpr lit
+  H.UnExpr      op expr     -> emitUnExpr op expr
+  H.BinExpr     op lhs rhs  -> emitBinExpr op lhs rhs
   H.CallExpr    callee args -> emitCallExpr callee args
   H.AssignExpr  varId inner -> emitAssignExpr varId inner
 
@@ -242,6 +242,38 @@ emitAssignExpr varId expr = do
   cexpr <- emitExpr expr
   let vid = [cexp| $id:vname |]
   return [cexp| $vid = $cexpr |]
+
+emitUnExpr :: H.UnOp -> H.Expr -> BEmit C.Exp
+emitUnExpr unOp expr = do
+  f :: String <- case unOp ^. H.unOpKind of
+    H.UnNot -> return "ieo_not"
+    H.UnNeg -> return "ieo_neg"
+  let cf = [cexp| $id:f |]
+  cexpr <- emitExpr expr
+  return [cexp| $cf ( $cexpr ) |]
+
+emitBinExpr :: H.BinOp -> H.Expr -> H.Expr -> BEmit C.Exp
+emitBinExpr binOp lhs rhs = do
+  f :: String <- case binOp ^. H.binOpKind of
+    H.BinAdd  -> return "ieo_add"
+    H.BinDiv  -> return "ieo_div"
+    H.BinEq   -> return "ieo_eq"
+    H.BinGt   -> return "ieo_gt"
+    H.BinGtEq -> return "ieo_gteq"
+    H.BinLt   -> return "ieo_lt"
+    H.BinLtEq -> return "ieo_lteq"
+    H.BinMul  -> return "ieo_mul"
+    H.BinNeq  -> return "ieo_neq"
+    H.BinSEq  -> return "ieo_seq"
+    H.BinSNeq -> return "ieo_sneq"
+    H.BinSub  -> return "ieo_sub"
+    H.BinAnd  -> lift $ pushIceFor binOp "HirImp: binary and operator"
+    H.BinOr   -> lift $ pushIceFor binOp "HirImp: binary or operator"
+    H.BinXor  -> lift $ pushIceFor binOp "HirImp: binary xor operator"
+  let cf = [cexp| $id:f |]
+  clhs <- emitExpr lhs
+  crhs <- emitExpr rhs
+  return [cexp| $cf ( $clhs , $crhs ) |]
 
 --------------------------------------------------------------------------------
 -- Helpers

@@ -129,7 +129,7 @@ data ExprKind
   = PathExpr Path
   | LitExpr Lit
   | BlockExpr Block
-  | UnaryExpr UnOp Expr
+  | UnExpr UnOp Expr
   | BinExpr BinOp Expr Expr
   | CallExpr Expr [Expr]
   | WhileExpr Expr Expr
@@ -218,6 +218,9 @@ data UnOp = UnOp
 instance ToJSON UnOp
 instance FromJSON UnOp
 
+instance HasSourcePos UnOp where
+  _sourcePos = _unOpSourcePos
+
 data UnOpKind
   = UnNeg
   | UnNot
@@ -234,6 +237,9 @@ data BinOp = BinOp
 
 instance ToJSON BinOp
 instance FromJSON BinOp
+
+instance HasSourcePos BinOp where
+  _sourcePos = _binOpSourcePos
 
 data BinOpKind
   = BinAdd

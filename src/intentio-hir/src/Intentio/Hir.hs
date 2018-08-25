@@ -127,7 +127,7 @@ instance HasSourcePos Expr where
 
 data ExprKind
   = PathExpr Path
-  | LiteralExpr Lit
+  | LitExpr Lit
   | BlockExpr Block
   | UnaryExpr UnOp Expr
   | BinExpr BinOp Expr Expr

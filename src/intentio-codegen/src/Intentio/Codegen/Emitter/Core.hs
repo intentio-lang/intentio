@@ -178,7 +178,7 @@ emitFnBodyValue = view (_3 . H.bodyValue) >>= emitTopLevelExpr
 emitTopLevelExpr :: H.Expr -> WriterT (Seq C.BlockItem) BEmit ()
 emitTopLevelExpr expr = case expr ^. H.exprKind of
   H.PathExpr{}       -> wrap
-  H.LiteralExpr{}    -> wrap
+  H.LitExpr{}    -> wrap
   H.UnaryExpr{}      -> wrap
   H.BinExpr{}        -> wrap
   H.CallExpr{}       -> wrap
@@ -200,7 +200,7 @@ emitTopLevelExpr expr = case expr ^. H.exprKind of
 emitExpr :: H.Expr -> BEmit C.Exp
 emitExpr expr = case expr ^. H.exprKind of
   H.PathExpr    path        -> emitPathExpr path
-  H.LiteralExpr lit         -> emitLitExpr lit
+  H.LitExpr lit             -> emitLitExpr lit
   H.UnaryExpr   op expr     -> lift $ pushIceFor expr "TODO: unary expr"
   H.BinExpr     op lhs rhs  -> lift $ pushIceFor expr "TODO: binary expr"
   H.CallExpr    callee args -> emitCallExpr callee args

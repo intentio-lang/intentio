@@ -127,7 +127,7 @@ instance HasSourcePos Expr where
 
 data ExprKind
   = PathExpr Path
-  | LiteralExpr Literal
+  | LiteralExpr Lit
   | BlockExpr Block
   | UnaryExpr UnOp Expr
   | BinExpr BinOp Expr Expr
@@ -153,7 +153,19 @@ instance FromJSON Ident
 instance HasSourcePos Ident where
   _sourcePos = _identSourcePos
 
-data Literal
+data Lit = Lit
+  { _litSourcePos :: SourcePos
+  , _litKind      :: LitKind
+  }
+  deriving (Show, Eq, Generic)
+
+instance ToJSON Lit
+instance FromJSON Lit
+
+instance HasSourcePos Lit where
+  _sourcePos = _litSourcePos
+
+data LitKind
   = IntegerLit Integer
   | FloatLit Double
   | StringLit Text
@@ -162,8 +174,8 @@ data Literal
   | NoneLit
   deriving (Show, Eq, Generic)
 
-instance ToJSON Literal
-instance FromJSON Literal
+instance ToJSON LitKind
+instance FromJSON LitKind
 
 data Block = Block
   { _blockSourcePos :: SourcePos
@@ -271,6 +283,11 @@ makeLenses ''ExprKind
 makePrisms ''ExprKind
 
 makeLenses ''Ident
+
+makeLenses ''Lit
+
+makeLenses ''LitKind
+makePrisms ''LitKind
 
 makeLenses ''Block
 

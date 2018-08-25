@@ -199,22 +199,31 @@ emitTopLevelExpr expr = case expr ^. H.exprKind of
 emitExpr :: H.Expr -> BEmit C.Exp
 emitExpr expr = case expr ^. H.exprKind of
   H.PathExpr    path -> emitPathExpr path
+
   H.LiteralExpr _    -> lift $ pushIceFor expr "TODO: literal expr"
   H.UnaryExpr _ _    -> lift $ pushIceFor expr "TODO: unary expr"
   H.BinExpr _ _ _    -> lift $ pushIceFor expr "TODO: binary expr"
   H.CallExpr   _ _   -> lift $ pushIceFor expr "TODO: call expr"
-  H.AssignExpr _ _   -> lift $ pushIceFor expr "TODO: assign expr"
 
-  H.BlockExpr{}      -> lift $ pushIceFor expr "HirImp Bug: block in inner"
-  H.WhileExpr{}      -> lift $ pushIceFor expr "HirImp Bug: while in inner"
-  H.IfExpr{}         -> lift $ pushIceFor expr "HirImp Bug: if in inner"
-  H.ReturnExpr{}     -> lift $ pushIceFor expr "HirImp Bug: return in inner"
+  H.AssignExpr varId inner -> emitAssignExpr varId inner
+
+  H.BlockExpr{}  -> lift $ pushIceFor expr "HirImp Bug: block in inner"
+  H.WhileExpr{}  -> lift $ pushIceFor expr "HirImp Bug: while in inner"
+  H.IfExpr{}     -> lift $ pushIceFor expr "HirImp Bug: if in inner"
+  H.ReturnExpr{} -> lift $ pushIceFor expr "HirImp Bug: return in inner"
 
 emitPathExpr :: H.Path -> BEmit C.Exp
 emitPathExpr path = case path ^. H.pathKind of
   H.Local  varId  -> getVarById varId <&> cVarName <&> mkExp
   H.Global itemId -> unIB (getItemById itemId >>= getCItemName) <&> mkExp
   where mkExp v = [cexp| $id:v |]
+
+emitAssignExpr :: H.VarId -> H.Expr -> BEmit C.Exp
+emitAssignExpr varId expr = do
+  vname <- cVarName <$> getVarById varId
+  cexpr <- emitExpr expr
+  let vid = [cexp| $id:vname |]
+  return [cexp| $vid = $cexpr |]
 
 --------------------------------------------------------------------------------
 -- Helpers

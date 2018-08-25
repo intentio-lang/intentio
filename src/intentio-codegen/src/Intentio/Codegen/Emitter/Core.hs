@@ -200,7 +200,7 @@ emitTopLevelExpr expr = case expr ^. H.exprKind of
 emitExpr :: H.Expr -> BEmit C.Exp
 emitExpr expr = case expr ^. H.exprKind of
   H.PathExpr    path        -> emitPathExpr path
-  H.LiteralExpr lit         -> lift $ pushIceFor expr "TODO: literal expr"
+  H.LiteralExpr lit         -> emitLitExpr lit
   H.UnaryExpr   op expr     -> lift $ pushIceFor expr "TODO: unary expr"
   H.BinExpr     op lhs rhs  -> lift $ pushIceFor expr "TODO: binary expr"
   H.CallExpr    callee args -> emitCallExpr callee args
@@ -216,6 +216,17 @@ emitPathExpr path = case path ^. H.pathKind of
   H.Local  varId  -> getVarById varId <&> cVarName <&> mkExp
   H.Global itemId -> unIB (getItemById itemId >>= getCItemName) <&> mkExp
   where mkExp v = [cexp| $id:v |]
+
+emitLitExpr :: H.Lit -> BEmit C.Exp
+emitLitExpr lit = case lit ^. H.litKind of
+  H.NoneLit      -> return [cexp| ieo_none |]
+  H.IntegerLit x -> return [cexp| ieo_int_new( $llint:x ) |]
+  H.FloatLit x   -> return [cexp| ieo_float_new( $ldouble:x ) |]
+  H.CharLit x    -> return [cexp| ieo_char_new( $char:x ) |]
+  H.StringLit x  -> let s = toS x
+                    in return [cexp| ieo_string_new( $string:s ) |]
+  H.RegexLit x   -> let s = toS x
+                    in return [cexp| ieo_regex_new( $string:s ) |]
 
 emitCallExpr :: H.Expr -> [H.Expr] -> BEmit C.Exp
 emitCallExpr callee args = do

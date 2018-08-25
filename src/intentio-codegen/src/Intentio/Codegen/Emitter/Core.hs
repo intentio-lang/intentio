@@ -101,11 +101,8 @@ emitItemSource modul itemId = runReaderT (emitItemSource' itemId) modul
 --------------------------------------------------------------------------------
 -- Constants
 
-tyIeoObj :: C.Type
-tyIeoObj = [cty| typename IeoObject |]
-
-tyPIeoObj :: C.Type
-tyPIeoObj = [cty| $ty:tyIeoObj * |]
+tyResult :: C.Type
+tyResult = [cty| typename IeoResult |]
 
 --------------------------------------------------------------------------------
 -- Main item emitter
@@ -136,7 +133,7 @@ emitFnHeader item bodyId = do
   fname   <- getCItemName item
   body    <- getBodyById bodyId
   fparams <- withIB item body emitFnParams
-  return [cunit| $ty:tyPIeoObj $id:fname ($params:fparams) ; |]
+  return [cunit| $ty:tyResult $id:fname ($params:fparams) ; |]
 
 emitFnItem :: H.Item -> H.BodyId -> MEmit [C.Definition]
 emitFnItem item bodyId = do
@@ -144,7 +141,7 @@ emitFnItem item bodyId = do
   body    <- getBodyById bodyId
   fparams <- withIB item body emitFnParams
   fbody   <- withIB item body emitFnBody
-  return [cunit| $ty:tyPIeoObj $id:fname ($params:fparams) { $items:fbody } |]
+  return [cunit| $ty:tyResult $id:fname ($params:fparams) { $items:fbody } |]
 
 emitFnParams :: BEmit [C.Param]
 emitFnParams = view (_3 . H.bodyParams) >>= mapM emitFnParam
@@ -152,7 +149,7 @@ emitFnParams = view (_3 . H.bodyParams) >>= mapM emitFnParam
 emitFnParam :: H.Param -> BEmit C.Param
 emitFnParam param = do
   v <- cVarName <$> getParamVar param
-  return [cparam| $ty:tyPIeoObj $id:v |]
+  return [cparam| $ty:tyResult $id:v |]
 
 emitFnBody :: BEmit [C.BlockItem]
 emitFnBody = toList <$> execWriterT (emitFnVars >> emitFnBodyValue)
@@ -167,7 +164,7 @@ emitFnVars = do
     $ \i -> lift (getVarById i) >>= lift . emitFnVar >>= tell . pure
 
 emitFnVar :: H.Var -> BEmit C.BlockItem
-emitFnVar var = return [citem| $ty:tyPIeoObj $id:v ; |] where v = cVarName var
+emitFnVar var = return [citem| $ty:tyResult $id:v ; |] where v = cVarName var
 
 emitFnBodyValue :: WriterT (Seq C.BlockItem) BEmit ()
 emitFnBodyValue = view (_3 . H.bodyValue) >>= emitTopLevelExpr
@@ -233,7 +230,7 @@ emitCallExpr callee args = do
   ccallee <- emitExpr callee
   let arity = length args
   cargs <- fmap (\e -> [cinit| $e |]) <$> mapM emitExpr args
-  let cargsArray = [cexp| ($ty:tyPIeoObj [$arity]){ $inits:cargs } |]
+  let cargsArray = [cexp| ($ty:tyResult [$arity]){ $inits:cargs } |]
   return [cexp| ieo_call( $ccallee, $arity, $cargsArray) |]
 
 emitAssignExpr :: H.VarId -> H.Expr -> BEmit C.Exp

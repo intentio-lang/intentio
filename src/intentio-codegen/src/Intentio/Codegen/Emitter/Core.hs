@@ -16,6 +16,7 @@ import qualified Data.List                     as List
 import qualified Data.Text                     as T
 import qualified Language.C.Quote              as C
 import           Language.C.Quote.C             ( cexp
+                                                , cinit
                                                 , citem
                                                 , citems
                                                 , cparam
@@ -198,14 +199,12 @@ emitTopLevelExpr expr = case expr ^. H.exprKind of
 
 emitExpr :: H.Expr -> BEmit C.Exp
 emitExpr expr = case expr ^. H.exprKind of
-  H.PathExpr    path -> emitPathExpr path
-
-  H.LiteralExpr _    -> lift $ pushIceFor expr "TODO: literal expr"
-  H.UnaryExpr _ _    -> lift $ pushIceFor expr "TODO: unary expr"
-  H.BinExpr _ _ _    -> lift $ pushIceFor expr "TODO: binary expr"
-  H.CallExpr   _ _   -> lift $ pushIceFor expr "TODO: call expr"
-
-  H.AssignExpr varId inner -> emitAssignExpr varId inner
+  H.PathExpr    path        -> emitPathExpr path
+  H.LiteralExpr lit         -> lift $ pushIceFor expr "TODO: literal expr"
+  H.UnaryExpr   op expr     -> lift $ pushIceFor expr "TODO: unary expr"
+  H.BinExpr     op lhs rhs  -> lift $ pushIceFor expr "TODO: binary expr"
+  H.CallExpr    callee args -> emitCallExpr callee args
+  H.AssignExpr  varId inner -> emitAssignExpr varId inner
 
   H.BlockExpr{}  -> lift $ pushIceFor expr "HirImp Bug: block in inner"
   H.WhileExpr{}  -> lift $ pushIceFor expr "HirImp Bug: while in inner"
@@ -217,6 +216,14 @@ emitPathExpr path = case path ^. H.pathKind of
   H.Local  varId  -> getVarById varId <&> cVarName <&> mkExp
   H.Global itemId -> unIB (getItemById itemId >>= getCItemName) <&> mkExp
   where mkExp v = [cexp| $id:v |]
+
+emitCallExpr :: H.Expr -> [H.Expr] -> BEmit C.Exp
+emitCallExpr callee args = do
+  ccallee <- emitExpr callee
+  let arity = length args
+  cargs <- fmap (\e -> [cinit| $e |]) <$> mapM emitExpr args
+  let cargsArray = [cexp| ($ty:tyPIeoObj [$arity]){ $inits:cargs } |]
+  return [cexp| ieo_call( $ccallee, $arity, $cargsArray) |]
 
 emitAssignExpr :: H.VarId -> H.Expr -> BEmit C.Exp
 emitAssignExpr varId expr = do

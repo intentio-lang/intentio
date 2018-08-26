@@ -157,7 +157,7 @@ mkAssembly _assemblyType _assemblyName _assemblyOutputPath modlist = MkAssembly
   mainMod _       _           = Nothing
 
 mkModuleMap :: Module m => NonEmpty m -> Map ModuleName m
-mkModuleMap = M.fromList . map (\m -> (_moduleName m, m)) . toList
+mkModuleMap = M.fromList . fmap (\m -> (_moduleName m, m)) . toList
 
 mapModules :: (Module a, Module b) => (a -> b) -> Assembly a -> Assembly b
 mapModules f srcAsm =

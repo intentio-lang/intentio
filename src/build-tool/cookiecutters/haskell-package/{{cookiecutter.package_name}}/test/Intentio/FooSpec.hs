@@ -1,5 +1,4 @@
-module Intentio.FooSpec
-where
+module Intentio.FooSpec where
 
 import           Intentio.Prelude
 

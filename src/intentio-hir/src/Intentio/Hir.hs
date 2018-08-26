@@ -18,8 +18,6 @@ import           Intentio.Compiler             as X
                                                 ( ModuleName(..)
                                                 , ItemName(..)
                                                 )
-import           Language.Intentio.AST         as X
-                                                ( Literal )
 
 --------------------------------------------------------------------------------
 -- HIR data structures
@@ -129,9 +127,9 @@ instance HasSourcePos Expr where
 
 data ExprKind
   = PathExpr Path
-  | LiteralExpr Literal
+  | LitExpr Lit
   | BlockExpr Block
-  | UnaryExpr UnOp Expr
+  | UnExpr UnOp Expr
   | BinExpr BinOp Expr Expr
   | CallExpr Expr [Expr]
   | WhileExpr Expr Expr
@@ -154,6 +152,30 @@ instance FromJSON Ident
 
 instance HasSourcePos Ident where
   _sourcePos = _identSourcePos
+
+data Lit = Lit
+  { _litSourcePos :: SourcePos
+  , _litKind      :: LitKind
+  }
+  deriving (Show, Eq, Generic)
+
+instance ToJSON Lit
+instance FromJSON Lit
+
+instance HasSourcePos Lit where
+  _sourcePos = _litSourcePos
+
+data LitKind
+  = IntegerLit Integer
+  | FloatLit Double
+  | StringLit Text
+  | CharLit Char
+  | RegexLit Text
+  | NoneLit
+  deriving (Show, Eq, Generic)
+
+instance ToJSON LitKind
+instance FromJSON LitKind
 
 data Block = Block
   { _blockSourcePos :: SourcePos
@@ -196,6 +218,9 @@ data UnOp = UnOp
 instance ToJSON UnOp
 instance FromJSON UnOp
 
+instance HasSourcePos UnOp where
+  _sourcePos = _unOpSourcePos
+
 data UnOpKind
   = UnNeg
   | UnNot
@@ -212,6 +237,9 @@ data BinOp = BinOp
 
 instance ToJSON BinOp
 instance FromJSON BinOp
+
+instance HasSourcePos BinOp where
+  _sourcePos = _binOpSourcePos
 
 data BinOpKind
   = BinAdd
@@ -262,6 +290,11 @@ makePrisms ''ExprKind
 
 makeLenses ''Ident
 
+makeLenses ''Lit
+
+makeLenses ''LitKind
+makePrisms ''LitKind
+
 makeLenses ''Block
 
 makeLenses ''Path
@@ -287,3 +320,10 @@ moduleBody (BodyId i) = moduleBodies . ix i
 
 bodyVar :: VarId -> Traversal' Body Var
 bodyVar (VarId i) = bodyVars . ix i
+
+--------------------------------------------------------------------------------
+-- Helper accessors
+
+findParamVar :: Body -> Param -> Maybe Var
+findParamVar body param = body ^? (bodyVars . ix i)
+  where i = param ^. paramVarId . _Wrapped

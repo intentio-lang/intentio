@@ -1,0 +1,26 @@
+conf_forward:
+  options_ghc:
+  - -XBangPatterns
+  - -XDeriveGeneric
+  - -XFlexibleContexts
+  - -XFlexibleInstances
+  - -XFunctionalDependencies
+  - -XGADTs
+  - -XGeneralizedNewtypeDeriving
+  - -XLambdaCase
+  - -XMultiParamTypeClasses
+  - -XMultiWayIf
+  - -XNamedFieldPuns
+  - -XNoImplicitPrelude
+  - -XOverloadedStrings
+  - -XPartialTypeSignatures
+  - -XQuasiQuotes
+  - -XRankNTypes
+  - -XRecordWildCards
+  - -XScopedTypeVariables
+  - -XTemplateHaskell
+  - -XTupleSections
+  - -XTypeApplications
+  - -XTypeFamilies
+  - -XTypeSynonymInstances
+  - -XViewPatterns

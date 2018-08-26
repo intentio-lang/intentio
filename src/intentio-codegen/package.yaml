@@ -1,6 +1,6 @@
 _common: !include "../package-common.yaml"
 
-name: intentio-hir
+name: intentio-codegen
 
 <<: *meta
 
@@ -9,16 +9,21 @@ dependencies:
   - base
   - containers
   - intentio-core
-  - intentio-syntax
+  - intentio-hir
+  - language-c-quote
+  - mainland-pretty
+  - mtl
+  - neat-interpolation
+  - text
 
 library:
   source-dirs: src
 
 tests:
-  intentio-hir-test:
+  intentio-codegen-test:
     main: Spec.hs
     source-dirs: test
     dependencies:
-      - aeson
-      - intentio-hir
+      - intentio-codegen
       - hspec
+      - QuickCheck

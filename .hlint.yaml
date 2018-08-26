@@ -1,5 +1,46 @@
 # HLint configuration file
 # https://github.com/ndmitchell/hlint
 
-# Not considered useful hints:
- - ignore: { name: "Redundant do" }
+- arguments:
+  - --color
+
+- extensions:
+  - name:
+    - BangPatterns
+    - DeriveGeneric
+    - FlexibleContexts
+    - FlexibleInstances
+    - FunctionalDependencies
+    - GADTs
+    - GeneralizedNewtypeDeriving
+    - LambdaCase
+    - MultiParamTypeClasses
+    - MultiWayIf
+    - NamedFieldPuns
+    - NoImplicitPrelude
+    - OverloadedStrings
+    - PartialTypeSignatures
+    - QuasiQuotes
+    - RankNTypes
+    - RecordWildCards
+    - ScopedTypeVariables
+    - TemplateHaskell
+    - TupleSections
+    - TypeApplications
+    - TypeFamilies
+    - TypeSynonymInstances
+    - ViewPatterns
+
+- functions:
+  - {name: unsafePerformIO, within: []} # unsafePerformIO can only appear in no modules
+
+# Generalise map to fmap, ++ to <>
+- group:
+    name: generalise
+    enabled: true
+
+- ignore: { name: "Reduce duplication" }
+- ignore: { name: "Redundant do" }
+
+# To generate a suitable file for HLint do:
+# $ hlint --default > .hlint.yaml

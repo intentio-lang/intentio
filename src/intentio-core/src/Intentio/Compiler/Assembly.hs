@@ -16,6 +16,14 @@ module Intentio.Compiler.Assembly
   , mkModuleMap
   , AssemblyConstructError(..)
   , prettyAssemblyConstructError
+   -- ** Operations on assemblies
+  , mapModules
+  , mapModulesM
+  , forModulesM
+  , mapModulesM_
+  , forModulesM_
+  , concatMapModules
+  , concatMapModulesM
 
    -- * Module type class
   , ModuleName(..)
@@ -149,7 +157,51 @@ mkAssembly _assemblyType _assemblyName _assemblyOutputPath modlist = MkAssembly
   mainMod _       _           = Nothing
 
 mkModuleMap :: Module m => NonEmpty m -> Map ModuleName m
-mkModuleMap = M.fromList . map (\m -> (_moduleName m, m)) . toList
+mkModuleMap = M.fromList . fmap (\m -> (_moduleName m, m)) . toList
+
+mapModules :: (Module a, Module b) => (a -> b) -> Assembly a -> Assembly b
+mapModules f srcAsm =
+  let srcMl = srcAsm ^. assemblyModules & toList
+      dstMl = fmap f srcMl
+      dstMm = mkModuleMap $ fromList dstMl
+  in  srcAsm & assemblyModules .~ dstMm
+
+mapModulesM
+  :: (Module a, Module b, Monad m) => (a -> m b) -> Assembly a -> m (Assembly b)
+mapModulesM f srcAsm = do
+  let srcMl = srcAsm ^. assemblyModules & toList
+  dstMl <- mapM f srcMl
+  let dstMm = mkModuleMap $ fromList dstMl
+  return $ srcAsm & assemblyModules .~ dstMm
+
+forModulesM
+  :: (Module a, Module b, Monad m) => Assembly a -> (a -> m b) -> m (Assembly b)
+forModulesM = flip mapModulesM
+
+mapModulesM_ :: (Module a, Monad m) => (a -> m b) -> Assembly a -> m ()
+mapModulesM_ f srcAsm = mapM_ f (srcAsm ^. assemblyModules & toList)
+
+forModulesM_ :: (Module a, Monad m) => Assembly a -> (a -> m b) -> m ()
+forModulesM_ = flip mapModulesM_
+
+concatMapModules
+  :: (Module a, Module b) => (a -> [b]) -> Assembly a -> Assembly b
+concatMapModules f srcAsm =
+  let srcMl = srcAsm ^. assemblyModules & toList
+      dstMl = fmap f srcMl
+      dstMm = mkModuleMap . fromList . concat $ dstMl
+  in  srcAsm & assemblyModules .~ dstMm
+
+concatMapModulesM
+  :: (Module a, Module b, Monad m)
+  => (a -> m [b])
+  -> Assembly a
+  -> m (Assembly b)
+concatMapModulesM f srcAsm = do
+  let srcMl = srcAsm ^. assemblyModules & toList
+  dstMl <- mapM f srcMl
+  let dstMm = mkModuleMap . fromList . concat $ dstMl
+  return $ srcAsm & assemblyModules .~ dstMm
 
 --------------------------------------------------------------------------------
 -- Module class

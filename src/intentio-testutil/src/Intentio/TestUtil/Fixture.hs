@@ -60,7 +60,7 @@ runFixture s f = it fname
     let actual = fixtureMaterialize . s $ input
     getFixtureExpected f >>= \case
       Nothing -> do
-        putStrLn $ "WARN: generating test case for fixture " ++ fixtureName f
+        putStrLn $ "WARN: generating test case for fixture " <> fixtureName f
         writeFixtureExpected f actual
         True `shouldBe` True
       Just expected -> actual `shouldBe` expected
@@ -101,8 +101,8 @@ getFileFixtures prefix = do
   path
     &   listDirectory
     <&> filter notExpected
-    <&> map (path </>)
-    <&> map mkFileFixtureFromInputPath
+    <&> fmap (path </>)
+    <&> fmap mkFileFixtureFromInputPath
  where
   expectedExt = ".expected"
 

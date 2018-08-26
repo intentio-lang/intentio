@@ -31,6 +31,23 @@ import           Control.Arrow                 as X
 
 import           Control.Lens                  as X
 
+import           Control.Monad.Reader          as X
+                                                ( Reader
+                                                , ReaderT
+                                                , withReader
+                                                , withReaderT
+                                                , mapReader
+                                                , mapReaderT
+                                                )
+import           Control.Monad.Writer          as X
+                                                ( Writer
+                                                , WriterT
+                                                , execWriter
+                                                , execWriterT
+                                                , mapWriter
+                                                , mapWriterT
+                                                )
+
 import           Data.Aeson                    as X
                                                 ( ToJSON
                                                 , FromJSON

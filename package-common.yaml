@@ -47,5 +47,3 @@
 
   ghc-options:
   - -Wall
-  - -Wincomplete-uni-patterns
-  - -Wincomplete-record-updates

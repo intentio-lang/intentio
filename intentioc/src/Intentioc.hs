@@ -20,9 +20,7 @@ import           Intentio.Compiler              ( Assembly
                                                 )
 import           Intentio.Diagnostics           ( diagnosticShow )
 import           Intentio.Hir.Compiler          ( readHirDumpFiles )
-import           Language.Intentio.Compiler     ( SourceFile
-                                                , parseSourceFiles
-                                                )
+import           Language.Intentio.Compiler     ( SourceFile )
 
 import           Intentioc.Opts                 ( buildInputAssembly )
 

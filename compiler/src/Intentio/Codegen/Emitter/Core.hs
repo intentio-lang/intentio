@@ -9,7 +9,7 @@ module Intentio.Codegen.Emitter.Core
   )
 where
 
-import           Intentio.Prelude
+import           Intentio.Prelude        hiding ( op )
 
 import           Control.Monad.Writer           ( tell )
 import qualified Data.List                     as List
@@ -198,7 +198,7 @@ emitExpr :: H.Expr -> BEmit C.Exp
 emitExpr expr = case expr ^. H.exprKind of
   H.PathExpr path          -> emitPathExpr path
   H.LitExpr lit            -> emitLitExpr lit
-  H.UnExpr op expr         -> emitUnExpr op expr
+  H.UnExpr op expr'        -> emitUnExpr op expr'
   H.BinExpr op lhs rhs     -> emitBinExpr op lhs rhs
   H.CallExpr callee args   -> emitCallExpr callee args
   H.AssignExpr varId inner -> emitAssignExpr varId inner

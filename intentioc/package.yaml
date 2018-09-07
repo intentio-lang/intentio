@@ -16,12 +16,11 @@ dependencies:
 library:
   source-dirs: src
 
-executables:
-  intentioc:
-    main: Main.hs
-    source-dirs: app
-    dependencies:
-      - intentioc
+executable:
+  main: Main.hs
+  source-dirs: app
+  dependencies:
+    - intentioc
 
 tests:
   intentioc-test:

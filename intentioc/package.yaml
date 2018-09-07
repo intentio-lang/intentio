@@ -1,0 +1,32 @@
+_common: !include "../package-common.yaml"
+
+name: intentioc
+
+<<: *meta
+
+dependencies:
+  - aeson
+  - base
+  - filepath
+  - intentio-prelude
+  - intentio-compiler
+  - intentio-syntax
+  - optparse-applicative
+
+library:
+  source-dirs: src
+
+executables:
+  intentioc:
+    main: Main.hs
+    source-dirs: app
+    dependencies:
+      - intentioc
+
+tests:
+  intentioc-test:
+    main: Spec.hs
+    source-dirs: test
+    dependencies:
+      - intentioc
+      - hspec

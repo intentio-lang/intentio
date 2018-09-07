@@ -1,0 +1,19 @@
+_common: !include "../package-common.yaml"
+
+name: intentio-prelude
+
+<<: *meta
+
+dependencies:
+  - aeson
+  - base
+  - containers
+  - convertible
+  - lens
+  - mtl
+  - protolude
+  - text
+  - transformers
+
+library:
+  source-dirs: src

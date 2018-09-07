@@ -1,0 +1,49 @@
+- &meta
+  version:        0.0.0
+
+  author:
+    - Marek Kaput
+    - Anna Bukowska
+  maintainer:
+    - Marek Kaput <marek.kaput@outlook.com>
+    - Anna Bukowska <woda33@vp.pl>
+
+  copyright:      Copyright (C) 2018 Marek Kaput, Anna Bukowska
+  license:        MIT
+
+  github:         intentio-lang/intentio
+
+  build-type:     Simple
+
+  description: >
+    Please see the README on GitHub at
+    <https://github.com/intentio-lang/intentio#readme>
+
+  default-extensions:
+  - ApplicativeDo
+  - BangPatterns
+  - DeriveGeneric
+  - FlexibleContexts
+  - FlexibleInstances
+  - FunctionalDependencies
+  - GADTs
+  - GeneralizedNewtypeDeriving
+  - LambdaCase
+  - MultiParamTypeClasses
+  - MultiWayIf
+  - NamedFieldPuns
+  - NoImplicitPrelude
+  - OverloadedStrings
+  - PartialTypeSignatures
+  - RankNTypes
+  - RecordWildCards
+  - ScopedTypeVariables
+  - TemplateHaskell
+  - TupleSections
+  - TypeApplications
+  - TypeFamilies
+  - TypeSynonymInstances
+  - ViewPatterns
+
+  ghc-options:
+  - -Wall

@@ -1,0 +1,30 @@
+_common: !include "../package-common.yaml"
+
+name: intentio-syntax
+
+<<: *meta
+
+dependencies:
+  - aeson
+  - base
+  - bimap
+  - containers
+  - convertible
+  - filepath
+  - intentio-prelude
+  - megaparsec
+  - text
+  - unordered-containers
+
+library:
+  source-dirs: src
+
+tests:
+  intentio-syntax-test:
+    main: Spec.hs
+    source-dirs: test
+    dependencies:
+      - hspec
+      - intentio-syntax
+      - intentio-test-utils
+      - QuickCheck

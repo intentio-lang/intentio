@@ -1,0 +1,32 @@
+_common: !include "../package-common.yaml"
+
+name: intentio-compiler
+
+<<: *meta
+
+dependencies:
+  - aeson
+  - base
+  - containers
+  - filepath
+  - intentio-prelude
+  - intentio-syntax
+  - language-c-quote
+  - mainland-pretty
+  - megaparsec
+  - mtl
+  - neat-interpolation
+  - text
+  - transformers
+
+library:
+  source-dirs: src
+
+tests:
+  intentio-core-test:
+    main: Spec.hs
+    source-dirs: test
+    dependencies:
+      - intentio-compiler
+      - hspec
+      - QuickCheck

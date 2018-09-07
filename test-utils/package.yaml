@@ -1,0 +1,19 @@
+_common: !include "../package-common.yaml"
+
+name: intentio-test-utils
+
+<<: *meta
+
+dependencies:
+  - aeson
+  - aeson-pretty
+  - base
+  - directory
+  - filepath
+  - hspec
+  - intentio-prelude
+  - megaparsec
+  - text
+
+library:
+  source-dirs: src

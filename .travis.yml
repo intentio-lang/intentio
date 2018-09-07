@@ -21,7 +21,10 @@ install:
   - travis_wait stack --no-terminal test --only-dependencies
 
 script:
-  - stack --no-terminal test --haddock --no-haddock-deps
+  - stack --no-terminal test intentio-syntax
+  - stack --no-terminal test intentio-compiler
+  - stack --no-terminal test intentioc
+  - stack --no-terminal haddock --no-haddock-deps
 
 notifications:
   email: false

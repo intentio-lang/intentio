@@ -1,4 +1,11 @@
-.stack-work/
-.intentio-work/
-*.cabal
+# Generic garbage,
 *~
+
+# Haskell garbadge.
+.stack-work/
+*.cabal
+
+# Lots of folks will probably play with intentioc in this directory,
+# so also ignore common intentioc garbage.
+.intentio-work/
+a.out

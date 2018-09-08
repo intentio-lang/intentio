@@ -8,6 +8,7 @@ dependencies:
   - aeson
   - base
   - containers
+  - directory
   - filepath
   - intentio-prelude
   - intentio-syntax

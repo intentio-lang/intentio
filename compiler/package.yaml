@@ -19,6 +19,7 @@ dependencies:
   - neat-interpolation
   - text
   - transformers
+  - typed-process
 
 library:
   source-dirs: src

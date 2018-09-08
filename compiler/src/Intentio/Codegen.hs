@@ -3,6 +3,7 @@ module Intentio.Codegen
   , printCAssembly
   , printCAssemblyToDirectory
   , printCAssemblyToWorkDir
+  , runGCC
   )
 where
 
@@ -11,3 +12,4 @@ import           Intentio.Codegen.Emitter       ( emitCAssembly
                                                 , printCAssemblyToDirectory
                                                 , printCAssemblyToWorkDir
                                                 )
+import           Intentio.Codegen.GCC           ( runGCC )

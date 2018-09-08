@@ -7,6 +7,8 @@ module Intentio.Codegen.Emitter.Types
   , cModuleDefFileName
   , cModuleDefDefinitions
   , cModuleEraseType
+  , CFile(..)
+  , cFilePath
   )
 where
 
@@ -17,7 +19,7 @@ import qualified Language.C.Quote              as C
 import           Intentio.Compiler              ( ModuleName(..)
                                                 , Module(..)
                                                 )
-import           Intentio.Diagnostics           ( SourcePos
+import           Intentio.Diagnostics           ( SourcePos(..)
                                                 , HasSourcePos(..)
                                                 )
 
@@ -58,3 +60,19 @@ instance Module (CModuleDef t) where
 
 cModuleEraseType :: CModuleDef a -> CModuleDef b
 cModuleEraseType (CModuleDef a b c d) = CModuleDef a b c d
+
+--------------------------------------------------------------------------------
+-- CFile data structure
+
+newtype CFile = CFile { _cFilePath :: FilePath }
+  deriving (Show, Eq, Ord)
+
+makeLenses ''CFile
+
+instance HasSourcePos CFile where
+  _sourcePos CFile { _cFilePath = p } = SourcePos p 0 0
+
+instance Module CFile where
+  type ItemTy CFile = Void
+  _moduleName = ModuleName . toS . _cFilePath
+  _moduleItems = const []

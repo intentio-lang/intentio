@@ -18,14 +18,16 @@ import           Text.PrettyPrint.Mainland      ( putDocLn
 import           Text.PrettyPrint.Mainland.Class
                                                 ( ppr )
 
-import   Intentio.Cache.WorkDir (getWorkDir)
+import           Intentio.Cache.WorkDir         ( getWorkDir )
 import           Intentio.Compiler              ( Assembly
+                                                , mapModulesM
                                                 , mapModulesM_
                                                 , Compile
                                                 , liftIOE
                                                 )
 
 import           Intentio.Codegen.Emitter.Types ( CModuleDef
+                                                , CFile(..)
                                                 , cModuleDefDefinitions
                                                 , cModuleDefFileName
                                                 )
@@ -33,17 +35,18 @@ import           Intentio.Codegen.Emitter.Types ( CModuleDef
 printCAssembly :: Assembly (CModuleDef t) -> Compile ()
 printCAssembly = mapModulesM_ printCModule
 
-printCAssemblyToDirectory :: FilePath -> Assembly (CModuleDef t) -> Compile ()
-printCAssemblyToDirectory dir = mapModulesM_ f
+printCAssemblyToDirectory
+  :: FilePath -> Assembly (CModuleDef t) -> Compile (Assembly CFile)
+printCAssemblyToDirectory dir = mapModulesM f
  where
   f modul = do
     let path = dir </> modul ^. cModuleDefFileName
     liftIOE $ withFile path WriteMode (flip hPrintCModule' modul)
+    return $ CFile path
 
-printCAssemblyToWorkDir :: Assembly (CModuleDef t) -> Compile ()
-printCAssemblyToWorkDir asm = do
-  wd <- getWorkDir "c"
-  printCAssemblyToDirectory wd asm
+printCAssemblyToWorkDir :: Assembly (CModuleDef t) -> Compile (Assembly CFile)
+printCAssemblyToWorkDir asm =
+  getWorkDir "cgen" >>= flip printCAssemblyToDirectory asm
 
 printCModule :: CModuleDef t -> Compile ()
 printCModule = liftIOE . printCModule'

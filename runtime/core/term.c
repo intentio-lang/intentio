@@ -22,7 +22,7 @@ ieo_term_alloc(IeoType *ty)
     return NULL;
 
   p->ty = ty;
-  p->refcount = 1;
+  atomic_init(&p->refcount, 1);
 
   return p;
 }

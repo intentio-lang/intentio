@@ -48,8 +48,14 @@ ieo_term_unref(IeoTerm **p)
   }
 }
 
-extern inline void
-ieo_term_free(IeoTerm **p);
+void
+ieo_term_free(IeoTerm **p)
+{
+  if (!p || !*p)
+    return;
+  ieo_term_ty(*p)->deleter(*p);
+  *p = NULL;
+}
 
 void
 ieo_term_deleter(IeoTerm *p)

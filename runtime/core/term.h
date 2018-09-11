@@ -102,15 +102,8 @@ ieo_term_unref(IeoTerm **p);
  *
  * @param p a pointer to term object
  */
-inline void
-ieo_term_free(IeoTerm **p)
-{
-  if (!p || !*p)
-    return;
-  assert((*p)->ty);
-  (*p)->ty->deleter(*p);
-  *p = NULL;
-}
+void
+ieo_term_free(IeoTerm **p);
 
 /**
  * @brief Default deleter of term objects.

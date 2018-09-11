@@ -8,7 +8,8 @@ import           System.Exit                    ( exitSuccess
                                                 )
 
 import           Intentio.Codegen               ( emitCAssembly
-                                                , printCAssembly
+                                                , printCAssemblyToWorkDir
+                                                , runGCC
                                                 )
 import           Intentio.Compiler              ( Assembly
                                                 , Module
@@ -30,7 +31,10 @@ import           Intentioc.Opts                 ( buildInputAssembly )
 compilerPipeline :: Assembly SourceFile -> Compile ()
 -- compilerPipeline = parseSourceFiles >=> traceStep_
 compilerPipeline =
-  readHirDumpFiles >=> (impurify . emitCAssembly) >=> printCAssembly
+  readHirDumpFiles
+    >=> (impurify . emitCAssembly)
+    >=> printCAssemblyToWorkDir
+    >=> runGCC
 
 --------------------------------------------------------------------------------
 -- Main function

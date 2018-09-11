@@ -8,6 +8,7 @@ dependencies:
   - aeson
   - base
   - containers
+  - directory
   - filepath
   - intentio-prelude
   - intentio-syntax
@@ -18,6 +19,7 @@ dependencies:
   - neat-interpolation
   - text
   - transformers
+  - typed-process
 
 library:
   source-dirs: src

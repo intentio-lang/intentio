@@ -18,7 +18,7 @@ typedef struct IeoResult IeoResult;
 // Primitive values constructors
 
 IeoResult
-ieo_none();
+ieo_none(void);
 
 IeoResult
 ieo_int_new(long long int val);
@@ -39,16 +39,16 @@ ieo_regex_new(const char *val);
 // Runtime metadata functions
 
 IeoResult
-ieo_rt_info();
+ieo_rt_info(void);
 
 IeoResult
-ieo_rt_version_major();
+ieo_rt_version_major(void);
 
 IeoResult
-ieo_rt_version_minor();
+ieo_rt_version_minor(void);
 
 IeoResult
-ieo_rt_version_patch();
+ieo_rt_version_patch(void);
 
 IeoResult
-ieo_rt_version_str();
+ieo_rt_version_str(void);

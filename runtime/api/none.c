@@ -1,7 +1,7 @@
 #include <intentio.h>
 
 IeoResult
-ieo_none()
+ieo_none(void)
 {
   IeoResult result;
   return result;

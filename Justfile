@@ -15,22 +15,22 @@ build-haskell :
 test : test-c test-haskell
 
 # Test C code
-test-c :
+test-c : build-c
   @echo "No tests for C code yet!"
 
 # Test Haskell code
-test-haskell :
+test-haskell : build-haskell
   stack test
 
 # Watch for changes in Haskell code
-watch-haskell CMD='test' :
-  stack {{ CMD }} --file-watch
+watch-haskell STACK_CMD='test' :
+  stack {{ STACK_CMD }} --file-watch
 
 # Watch for changes in C code
-watch-c CMD='cmake --build .' :
+watch-c CMD='just test-c' :
   #!/usr/bin/env bash
   while :; do
-    rg --files | entr -d bash -c 'cd cmake-build-vsc && {{ CMD }}'
+    rg --files | entr -d bash -c '{{ CMD }}'
   done
 
 # Run all linters

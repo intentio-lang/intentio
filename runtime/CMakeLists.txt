@@ -27,3 +27,5 @@ configure_file(
 target_include_directories(intentiort PUBLIC include)
 target_include_directories(intentiort
                            PRIVATE ${PROJECT_BINARY_DIR}/runtime/include_priv)
+
+add_subdirectory(test)

@@ -16,7 +16,7 @@ test : test-c test-haskell
 
 # Test C code
 test-c : build-c
-  @echo "No tests for C code yet!"
+  cd cmake-build-vsc && ctest -j 4
 
 # Test Haskell code
 test-haskell : build-haskell

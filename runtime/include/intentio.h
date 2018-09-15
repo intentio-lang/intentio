@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <stdint.h>
 
 //----------------------------------------------------------------------------
 // Core API Data Structures
@@ -21,7 +22,7 @@ IeoResult
 ieo_none(void);
 
 IeoResult
-ieo_int_new(long long int val);
+ieo_int_new(int64_t val);
 
 IeoResult
 ieo_float_new(long double val);

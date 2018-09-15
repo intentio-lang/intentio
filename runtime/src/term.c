@@ -53,6 +53,7 @@ ieo_term_free(IeoTerm **p)
 {
   if (!p || !*p)
     return;
+  assert(ieo_term_ty(*p)->deleter);
   ieo_term_ty(*p)->deleter(*p);
   *p = NULL;
 }

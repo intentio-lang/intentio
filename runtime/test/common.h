@@ -6,8 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <runtime/src/attrs.h>
+
 #include <cmocka.h>
-
-#include <runtime/include/intentio.h>
-
-#include <runtime/core/attrs.h>

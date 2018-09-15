@@ -1,14 +1,14 @@
-#include <intentio.h>
+#include "num.h"
 
 IeoResult
-ieo_char_new(char val)
+ieo_int_new(int64_t val)
 {
   IeoResult result;
   return result;
 }
 
 IeoResult
-ieo_string_new(const char *val)
+ieo_float_new(long double val)
 {
   IeoResult result;
   return result;

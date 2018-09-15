@@ -1,4 +1,7 @@
-#include <intentio.h>
+#include "rt_meta.h"
+
+#include "num.h"
+#include "str.h"
 
 #include <_intentio_config.h>
 

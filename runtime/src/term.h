@@ -23,10 +23,17 @@ struct IeoTerm
 };
 typedef struct IeoTerm IeoTerm;
 
+struct IeoResult
+{
+  bool succ;
+  IeoTerm *term;
+};
+typedef struct IeoResult IeoResult;
+
 /**
  * @brief Get pointer to term type.
  */
-inline const IeoType *
+inline IEO_PURE const IeoType *
 ieo_term_ty(const IeoTerm *p)
 {
   assert(p);
@@ -38,7 +45,7 @@ ieo_term_ty(const IeoTerm *p)
  * @brief Get pointer to term type with mutable access.
  * @warning Use this only when needed.
  */
-inline IeoType *
+inline IEO_PURE IeoType *
 ieo_term_ty_mut(const IeoTerm *p)
 {
   assert(p);
@@ -59,7 +66,7 @@ ieo_term_refcount(const IeoTerm *p)
 /**
  * @brief Get pointer to value memory of given term.
  */
-inline void *
+inline IEO_PURE void *
 ieo_term_value(IeoTerm *p)
 {
   assert(p);

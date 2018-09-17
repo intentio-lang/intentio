@@ -16,7 +16,7 @@ test : test-c test-haskell
 
 # Test C code
 test-c : build-c
-  cd cmake-build-vsc && ctest -j 4
+  cd cmake-build-vsc && ctest -j 4 --output-on-failure
 
 # Test Haskell code
 test-haskell : build-haskell

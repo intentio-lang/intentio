@@ -3,16 +3,19 @@ add_library(
 
     include/intentio.h
 
-    src/attrs.h
+    src/alltypes.c src/alltypes.h
+    src/char.c src/char.h
+    src/float.c src/float.h
+    src/int.c src/int.h
     src/memory.c src/memory.h
     src/none.c src/none.h
-    src/num.c src/num.h
     src/ops.c src/ops.h
     src/regex.c src/regex.h
     src/rt_meta.c src/rt_meta.h
     src/str.c src/str.h
     src/term.c src/term.h
     src/type.c src/type.h
+    src/util.c src/util.h
 )
 
 configure_file(

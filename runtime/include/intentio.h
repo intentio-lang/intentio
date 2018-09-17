@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
 //----------------------------------------------------------------------------
@@ -31,7 +32,7 @@ IeoResult
 ieo_char_new(char val);
 
 IeoResult
-ieo_string_new(const char *val);
+ieo_string_new(const char *str, size_t strsz);
 
 IeoResult
 ieo_regex_new(const char *val);

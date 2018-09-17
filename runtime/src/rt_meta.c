@@ -1,6 +1,6 @@
 #include "rt_meta.h"
 
-#include "num.h"
+#include "int.h"
 #include "str.h"
 
 #include <_intentio_config.h>
@@ -8,7 +8,8 @@
 IeoResult
 ieo_rt_info(void)
 {
-  return ieo_string_new("Intentio Runtime v" INTENTIO_VERSION_STRING);
+  IEO_STATIC_STRING(s, "Intentio Runtime v" INTENTIO_VERSION_STRING);
+  return IEO_SUCCT(&s);
 }
 
 IeoResult
@@ -32,5 +33,6 @@ ieo_rt_version_patch(void)
 IeoResult
 ieo_rt_version_str(void)
 {
-  return ieo_string_new(INTENTIO_VERSION_STRING);
+  IEO_STATIC_STRING(s, INTENTIO_VERSION_STRING);
+  return IEO_SUCCT(&s);
 }

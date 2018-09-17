@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 
-#include "attrs.h"
+#include "util.h"
 
 IEO_MALLOC IEO_WARN_UNUSED_RESULT IEO_ALLOC_SIZE(1) inline void *ieo_malloc(size_t size)
 {

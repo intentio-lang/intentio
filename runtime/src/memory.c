@@ -1,7 +1,5 @@
 #include "memory.h"
 
-#include <assert.h>
-
 extern inline void *
 ieo_malloc(size_t size);
 

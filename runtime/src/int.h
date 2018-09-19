@@ -17,7 +17,7 @@ ieo_is_int(IEO_NOTNULL const IeoTerm *term);
 inline IEO_PURE int64_t
 ieo_int_value(IEO_NOTNULL const IeoTerm *p)
 {
-  assert(p);
-  assert(IEO_OK(ieo_is_int(p)));
+  ieo_assert(p);
+  ieo_assert(IEO_OK(ieo_is_int(p)));
   return ((IeoInt *)p)->val;
 }

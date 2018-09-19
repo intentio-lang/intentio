@@ -27,8 +27,8 @@ ieo_term_alloc(IeoType *ty)
 IEO_MALLOC IEO_WARN_UNUSED_RESULT IeoTerm *
 ieo_term_alloc_s(IeoType *ty, size_t size)
 {
-  assert(ty);
-  assert(ty->term_size >= sizeof(IeoTermHeader));
+  ieo_assert(ty);
+  ieo_assert(ty->term_size >= sizeof(IeoTermHeader));
 
   IeoTerm *p = (IeoTerm *)ieo_mallocz(ty->term_size + size);
   if (!p)
@@ -76,7 +76,7 @@ ieo_term_free(IeoTerm **p)
   if ((*p)->head.flags.is_static)
     return;
 
-  assert(ieo_term_ty(*p)->deleter);
+  ieo_assert(ieo_term_ty(*p)->deleter);
   ieo_term_ty(*p)->deleter(*p);
 
   *p = NULL;

@@ -26,8 +26,8 @@ ieo_int_new(int64_t val)
 IEO_PURE IeoResult
 ieo_is_int(IEO_NOTNULL const IeoTerm *term)
 {
-  assert(term);
-  assert(term->head.ty);
+  ieo_assert(term);
+  ieo_assert(term->head.ty);
   return IEO_BOOL(term->head.ty == &ieo_std_type_int);
 }
 

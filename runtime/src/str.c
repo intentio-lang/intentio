@@ -47,8 +47,8 @@ ieo_string_new(const char *str, size_t strsz)
 IEO_PURE IeoResult
 ieo_is_string(IEO_NOTNULL const IeoTerm *term)
 {
-  assert(term);
-  assert(term->head.ty);
+  ieo_assert(term);
+  ieo_assert(term->head.ty);
   return IEO_BOOL(term->head.ty == &ieo_std_type_string);
 }
 

@@ -28,7 +28,7 @@ ieo_none(void)
 IEO_PURE IeoResult
 ieo_is_none(IEO_NOTNULL IeoTerm *term)
 {
-  assert(term != NULL);
-  assert(term->head.ty != NULL);
+  ieo_assert(term != NULL);
+  ieo_assert(term->head.ty != NULL);
   return IEO_BOOL(term->head.ty == &ieo_std_type_none);
 }

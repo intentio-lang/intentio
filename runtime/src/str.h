@@ -53,16 +53,16 @@ ieo_is_string(IEO_NOTNULL const IeoTerm *term);
 inline IEO_PURE size_t
 ieo_string_size(IEO_NOTNULL const IeoTerm *p)
 {
-  assert(p);
-  assert(IEO_OK(ieo_is_string(p)));
+  ieo_assert(p);
+  ieo_assert(IEO_OK(ieo_is_string(p)));
   return ((IeoString *)p)->value.size;
 }
 
 inline IEO_PURE const char *
 ieo_string_data(IEO_NOTNULL const IeoTerm *p)
 {
-  assert(p);
-  assert(IEO_OK(ieo_is_string(p)));
+  ieo_assert(p);
+  ieo_assert(IEO_OK(ieo_is_string(p)));
   return ((IeoString *)p)->value.data;
 }
 

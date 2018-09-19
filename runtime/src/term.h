@@ -8,6 +8,8 @@
 #include "type.h"
 #include "util.h"
 
+#define IEO_TP(P) (_Generic((P), IeoTerm * : (P), default : ((IeoTerm *)&(P))))
+
 #define IEO_SUCCT(TERM_PTR)                                                    \
   ((IeoResult){ .succ = true, .term = (IeoTerm *)(TERM_PTR) })
 #define IEO_FAILT(TERM_PTR)                                                    \
@@ -15,6 +17,7 @@
 
 #define IEO_SUCC(RESULT) ((IeoResult){ .succ = true, .term = (RESULT).term })
 #define IEO_FAIL(RESULT) ((IeoResult){ .succ = false, .term = (RESULT).term })
+#define IEO_NOT(RESULT) (ieo_not((RESULT)))
 #define IEO_SSET(STATE, RESULT)                                                \
   ((IeoResult){ .succ = (STATE), .term = (RESULT).term })
 
@@ -31,9 +34,43 @@
 
 #define IEO_TRY_(EXPR)                                                         \
   do {                                                                         \
-    IeoResult tmp__;                                                           \
-    IEO_TRY(tmp__, EXPR);                                                      \
+    IeoResult tmp_;                                                            \
+    IEO_TRY(tmp_, EXPR);                                                       \
   } while (0);
+
+#define IEO_TRY_ERR(RESULT_VAR, EXPR, ERR)                                     \
+  do {                                                                         \
+    (RESULT_VAR) = (EXPR);                                                     \
+    if (IEO_ERR(RESULT_VAR)) {                                                 \
+      return IEO_FAILT((ERR));                                                            \
+    }                                                                          \
+  } while (0)
+
+#define IEO_TRY_ERR_(EXPR, ERR)                                                \
+  do {                                                                         \
+    IeoResult tmp_;                                                            \
+    IEO_TRY_ERR(tmp_, EXPR, ERR);                                              \
+  } while (0);
+
+#define IEO_TRY_UNWRAP(TERM_VAR, EXPR)                                         \
+  do {                                                                         \
+    IeoResult tmp_ = (EXPR);                                                   \
+    if (IEO_ERR(tmp_)) {                                                       \
+      return (tmp_);                                                           \
+    } else {                                                                   \
+      (TERM_VAR) = tmp_.term;                                                  \
+    }                                                                          \
+  } while (0)
+
+#define IEO_TRY_UNWRAP_ERR(TERM_VAR, EXPR, ERR)                                \
+  do {                                                                         \
+    IeoResult tmp_ = (EXPR);                                                   \
+    if (IEO_ERR(tmp_)) {                                                       \
+      return IEO_FAILT((ERR));                                                            \
+    } else {                                                                   \
+      (TERM_VAR) = tmp_.term;                                                  \
+    }                                                                          \
+  } while (0)
 
 typedef uint_fast32_t IeoRefCount;
 typedef atomic_uint_fast32_t AtomicIeoRefCount;
@@ -70,6 +107,15 @@ typedef struct IeoResult
   bool succ;
   IeoTerm *term;
 } IeoResult;
+
+/**
+ * @private
+ */
+inline IEO_CONST IeoResult
+ieo_not(IeoResult r)
+{
+  return (IeoResult){ .succ = !r.succ, .term = r.term };
+}
 
 /**
  * @brief Get pointer to term type.

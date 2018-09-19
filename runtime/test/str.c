@@ -8,15 +8,15 @@ static void
 static_empty_string(IEO_UNUSED void **state)
 {
   IEO_STATIC_STRING(str, "");
-  assert_int_equal(ieo_string_size((IeoTerm *)&str), 0);
-  assert_ieo_ok(ieo_is_string((IeoTerm *)&str));
+  assert_int_equal(ieo_string_size(IEO_TP(str)), 0);
+  assert_ieo_ok(ieo_is_string(IEO_TP(str)));
 }
 
 static void
 static_string_size_is_computed_properly(IEO_UNUSED void **state)
 {
   IEO_STATIC_STRING(str, "foobar");
-  assert_int_equal(ieo_string_size((IeoTerm *)&str), strlen("foobar"));
+  assert_int_equal(ieo_string_size(IEO_TP(str)), strlen("foobar"));
 }
 
 static void
@@ -47,18 +47,15 @@ string_equal(IEO_UNUSED void **state)
   IeoTerm *foobar_alloc;
   TRY_UNWRAP(foobar_alloc, IEO_STRING_ALLOC("foobar"));
 
-  assert_ieo_ok(
-    ieo_string_equal((IeoTerm *)&empty_static, (IeoTerm *)&empty_static));
-  assert_ieo_ok(
-    ieo_string_equal((IeoTerm *)&foobar_static, (IeoTerm *)&foobar_static));
+  assert_ieo_ok(ieo_string_equal(IEO_TP(empty_static), IEO_TP(empty_static)));
+  assert_ieo_ok(ieo_string_equal(IEO_TP(foobar_static), IEO_TP(foobar_static)));
   assert_ieo_ok(ieo_string_equal(empty_alloc, empty_alloc));
   assert_ieo_ok(ieo_string_equal(foobar_alloc, foobar_alloc));
 
-  assert_ieo_err(
-    ieo_string_equal((IeoTerm *)&empty_static, (IeoTerm *)&foobar_static));
+  assert_ieo_err(ieo_string_equal(IEO_TP(empty_static), IEO_TP(foobar_static)));
   assert_ieo_err(ieo_string_equal(empty_alloc, foobar_alloc));
 
-  assert_ieo_err(ieo_string_equal(ieo_none().term, (IeoTerm *)&foobar_static));
+  assert_ieo_err(ieo_string_equal(ieo_none().term, IEO_TP(foobar_static)));
   assert_ieo_err(ieo_string_equal(empty_alloc, ieo_none().term));
 }
 

@@ -10,6 +10,11 @@ typedef struct IeoTerm IeoTerm;
 typedef struct IeoResult IeoResult;
 typedef struct IeoString IeoString;
 
+typedef IeoResult(IeoOpUnary)(IEO_NOTNULL const IeoTerm *self);
+
+typedef IeoResult(IeoOpBinary)(IEO_NOTNULL const IeoTerm *self,
+                               IEO_NOTNULL const IeoTerm *rhs);
+
 typedef struct IeoType
 {
   /**
@@ -37,83 +42,87 @@ typedef struct IeoType
   IEO_NOTNULL void (*deleter)(IEO_NULLABLE IeoTerm *self);
 
   /**
+   * @brief Perform `-self` operation.
+   */
+  IeoOpUnary *neg_func;
+
+  /**
    * @brief Perform `self + rhs` operation.
    */
-  IeoResult (*add_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
+  IeoOpBinary *add_func;
 
   /**
    * @brief Perform `self / rhs` operation.
    */
-  IeoResult (*div_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
+  IeoOpBinary *div_func;
 
   /**
    * @brief Perform `self == rhs` operation.
    *
    * If this method is not defined, the IeoType::compare_func method is tried.
    */
-  IeoResult (*eq_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
+  IeoOpBinary *eq_func;
 
   /**
    * @brief Perform `self > rhs` operation.
    *
    * If this method is not defined, the IeoType::compare_func method is tried.
    */
-  IeoResult (*gt_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
+  IeoOpBinary *gt_func;
 
   /**
    * @brief Perform `self >= rhs` operation.
    *
    * If this method is not defined, the IeoType::compare_func method is tried.
    */
-  IeoResult (*gteq_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
+  IeoOpBinary *gteq_func;
 
   /**
    * @brief Perform `self < rhs` operation.
    *
    * If this method is not defined, the IeoType::compare_func method is tried.
    */
-  IeoResult (*lt_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
+  IeoOpBinary *lt_func;
 
   /**
    * @brief Perform `self <= rhs` operation.
    *
    * If this method is not defined, the IeoType::compare_func method is tried.
    */
-  IeoResult (*lteq_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
+  IeoOpBinary *lteq_func;
 
   /**
    * @brief Perform `self * rhs` operation.
    *
    * If this method is not defined, the IeoType::compare_func method is tried.
    */
-  IeoResult (*mul_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
+  IeoOpBinary *mul_func;
 
   /**
    * @brief Perform `self != rhs` operation.
    *
    * If this method is not defined, the IeoType::compare_func method is tried.
    */
-  IeoResult (*neq_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
+  IeoOpBinary *neq_func;
 
   /**
    * @brief Perform `self - rhs` operation.
    *
    * If this method is not defined, the IeoType::compare_func method is tried.
    */
-  IeoResult (*sub_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
+  IeoOpBinary *sub_func;
 
   /**
    * @brief Compare `self` to `rhs`.
    *
    * Returns:
-   * - Negative value if lhs appears before rhs in lexicographical order.
+   * - Negative value if lhs appears before rhs.
    * - Zero if lhs and rhs compare equal.
-   * - Positive value if lhs appears after rhs in lexicographical order.
+   * - Positive value if lhs appears after rhs.
    *
    * @return IeoInt*
    */
-  IeoResult (*compare_func)(IEO_NOTNULL IeoTerm *self,
-                            IEO_NOTNULL IeoTerm *other);
+  IeoOpBinary *compare_func;
 } IeoType;
 
 /**
@@ -126,3 +135,19 @@ typedef struct IeoType
  */
 IEO_NULLABLE IeoType *
 ieo_type_iterate(IEO_NOTNULL void **opaque);
+
+/**
+ * @brief Compare two types in terms of type sorting order.
+ *
+ * Returns:
+ * - Negative value if lhs appears before rhs.
+ * - Zero if lhs and rhs compare equal.
+ * - Positive value if lhs appears after rhs.
+ *
+ * @param IeoType* lhs left hand side of comparison
+ * @param IeoType* rhs right hand side of comparison
+ * @return IeoInt
+ */
+IEO_PURE int
+ieo_type_compare(IEO_NOTNULL const IeoType *lhs,
+                 IEO_NOTNULL const IeoType *rhs);

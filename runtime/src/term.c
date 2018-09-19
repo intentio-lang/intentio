@@ -18,6 +18,9 @@ ieo_term_value_mut(IEO_NOTNULL IeoTerm *p);
 extern inline IEO_PURE IeoTermFlags
 ieo_term_flags(IEO_NOTNULL const IeoTerm *p);
 
+extern inline IEO_CONST IeoResult
+ieo_not(IeoResult r);
+
 IeoTerm *
 ieo_term_alloc(IeoType *ty)
 {

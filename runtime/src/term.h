@@ -8,28 +8,31 @@
 #include "type.h"
 #include "util.h"
 
-#define IEO_SUCCT(TERM_PTR) ((IeoResult){ .succ = true, .term = (IeoTerm *)(TERM_PTR) })
-#define IEO_FAILT(TERM_PTR) ((IeoResult){ .succ = false, .term = (IeoTerm *)(TERM_PTR) })
+#define IEO_SUCCT(TERM_PTR)                                                    \
+  ((IeoResult){ .succ = true, .term = (IeoTerm *)(TERM_PTR) })
+#define IEO_FAILT(TERM_PTR)                                                    \
+  ((IeoResult){ .succ = false, .term = (IeoTerm *)(TERM_PTR) })
 
 #define IEO_SUCC(RESULT) ((IeoResult){ .succ = true, .term = (RESULT).term })
 #define IEO_FAIL(RESULT) ((IeoResult){ .succ = false, .term = (RESULT).term })
-#define IEO_SSET(STATE, RESULT) ((IeoResult){ .succ = (STATE), .term = (RESULT).term })
+#define IEO_SSET(STATE, RESULT)                                                \
+  ((IeoResult){ .succ = (STATE), .term = (RESULT).term })
 
 #define IEO_OK(COND) ((COND).succ)
 #define IEO_ERR(COND) (!(COND).succ)
 
-#define IEO_TRY(RESULT_VAR, EXPR)                                                                  \
-  do {                                                                                             \
-    (RESULT_VAR) = (EXPR);                                                                         \
-    if (IEO_ERR(RESULT_VAR)) {                                                                     \
-      return (RESULT_VAR);                                                                         \
-    }                                                                                              \
+#define IEO_TRY(RESULT_VAR, EXPR)                                              \
+  do {                                                                         \
+    (RESULT_VAR) = (EXPR);                                                     \
+    if (IEO_ERR(RESULT_VAR)) {                                                 \
+      return (RESULT_VAR);                                                     \
+    }                                                                          \
   } while (0)
 
-#define IEO_TRY_(EXPR)                                                                             \
-  do {                                                                                             \
-    IeoResult tmp__;                                                                               \
-    IEO_TRY(tmp__, EXPR);                                                                          \
+#define IEO_TRY_(EXPR)                                                         \
+  do {                                                                         \
+    IeoResult tmp__;                                                           \
+    IEO_TRY(tmp__, EXPR);                                                      \
   } while (0);
 
 typedef uint_fast32_t IeoRefCount;
@@ -37,10 +40,12 @@ typedef atomic_uint_fast32_t AtomicIeoRefCount;
 
 typedef struct IeoTermFlags
 {
-  /// This term is stored in static memory: it is not refcounted and cannot be freed.
+  /// This term is stored in static memory: it is not refcounted and cannot be
+  /// freed.
   bool is_static : 1;
 } IeoTermFlags;
-static_assert(sizeof(IeoTermFlags) <= sizeof(uint8_t), "IeoTermFlags must occupy 1 byte");
+static_assert(sizeof(IeoTermFlags) <= sizeof(uint8_t),
+              "IeoTermFlags must occupy 1 byte");
 
 typedef struct IeoTermHeader
 {
@@ -51,7 +56,8 @@ typedef struct IeoTermHeader
 
 /**
  * @brief Represents Intentio term objects.
- * @warning NEVER TOUCH FIELDS OF THIS STRUCTURE DIRECTLY, USE ACCESSOR FUNCTIONS!
+ * @warning NEVER TOUCH FIELDS OF THIS STRUCTURE DIRECTLY, USE ACCESSOR
+ * FUNCTIONS!
  */
 typedef struct IeoTerm
 {
@@ -140,8 +146,8 @@ IEO_MALLOC IEO_WARN_UNUSED_RESULT IeoTerm *
 ieo_term_alloc(IeoType *ty);
 
 /**
- * @brief Allocate and initialize a new term object with additional `size` bytes of data after term
- * header.
+ * @brief Allocate and initialize a new term object with additional `size` bytes
+ * of data after term header.
  *
  * The object starts with reference count equal to 1.
  *
@@ -161,7 +167,8 @@ IeoTerm *
 ieo_term_ref(IeoTerm *p);
 
 /**
- * @brief Decrement reference counter of given term object, and free it if it reaches zero.
+ * @brief Decrement reference counter of given term object, and free it if it
+ * reaches zero.
  *
  * @param p a pointer to term object, set to null if term is freed
  */
@@ -171,8 +178,8 @@ ieo_term_unref(IeoTerm **p);
 /**
  * @brief Force free term from memory and set remaining pointer to null.
  *
- * @warning This is dangerous, avoid this function as much as possible and use reference counting
- * instead.
+ * @warning This is dangerous, avoid this function as much as possible and use
+ * reference counting instead.
  *
  * @param p a pointer to term object
  */

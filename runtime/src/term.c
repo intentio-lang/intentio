@@ -62,7 +62,8 @@ ieo_term_unref(IeoTerm **p)
   if ((*p)->head.flags.is_static)
     return;
 
-  if (atomic_fetch_sub_explicit(&(*p)->head.refcount, 1, memory_order_acq_rel) == 1) {
+  if (atomic_fetch_sub_explicit(
+        &(*p)->head.refcount, 1, memory_order_acq_rel) == 1) {
     ieo_term_free(p);
   }
 }

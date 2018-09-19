@@ -11,10 +11,11 @@ IEO_STATIC_STRING(ieo_str_type_name, "String");
 /**
  * @brief Special structure of allocated strings.
  *
- * Allocated strings contain character data right next to the term, the usage of the `value` fields
- * ensures correct alignment. Freeing allocated string also frees its data, as the memory is
- * allocated in one chunk. This type is internal to string allocator, as string data is normally
- * accessible via `data` pointer.
+ * Allocated strings contain character data right next to the term, the usage of
+ * the `value` fields ensures correct alignment. Freeing allocated string also
+ * frees its data, as the memory is allocated in one chunk. This type is
+ * internal to string allocator, as string data is normally accessible via
+ * `data` pointer.
  */
 typedef struct IeoStringAllocated
 {
@@ -31,8 +32,10 @@ IeoType ieo_std_type_string = {
 IeoResult
 ieo_string_new(const char *str, size_t strsz)
 {
-  // Allocate base storage for string term + storage for string data + one byte for NULL character
-  IeoStringAllocated *p = (IeoStringAllocated *)ieo_term_alloc_s(&ieo_std_type_string, strsz + 1);
+  // Allocate base storage for string term + storage for string data + one byte
+  // for NULL character
+  IeoStringAllocated *p =
+    (IeoStringAllocated *)ieo_term_alloc_s(&ieo_std_type_string, strsz + 1);
   if (!p)
     return IEO_FAIL(ieo_none());
 
@@ -83,7 +86,8 @@ ieo_string_equal(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 }
 
 IEO_PURE IeoResult
-ieo_string_compare(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
+ieo_string_compare(IEO_NOTNULL const IeoTerm *lhs,
+                   IEO_NOTNULL const IeoTerm *rhs)
 {
   IEO_TRY_(ieo_is_string(lhs));
   IEO_TRY_(ieo_is_string(rhs));
@@ -95,7 +99,8 @@ ieo_string_compare(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rh
   const IeoStringValue *lhs_val = ieo_term_value(lhs);
   const IeoStringValue *rhs_val = ieo_term_value(rhs);
 
-  int cmp = strncmp(lhs_val->data, rhs_val->data, MIN(lhs_val->size, rhs_val->size));
+  int cmp =
+    strncmp(lhs_val->data, rhs_val->data, MIN(lhs_val->size, rhs_val->size));
 
   if (cmp == 0) {
     if (lhs_val->size < rhs_val->size) {

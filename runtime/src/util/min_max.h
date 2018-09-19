@@ -108,26 +108,26 @@ ieo_max_ld(long double const x, long double const y)
   return x < y ? y : x;
 }
 
-#define MIN(X, Y)                                                                                  \
-  (_Generic((X) + (Y), int                                                                         \
-            : ieo_min_i, unsigned                                                                  \
-            : ieo_min_u, long                                                                      \
-            : ieo_min_l, unsigned long                                                             \
-            : ieo_min_ul, long long                                                                \
-            : ieo_min_ll, unsigned long long                                                       \
-            : ieo_min_ull, float                                                                   \
-            : ieo_min_f, double                                                                    \
-            : ieo_min_d, long double                                                               \
+#define MIN(X, Y)                                                              \
+  (_Generic((X) + (Y), int                                                     \
+            : ieo_min_i, unsigned                                              \
+            : ieo_min_u, long                                                  \
+            : ieo_min_l, unsigned long                                         \
+            : ieo_min_ul, long long                                            \
+            : ieo_min_ll, unsigned long long                                   \
+            : ieo_min_ull, float                                               \
+            : ieo_min_f, double                                                \
+            : ieo_min_d, long double                                           \
             : ieo_min_ld)((X), (Y)))
 
-#define MAX(X, Y)                                                                                  \
-  (_Generic((X) + (Y), int                                                                         \
-            : ieo_max_i, unsigned                                                                  \
-            : ieo_max_u, long                                                                      \
-            : ieo_max_l, unsigned long                                                             \
-            : ieo_max_ul, long long                                                                \
-            : ieo_max_ll, unsigned long long                                                       \
-            : ieo_max_ull, float                                                                   \
-            : ieo_max_f, double                                                                    \
-            : ieo_max_d, long double                                                               \
+#define MAX(X, Y)                                                              \
+  (_Generic((X) + (Y), int                                                     \
+            : ieo_max_i, unsigned                                              \
+            : ieo_max_u, long                                                  \
+            : ieo_max_l, unsigned long                                         \
+            : ieo_max_ul, long long                                            \
+            : ieo_max_ll, unsigned long long                                   \
+            : ieo_max_ull, float                                               \
+            : ieo_max_f, double                                                \
+            : ieo_max_d, long double                                           \
             : ieo_max_ld)((X), (Y)))

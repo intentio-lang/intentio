@@ -7,12 +7,14 @@
 #include "util.h"
 
 typedef struct IeoTerm IeoTerm;
+typedef struct IeoResult IeoResult;
 typedef struct IeoString IeoString;
 
 typedef struct IeoType
 {
   /**
-   * @brief Type name. Preferably the term should be static if declared by native code.
+   * @brief Type name. Preferably the term should be static if declared by
+   * native code.
    */
   IEO_NOTNULL IeoString *type_name;
 
@@ -26,84 +28,92 @@ typedef struct IeoType
   /**
    * @brief Free term memory after itself.
    *
-   * In 90% cases, this would point to the ::ieo_term_deleter function. Overriding it is useful if
-   * the term contains owned memory. This method should either be or call directly or
-   * indirectly the mentioned ::ieo_term_deleter function, which calls `ieo_free()` on the term
-   * itself and also may apply some debug or performance hooks.
+   * In 90% cases, this would point to the ::ieo_term_deleter function.
+   * Overriding it is useful if the term contains owned memory. This method
+   * should either be or call directly or indirectly the mentioned
+   * ::ieo_term_deleter function, which calls `ieo_free()` on the term itself
+   * and also may apply some debug or performance hooks.
    */
   IEO_NOTNULL void (*deleter)(IEO_NULLABLE IeoTerm *self);
 
   /**
    * @brief Perform `self + rhs` operation.
    */
-  IEO_NOTNULL IeoTerm *(*add_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
+  IeoResult (*add_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
 
   /**
    * @brief Perform `self / rhs` operation.
    */
-  IEO_NOTNULL IeoTerm *(*div_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
+  IeoResult (*div_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
 
   /**
    * @brief Perform `self == rhs` operation.
    *
    * If this method is not defined, the IeoType::compare_func method is tried.
    */
-  IEO_NOTNULL IeoTerm *(*eq_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
+  IeoResult (*eq_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
 
   /**
    * @brief Perform `self > rhs` operation.
    *
    * If this method is not defined, the IeoType::compare_func method is tried.
    */
-  IEO_NOTNULL IeoTerm *(*gt_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
+  IeoResult (*gt_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
 
   /**
    * @brief Perform `self >= rhs` operation.
    *
    * If this method is not defined, the IeoType::compare_func method is tried.
    */
-  IEO_NOTNULL IeoTerm *(*gteq_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
+  IeoResult (*gteq_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
 
   /**
    * @brief Perform `self < rhs` operation.
    *
    * If this method is not defined, the IeoType::compare_func method is tried.
    */
-  IEO_NOTNULL IeoTerm *(*lt_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
+  IeoResult (*lt_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
 
   /**
    * @brief Perform `self <= rhs` operation.
    *
    * If this method is not defined, the IeoType::compare_func method is tried.
    */
-  IEO_NOTNULL IeoTerm *(*lteq_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
+  IeoResult (*lteq_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
 
   /**
    * @brief Perform `self * rhs` operation.
    *
    * If this method is not defined, the IeoType::compare_func method is tried.
    */
-  IEO_NOTNULL IeoTerm *(*mul_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
+  IeoResult (*mul_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
 
   /**
    * @brief Perform `self != rhs` operation.
    *
    * If this method is not defined, the IeoType::compare_func method is tried.
    */
-  IEO_NOTNULL IeoTerm *(*neq_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
+  IeoResult (*neq_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
 
   /**
    * @brief Perform `self - rhs` operation.
    *
    * If this method is not defined, the IeoType::compare_func method is tried.
    */
-  IEO_NOTNULL IeoTerm *(*sub_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
+  IeoResult (*sub_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *rhs);
 
   /**
    * @brief Compare `self` to `rhs`.
    *
+   * Returns:
+   * - Negative value if lhs appears before rhs in lexicographical order.
+   * - Zero if lhs and rhs compare equal.
+   * - Positive value if lhs appears after rhs in lexicographical order.
+   *
+   * @return IeoInt*
    */
-  IEO_NOTNULL IeoTerm *(*compare_func)(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *other);
+  IeoResult (*compare_func)(IEO_NOTNULL IeoTerm *self,
+                            IEO_NOTNULL IeoTerm *other);
 } IeoType;
 
 /**
@@ -111,7 +121,8 @@ typedef struct IeoType
  *
  * @param opaque a pointer where the iterator function  will store its state.
  *               Must point to NULL to start the iteration.
- * @return IeoType* the next registered type or NULL when the iteration is finished.
+ * @return IeoType* the next registered type or NULL when the iteration is
+ * finished.
  */
 IEO_NULLABLE IeoType *
 ieo_type_iterate(IEO_NOTNULL void **opaque);

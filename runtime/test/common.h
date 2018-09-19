@@ -15,13 +15,10 @@
 #define assert_ieo_ok(EXPR) assert_ieo_ok_cond(EXPR, 1);
 #define assert_ieo_err(EXPR) assert_ieo_err_cond(EXPR, 1);
 
-#define assert_ieo_ok_cond(EXPR, COND) assert_ieo_ok_cond_t(EXPR, IeoTerm, COND);
-#define assert_ieo_err_cond(EXPR, COND) assert_ieo_err_cond_t(EXPR, IeoTerm, COND);
+#define assert_ieo_ok_cond(EXPR, COND) assert_ieo_X_cond_impl(EXPR, 1, COND);
+#define assert_ieo_err_cond(EXPR, COND) assert_ieo_X_cond_impl(EXPR, 0, COND);
 
-#define assert_ieo_ok_cond_t(EXPR, IT_TYPE, COND) assert_ieo_X_cond_t_impl(EXPR, 1, IT_TYPE, COND)
-#define assert_ieo_err_cond_t(EXPR, IT_TYPE, COND) assert_ieo_X_cond_t_impl(EXPR, 0, IT_TYPE, COND)
-
-#define assert_ieo_X_cond_t_impl(EXPR, SUCC, IT_TYPE, COND)                                        \
+#define assert_ieo_X_cond_impl(EXPR, SUCC, COND)                                                   \
   do {                                                                                             \
     IeoResult tmp__ = (EXPR);                                                                      \
     if ((SUCC)) {                                                                                  \
@@ -34,7 +31,7 @@
       }                                                                                            \
     }                                                                                              \
     do {                                                                                           \
-      IEO_UNUSED IT_TYPE *it = (IT_TYPE *)tmp__.term;                                              \
+      IEO_UNUSED IeoTerm *it = (IeoTerm *)tmp__.term;                                              \
       if (!(COND)) {                                                                               \
         fail_msg("the condition `" IEO_STRINGIZE(COND) "` failed");                                \
         return;                                                                                    \
@@ -42,13 +39,11 @@
     } while (0);                                                                                   \
   } while (0)
 
-#define TRY_UNWRAP(TERM_VAR, EXPR) TRY_UNWRAP_T(IeoTerm, TERM_VAR, EXPR)
-
-#define TRY_UNWRAP_T(TERM_TYPE, TERM_VAR, EXPR)                                                    \
+#define TRY_UNWRAP(TERM_VAR, EXPR)                                                                 \
   do {                                                                                             \
     IeoResult tmp__ = (EXPR);                                                                      \
     if (IEO_OK(tmp__)) {                                                                           \
-      (TERM_VAR) = (TERM_TYPE *)tmp__.term;                                                        \
+      (TERM_VAR) = tmp__.term;                                                                     \
     } else {                                                                                       \
       fail_msg("TRY_UNWRAP: expected SUCC result");                                                \
       return;                                                                                      \

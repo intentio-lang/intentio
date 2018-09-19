@@ -15,16 +15,31 @@
             .is_static = true,                                                                     \
           },                                                                                       \
       },                                                                                           \
-    .size = (sizeof(STR) / sizeof(char) - 1), .data = (const char *)(STR)                          \
+    .value = {                                                                                     \
+      .size = (sizeof(STR) / sizeof(char) - 1),                                                    \
+      .data = (const char *)(STR)                                                                  \
+    }                                                                                              \
   }
 
 #define IEO_STRING_ALLOC(STR) ieo_string_new((STR), sizeof(STR) / sizeof(char) - 1)
 
+typedef struct IeoStringValue
+{
+  size_t size;
+  const char *data;
+} IeoStringValue;
+
+/**
+ * @brief A string term implementation, conforming to Intentio reference.
+ *
+ * Strings in Intentio are immutable.
+ *
+ * @warning NEVER TOUCH FIELDS OF THIS STRUCTURE DIRECTLY, USE ACCESSOR FUNCTIONS!
+ */
 typedef struct IeoString
 {
   IeoTermHeader head;
-  size_t size;
-  const char *data;
+  IeoStringValue value;
 } IeoString;
 
 extern IeoType ieo_std_type_string;
@@ -33,10 +48,26 @@ IeoResult
 ieo_string_new(const char *str, size_t strsz);
 
 IEO_PURE IeoResult
-ieo_is_string(IEO_NOTNULL IeoTerm *term);
+ieo_is_string(IEO_NOTNULL const IeoTerm *term);
+
+inline IEO_PURE size_t
+ieo_string_size(IEO_NOTNULL const IeoTerm *p)
+{
+  assert(p);
+  assert(IEO_OK(ieo_is_string(p)));
+  return ((IeoString *)p)->value.size;
+}
+
+inline IEO_PURE const char *
+ieo_string_data(IEO_NOTNULL const IeoTerm *p)
+{
+  assert(p);
+  assert(IEO_OK(ieo_is_string(p)));
+  return ((IeoString *)p)->value.data;
+}
 
 IEO_PURE IeoResult
-ieo_string_equal(IEO_NOTNULL IeoTerm *lhs, IEO_NOTNULL IeoTerm *rhs);
+ieo_string_equal(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs);
 
 IEO_PURE IeoResult
-ieo_string_compare(IEO_NOTNULL IeoTerm *lhs, IEO_NOTNULL IeoTerm *rhs);
+ieo_string_compare(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs);

@@ -112,8 +112,18 @@ ieo_term_flags(IEO_NOTNULL const IeoTerm *p)
 /**
  * @brief Get pointer to value memory of given term.
  */
+inline IEO_PURE IEO_NOTNULL const void *
+ieo_term_value(IEO_NOTNULL const IeoTerm *p)
+{
+  assert(p);
+  return (void *)p->value;
+}
+
+/**
+ * @brief Get pointer to mutable value memory of given term.
+ */
 inline IEO_PURE IEO_NOTNULL void *
-ieo_term_value(IEO_NOTNULL IeoTerm *p)
+ieo_term_value_mut(IEO_NOTNULL IeoTerm *p)
 {
   assert(p);
   return (void *)p->value;

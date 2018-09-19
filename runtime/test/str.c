@@ -8,7 +8,7 @@ static void
 static_empty_string(IEO_UNUSED void **state)
 {
   IEO_STATIC_STRING(str, "");
-  assert_int_equal(str.size, 0);
+  assert_int_equal(ieo_string_size((IeoTerm *)&str), 0);
   assert_ieo_ok(ieo_is_string((IeoTerm *)&str));
 }
 
@@ -16,25 +16,25 @@ static void
 static_string_size_is_computed_properly(IEO_UNUSED void **state)
 {
   IEO_STATIC_STRING(str, "foobar");
-  assert_int_equal(str.size, strlen("foobar"));
+  assert_int_equal(ieo_string_size((IeoTerm *)&str), strlen("foobar"));
 }
 
 static void
 allocate_empty_string(IEO_UNUSED void **state)
 {
-  IeoString *str;
-  TRY_UNWRAP_T(IeoString, str, IEO_STRING_ALLOC(""));
-  assert_int_equal(str->size, 0);
+  IeoTerm *str;
+  TRY_UNWRAP(str, IEO_STRING_ALLOC(""));
+  assert_int_equal(ieo_string_size(str), 0);
   assert_ieo_ok(ieo_is_string((IeoTerm *)str));
 }
 
 static void
 allocate_nonempty_string(IEO_UNUSED void **state)
 {
-  IeoString *str;
-  TRY_UNWRAP_T(IeoString, str, IEO_STRING_ALLOC("foobar"));
-  assert_int_equal(str->size, strlen("foobar"));
-  assert_memory_equal(str->data, "foobar", strlen("foobar"));
+  IeoTerm *str;
+  TRY_UNWRAP(str, IEO_STRING_ALLOC("foobar"));
+  assert_int_equal(ieo_string_size(str), strlen("foobar"));
+  assert_memory_equal(ieo_string_data(str), "foobar", strlen("foobar"));
 }
 
 static void
@@ -69,12 +69,12 @@ string_compare(IEO_UNUSED void **state)
   IeoTerm *foobbr;
   TRY_UNWRAP(foobbr, IEO_STRING_ALLOC("foobbr"));
 
-  assert_ieo_ok_cond_t(ieo_string_compare(empty, empty), IeoInt, it->val == 0);
-  assert_ieo_ok_cond_t(ieo_string_compare(foobar, foobar), IeoInt, it->val == 0);
-  assert_ieo_ok_cond_t(ieo_string_compare(foobar, foobbr), IeoInt, it->val < 0);
-  assert_ieo_ok_cond_t(ieo_string_compare(foobbr, foobar), IeoInt, it->val > 0);
-  assert_ieo_ok_cond_t(ieo_string_compare(empty, foobar), IeoInt, it->val < 0);
-  assert_ieo_ok_cond_t(ieo_string_compare(foobar, empty), IeoInt, it->val > 0);
+  assert_ieo_ok_cond(ieo_string_compare(empty, empty), ieo_int_value(it) == 0);
+  assert_ieo_ok_cond(ieo_string_compare(foobar, foobar), ieo_int_value(it) == 0);
+  assert_ieo_ok_cond(ieo_string_compare(foobar, foobbr), ieo_int_value(it) < 0);
+  assert_ieo_ok_cond(ieo_string_compare(foobbr, foobar), ieo_int_value(it) > 0);
+  assert_ieo_ok_cond(ieo_string_compare(empty, foobar), ieo_int_value(it) < 0);
+  assert_ieo_ok_cond(ieo_string_compare(foobar, empty), ieo_int_value(it) > 0);
 
   assert_ieo_err(ieo_string_compare(empty, ieo_none().term));
 }

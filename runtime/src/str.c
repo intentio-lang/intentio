@@ -68,8 +68,8 @@ ieo_string_equal(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
     return ieo_none();
   }
 
-  IeoStringValue *lhs_val = ieo_term_value(lhs);
-  IeoStringValue *rhs_val = ieo_term_value(rhs);
+  const IeoStringValue *lhs_val = ieo_term_value(lhs);
+  const IeoStringValue *rhs_val = ieo_term_value(rhs);
 
   if (lhs_val->size != rhs_val->size) {
     return IEO_FAIL(ieo_none());
@@ -92,8 +92,8 @@ ieo_string_compare(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rh
     return ieo_int_new(0);
   }
 
-  IeoStringValue *lhs_val = ieo_term_value(lhs);
-  IeoStringValue *rhs_val = ieo_term_value(rhs);
+  const IeoStringValue *lhs_val = ieo_term_value(lhs);
+  const IeoStringValue *rhs_val = ieo_term_value(rhs);
 
   int cmp = strncmp(lhs_val->data, rhs_val->data, MIN(lhs_val->size, rhs_val->size));
 

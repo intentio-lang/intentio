@@ -1,4 +1,4 @@
-#include "util.h"
+#include "min_max.h"
 
 extern inline int
 ieo_min_i(int const x, int const y);

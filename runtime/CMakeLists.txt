@@ -15,7 +15,11 @@ add_library(
     src/str.c src/str.h
     src/term.c src/term.h
     src/type.c src/type.h
-    src/util.c src/util.h
+    src/util.h
+    src/util/attrs.h
+    src/util/ieo_assert.h
+    src/util/min_max.c src/util/min_max.h
+    src/util/pp.h
 )
 
 configure_file(

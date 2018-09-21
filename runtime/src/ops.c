@@ -28,8 +28,7 @@
   FIND_BINARY(METHOD, SELF) { DELEGATE_BINARY(METHOD, SELF, OTHER); }
 
 #define FAIL(METHOD)                                                           \
-  return IEO_FAIL(                                                             \
-    IEO_STRING_ALLOC("method __" #METHOD "__ is not implemented"));
+  return IEO_FAIL(IEO_STRING_ALLOC(#METHOD " is not available"));
 
 #define COMMUTATIVE(LHS, RHS, BLOCK)                                           \
   do {                                                                         \

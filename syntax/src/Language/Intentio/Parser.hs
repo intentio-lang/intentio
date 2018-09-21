@@ -126,7 +126,9 @@ opexpr = makeExprParser term table
     , [infixL TOpMul, infixL TOpDiv]
     , [infixL TOpAdd, infixL TOpSub]
     , [ infixL TOpEqEq
+      , infixL TOpEqEqEq
       , infixL TOpNeq
+      , infixL TOpNeqEq
       , infixL TOpLtEq
       , infixL TOpGtEq
       , infixL TOpLt

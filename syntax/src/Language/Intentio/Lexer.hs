@@ -117,6 +117,7 @@ tok TKwContinue   = tokKw TKwContinue
 tok TKwDo         = tokKw TKwDo
 tok TKwElse       = tokKw TKwElse
 tok TKwEnum       = tokKw TKwEnum
+tok TKwEval       = tokKw TKwEval
 tok TKwExport     = tokKw TKwExport
 tok TKwFail       = tokKw TKwFail
 tok TKwFun        = tokKw TKwFun
@@ -128,14 +129,18 @@ tok TKwIs         = tokKw TKwIs
 tok TKwLoop       = tokKw TKwLoop
 tok TKwLet        = tokKw TKwLet
 tok TKwModule     = tokKw TKwModule
+tok TKwNone       = tokKw TKwNone
 tok TKwNot        = tokKw TKwNot
 tok TKwOr         = tokKw TKwOr
 tok TKwReturn     = tokKw TKwReturn
 tok TKwStruct     = tokKw TKwStruct
+tok TKwSucc       = tokKw TKwSucc
+tok TKwTrait      = tokKw TKwTrait
 tok TKwType       = tokKw TKwType
 tok TKwUnderscore = tokKw TKwUnderscore
 tok TKwWhere      = tokKw TKwWhere
 tok TKwWhile      = tokKw TKwWhile
+tok TKwXor        = tokKw TKwXor
 tok TKwYield      = tokKw TKwYield
 tok TOpAdd        = tokOp TOpAdd
 tok TOpSub        = tokOp TOpSub
@@ -152,11 +157,13 @@ tok TOpColon      = tokOp TOpColon
 tok TOpSemicolon  = tokOp TOpSemicolon
 tok TOpEq         = tokOp TOpEq
 tok TOpEqEq       = tokOp TOpEqEq
+tok TOpEqEqEq     = tokOp TOpEqEqEq
 tok TOpLt         = tokOp TOpLt
 tok TOpLtEq       = tokOp TOpLtEq
 tok TOpGt         = tokOp TOpGt
 tok TOpGtEq       = tokOp TOpGtEq
 tok TOpNeq        = tokOp TOpNeq
+tok TOpNeqEq      = tokOp TOpNeqEq
 tok TOpColonEq    = tokOp TOpColonEq
 tok TOpLtSub      = tokOp TOpLtSub
 tok TOpDollar     = tokOp TOpDollar
@@ -363,6 +370,7 @@ keywords = BM.fromList
   , ("do"      , TKwDo)
   , ("else"    , TKwElse)
   , ("enum"    , TKwEnum)
+  , ("eval"    , TKwEval)
   , ("export"  , TKwExport)
   , ("fail"    , TKwFail)
   , ("fun"     , TKwFun)
@@ -374,43 +382,49 @@ keywords = BM.fromList
   , ("let"     , TKwLet)
   , ("loop"    , TKwLoop)
   , ("module"  , TKwModule)
+  , ("none"    , TKwNone)
   , ("not"     , TKwNot)
   , ("or"      , TKwOr)
   , ("return"  , TKwReturn)
   , ("struct"  , TKwStruct)
+  , ("succ"    , TKwSucc)
+  , ("trait"   , TKwTrait)
   , ("type"    , TKwType)
   , ("where"   , TKwWhere)
   , ("while"   , TKwWhile)
+  , ("xor"     , TKwXor)
   , ("yield"   , TKwYield)
   , ("_"       , TKwUnderscore)
   ]
 
 operators :: BM.Bimap Text TokenType
 operators = BM.fromList
-  [ ("+" , TOpAdd)
-  , ("-" , TOpSub)
-  , ("*" , TOpMul)
-  , ("/" , TOpDiv)
-  , ("(" , TOpLParen)
-  , (")" , TOpRParen)
-  , ("[" , TOpLBracket)
-  , ("]" , TOpRBracket)
-  , ("{" , TOpLBrace)
-  , ("}" , TOpRBrace)
-  , ("," , TOpComma)
-  , (":" , TOpColon)
-  , (";" , TOpSemicolon)
-  , ("=" , TOpEq)
-  , ("==", TOpEqEq)
-  , ("<" , TOpLt)
-  , ("<=", TOpLtEq)
-  , (">" , TOpGt)
-  , (">=", TOpGtEq)
-  , ("/=", TOpNeq)
-  , (":=", TOpColonEq)
-  , ("<-", TOpLtSub)
-  , ("$" , TOpDollar)
-  , ("%" , TOpPercent)
+  [ ("+"  , TOpAdd)
+  , ("-"  , TOpSub)
+  , ("*"  , TOpMul)
+  , ("/"  , TOpDiv)
+  , ("("  , TOpLParen)
+  , (")"  , TOpRParen)
+  , ("["  , TOpLBracket)
+  , ("]"  , TOpRBracket)
+  , ("{"  , TOpLBrace)
+  , ("}"  , TOpRBrace)
+  , (","  , TOpComma)
+  , (":"  , TOpColon)
+  , (";"  , TOpSemicolon)
+  , ("="  , TOpEq)
+  , ("==" , TOpEqEq)
+  , ("===", TOpEqEqEq)
+  , ("<"  , TOpLt)
+  , ("<=" , TOpLtEq)
+  , (">"  , TOpGt)
+  , (">=" , TOpGtEq)
+  , ("!=" , TOpNeq)
+  , ("!==", TOpNeqEq)
+  , (":=" , TOpColonEq)
+  , ("<-" , TOpLtSub)
+  , ("$"  , TOpDollar)
+  , ("%"  , TOpPercent)
   ]
 
 infixl 6 <:<

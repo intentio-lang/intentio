@@ -17,6 +17,7 @@ data TokenType
   | TKwDo
   | TKwElse
   | TKwEnum
+  | TKwEval
   | TKwExport
   | TKwFail
   | TKwFun
@@ -28,14 +29,18 @@ data TokenType
   | TKwLet
   | TKwLoop
   | TKwModule
+  | TKwNone
   | TKwNot
   | TKwOr
   | TKwReturn
   | TKwStruct
+  | TKwSucc
+  | TKwTrait
   | TKwType
   | TKwUnderscore
   | TKwWhere
   | TKwWhile
+  | TKwXor
   | TKwYield
 
   | TOpAdd
@@ -55,11 +60,13 @@ data TokenType
 
   | TOpEq
   | TOpEqEq
+  | TOpEqEqEq
   | TOpGt
   | TOpGtEq
   | TOpLt
   | TOpLtEq
   | TOpNeq
+  | TOpNeqEq
 
   | TOpColonEq
   | TOpLtSub

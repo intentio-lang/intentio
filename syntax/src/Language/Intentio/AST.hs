@@ -113,12 +113,14 @@ data BinOp
   | BinAnd
   | BinDiv
   | BinEqEq
+  | BinEqEqEq
   | BinGt
   | BinGtEq
   | BinLt
   | BinLtEq
   | BinMul
   | BinNeq
+  | BinNeqEq
   | BinOr
   | BinSub
   deriving (Show, Eq, Generic)
@@ -154,18 +156,20 @@ makeLenses ''ScopeId
 -- Token/TokenType -> AST tag conversions
 
 instance Convertible TokenType BinOp where
-  safeConvert TKwAnd  = Right BinAnd
-  safeConvert TKwOr   = Right BinOr
-  safeConvert TOpAdd  = Right BinAdd
-  safeConvert TOpSub  = Right BinSub
-  safeConvert TOpMul  = Right BinMul
-  safeConvert TOpDiv  = Right BinDiv
-  safeConvert TOpEqEq = Right BinEqEq
-  safeConvert TOpNeq  = Right BinNeq
-  safeConvert TOpLt   = Right BinLt
-  safeConvert TOpLtEq = Right BinLtEq
-  safeConvert TOpGt   = Right BinGt
-  safeConvert TOpGtEq = Right BinGtEq
+  safeConvert TKwAnd    = Right BinAnd
+  safeConvert TKwOr     = Right BinOr
+  safeConvert TOpAdd    = Right BinAdd
+  safeConvert TOpSub    = Right BinSub
+  safeConvert TOpMul    = Right BinMul
+  safeConvert TOpDiv    = Right BinDiv
+  safeConvert TOpEqEq   = Right BinEqEq
+  safeConvert TOpEqEqEq = Right BinEqEqEq
+  safeConvert TOpNeq    = Right BinNeq
+  safeConvert TOpNeq    = Right BinNeqEq
+  safeConvert TOpLt     = Right BinLt
+  safeConvert TOpLtEq   = Right BinLtEq
+  safeConvert TOpGt     = Right BinGt
+  safeConvert TOpGtEq   = Right BinGtEq
   safeConvert x = convError "Not a binary operator" x
 
 instance Convertible Token BinOp where

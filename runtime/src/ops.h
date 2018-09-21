@@ -12,6 +12,12 @@ IeoResult
 ieo_div(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs);
 
 IeoResult
+ieo_mul(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs);
+
+IeoResult
+ieo_sub(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs);
+
+IeoResult
 ieo_eq(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs);
 
 IeoResult
@@ -27,19 +33,13 @@ IeoResult
 ieo_lteq(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs);
 
 IeoResult
-ieo_mul(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs);
-
-IeoResult
 ieo_neq(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs);
 
 IeoResult
-ieo_sub(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs);
+ieo_compare(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs);
 
 IeoResult
 ieo_seq(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs);
 
 IeoResult
 ieo_sneq(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs);
-
-IeoResult
-ieo_compare(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs);

@@ -133,8 +133,8 @@ ieo_not_impl_(IeoResult r)
 inline IEO_PURE const IeoType *
 ieo_term_ty(IEO_NOTNULL const IeoTerm *p)
 {
-  ieo_assert(p);
-  ieo_assert(p->head.ty);
+  IEO_ASSERT(p);
+  IEO_ASSERT(p->head.ty);
   return p->head.ty;
 }
 
@@ -145,8 +145,8 @@ ieo_term_ty(IEO_NOTNULL const IeoTerm *p)
 inline IEO_PURE IeoType *
 ieo_term_ty_mut(IEO_NOTNULL const IeoTerm *p)
 {
-  ieo_assert(p);
-  ieo_assert(p->head.ty);
+  IEO_ASSERT(p);
+  IEO_ASSERT(p->head.ty);
   return p->head.ty;
 }
 
@@ -156,7 +156,7 @@ ieo_term_ty_mut(IEO_NOTNULL const IeoTerm *p)
 inline IeoRefCount
 ieo_term_refcount(IEO_NOTNULL const IeoTerm *p)
 {
-  ieo_assert(p);
+  IEO_ASSERT(p);
   return atomic_load(&p->head.refcount);
 }
 
@@ -166,7 +166,7 @@ ieo_term_refcount(IEO_NOTNULL const IeoTerm *p)
 inline IEO_PURE IeoTermFlags
 ieo_term_flags(IEO_NOTNULL const IeoTerm *p)
 {
-  ieo_assert(p);
+  IEO_ASSERT(p);
   return p->head.flags;
 }
 
@@ -176,7 +176,7 @@ ieo_term_flags(IEO_NOTNULL const IeoTerm *p)
 inline IEO_PURE IEO_NOTNULL const void *
 ieo_term_value(IEO_NOTNULL const IeoTerm *p)
 {
-  ieo_assert(p);
+  IEO_ASSERT(p);
   return (void *)p->value;
 }
 
@@ -186,7 +186,7 @@ ieo_term_value(IEO_NOTNULL const IeoTerm *p)
 inline IEO_PURE IEO_NOTNULL void *
 ieo_term_value_mut(IEO_NOTNULL IeoTerm *p)
 {
-  ieo_assert(p);
+  IEO_ASSERT(p);
   return (void *)p->value;
 }
 

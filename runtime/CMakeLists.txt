@@ -20,6 +20,7 @@ add_library(
     src/util/ieo_assert.h
     src/util/min_max.c src/util/min_max.h
     src/util/pp.h
+    src/util/typeck.c src/util/typeck.h
 )
 
 configure_file(

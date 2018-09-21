@@ -78,7 +78,7 @@ IEO_STATIC_STRING(COMPARE_RETURNED_NON_INT,
 IeoResult
 ieo_neg(IEO_NOTNULL const IeoTerm *self)
 {
-  ieo_assert(self);
+  IEO_ASSERT(self);
 
   FIND_DELEGATE_UNARY(neg, self);
   FAIL(neg);
@@ -87,8 +87,8 @@ ieo_neg(IEO_NOTNULL const IeoTerm *self)
 IeoResult
 ieo_add(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 {
-  ieo_assert(lhs);
-  ieo_assert(rhs);
+  IEO_ASSERT(lhs);
+  IEO_ASSERT(rhs);
 
   COMMUTATIVE(lhs, rhs, FIND_DELEGATE_BINARY(add, lhs, rhs));
   FAIL(add);
@@ -97,8 +97,8 @@ ieo_add(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 IeoResult
 ieo_div(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 {
-  ieo_assert(lhs);
-  ieo_assert(rhs);
+  IEO_ASSERT(lhs);
+  IEO_ASSERT(rhs);
 
   FIND_DELEGATE_BINARY(div, lhs, rhs);
   FAIL(div);
@@ -107,8 +107,8 @@ ieo_div(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 IeoResult
 ieo_mul(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 {
-  ieo_assert(lhs);
-  ieo_assert(rhs);
+  IEO_ASSERT(lhs);
+  IEO_ASSERT(rhs);
 
   COMMUTATIVE(lhs, rhs, FIND_DELEGATE_BINARY(mul, lhs, rhs));
   FAIL(mul);
@@ -117,8 +117,8 @@ ieo_mul(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 IeoResult
 ieo_sub(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 {
-  ieo_assert(lhs);
-  ieo_assert(rhs);
+  IEO_ASSERT(lhs);
+  IEO_ASSERT(rhs);
 
   FIND_DELEGATE_BINARY(sub, lhs, rhs);
   FAIL(sub);
@@ -127,8 +127,8 @@ ieo_sub(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 IeoResult
 ieo_eq(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 {
-  ieo_assert(lhs);
-  ieo_assert(rhs);
+  IEO_ASSERT(lhs);
+  IEO_ASSERT(rhs);
 
   COMMUTATIVE(lhs, rhs, {
     FIND_DELEGATE_BINARY(eq, lhs, rhs);
@@ -141,8 +141,8 @@ ieo_eq(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 IeoResult
 ieo_gt(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 {
-  ieo_assert(lhs);
-  ieo_assert(rhs);
+  IEO_ASSERT(lhs);
+  IEO_ASSERT(rhs);
 
   if (!SAME_TYPE(lhs, rhs)) {
     return IEO_BOOL(ieo_type_compare(ieo_term_ty(lhs), ieo_term_ty(rhs)) > 0);
@@ -156,8 +156,8 @@ ieo_gt(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 IeoResult
 ieo_gteq(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 {
-  ieo_assert(lhs);
-  ieo_assert(rhs);
+  IEO_ASSERT(lhs);
+  IEO_ASSERT(rhs);
 
   if (!SAME_TYPE(lhs, rhs)) {
     return IEO_BOOL(ieo_type_compare(ieo_term_ty(lhs), ieo_term_ty(rhs)) >= 0);
@@ -172,8 +172,8 @@ ieo_gteq(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 IeoResult
 ieo_lt(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 {
-  ieo_assert(lhs);
-  ieo_assert(rhs);
+  IEO_ASSERT(lhs);
+  IEO_ASSERT(rhs);
 
   if (!SAME_TYPE(lhs, rhs)) {
     return IEO_BOOL(ieo_type_compare(ieo_term_ty(lhs), ieo_term_ty(rhs)) < 0);
@@ -187,8 +187,8 @@ ieo_lt(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 IeoResult
 ieo_lteq(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 {
-  ieo_assert(lhs);
-  ieo_assert(rhs);
+  IEO_ASSERT(lhs);
+  IEO_ASSERT(rhs);
 
   if (!SAME_TYPE(lhs, rhs)) {
     return IEO_BOOL(ieo_type_compare(ieo_term_ty(lhs), ieo_term_ty(rhs)) <= 0);
@@ -203,8 +203,8 @@ ieo_lteq(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 IeoResult
 ieo_neq(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 {
-  ieo_assert(lhs);
-  ieo_assert(rhs);
+  IEO_ASSERT(lhs);
+  IEO_ASSERT(rhs);
 
   COMMUTATIVE(lhs, rhs, {
     FIND_DELEGATE_BINARY(neq, lhs, rhs);
@@ -229,8 +229,8 @@ ieo_sneq(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 IeoResult
 ieo_compare(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 {
-  ieo_assert(lhs);
-  ieo_assert(rhs);
+  IEO_ASSERT(lhs);
+  IEO_ASSERT(rhs);
 
   if (!SAME_TYPE(lhs, rhs)) {
     return ieo_int_new(ieo_type_compare(ieo_term_ty(lhs), ieo_term_ty(rhs)));

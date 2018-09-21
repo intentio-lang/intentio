@@ -218,6 +218,34 @@
 #endif
 
 /**
+ * @def IEO_NORETURN
+ * A few standard library functions, such as abort and exit, cannot return. The
+ * compiler knows this automatically. Some programs define their own functions
+ * that never return. You can declare them noreturn to tell the compiler this
+ * fact.
+ *
+ * The noreturn keyword tells the compiler to assume that fatal cannot return.
+ * It can then optimize without regard to what would happen if fatal ever did
+ * return. This makes slightly better code. More importantly, it helps avoid
+ * spurious warnings of uninitialized variables.
+ *
+ * The noreturn keyword does not affect the exceptional path when that applies:
+ * a noreturn-marked function may still return to the caller by throwing an
+ * exception or calling longjmp.
+ *
+ * Do not assume that registers saved by the calling function are restored
+ * before calling the noreturn function.
+ *
+ * It does not make sense for a noreturn function to have a return type other
+ * than void.
+ */
+#if IEO_GCC_GTEQ(2, 5) || defined(__clang__)
+#define IEO_NORETURN __attribute__((noreturn))
+#else
+#define IEO_NORETURN
+#endif
+
+/**
  * @def IEO_NOTNULL
  * The variable/parameter may never be NULL, or the function never returns NULL.
  */

@@ -7,7 +7,7 @@
 IEO_NULLABLE IeoType *
 ieo_type_iterate(IEO_NOTNULL void **opaque)
 {
-  ieo_assert(opaque);
+  IEO_ASSERT(opaque);
 
   size_t i = (size_t)*opaque;
   IeoType *ty = ieo_type_all[i];
@@ -22,8 +22,8 @@ ieo_type_iterate(IEO_NOTNULL void **opaque)
 IEO_PURE int
 ieo_type_compare(IEO_NOTNULL const IeoType *lhs, IEO_NOTNULL const IeoType *rhs)
 {
-  ieo_assert(lhs);
-  ieo_assert(rhs);
+  IEO_ASSERT(lhs);
+  IEO_ASSERT(rhs);
 
   if (lhs == rhs) {
     return 0;
@@ -39,5 +39,5 @@ ieo_type_compare(IEO_NOTNULL const IeoType *lhs, IEO_NOTNULL const IeoType *rhs)
     }
   }
 
-  ieo_assert(false);
+  IEO_ASSERT(false);
 }

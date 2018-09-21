@@ -46,8 +46,8 @@ ieo_string_new(const char *str, size_t strsz)
 IEO_PURE IeoResult
 ieo_is_string(IEO_NOTNULL const IeoTerm *term)
 {
-  ieo_assert(term);
-  ieo_assert(term->head.ty);
+  IEO_ASSERT(term);
+  IEO_ASSERT(term->head.ty);
   return IEO_BOOL(term->head.ty == &ieo_std_type_string);
 }
 
@@ -60,8 +60,8 @@ ieo_string_data(IEO_NOTNULL const IeoTerm *p);
 static IEO_PURE IeoResult
 eq_impl(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 {
-  ieo_assert(IEO_OK(ieo_is_string(lhs)));
-  ieo_assert(IEO_OK(ieo_is_string(rhs)));
+  IEO_ASSERT(IEO_OK(ieo_is_string(lhs)));
+  IEO_ASSERT(IEO_OK(ieo_is_string(rhs)));
 
   if (lhs == rhs) {
     return ieo_none();
@@ -84,14 +84,14 @@ eq_impl(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 static IEO_PURE IeoResult
 eq_func(const IeoTerm *self, const IeoTerm *rhs)
 {
-  ieo_assert(IEO_OK(ieo_is_string(self)));
+  IEO_ASSERT(IEO_OK(ieo_is_string(self)));
   return !IEO_OK(ieo_is_string(rhs)) ? IEO_BOOL(false) : eq_impl(self, rhs);
 }
 
 static IEO_PURE IeoResult
 neq_func(const IeoTerm *self, const IeoTerm *rhs)
 {
-  ieo_assert(IEO_OK(ieo_is_string(self)));
+  IEO_ASSERT(IEO_OK(ieo_is_string(self)));
   return IEO_OK(ieo_is_string(rhs)) ? IEO_NOT(eq_impl(self, rhs))
                                     : IEO_BOOL(true);
 }
@@ -99,8 +99,8 @@ neq_func(const IeoTerm *self, const IeoTerm *rhs)
 static IEO_PURE IeoResult
 compare_func(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 {
-  ieo_assert(IEO_OK(ieo_is_string(lhs)));
-  ieo_assert(IEO_OK(ieo_is_string(rhs)));
+  IEO_ASSERT(IEO_OK(ieo_is_string(lhs)));
+  IEO_ASSERT(IEO_OK(ieo_is_string(rhs)));
 
   if (lhs == rhs) {
     return ieo_int_new(0);

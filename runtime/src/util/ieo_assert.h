@@ -2,4 +2,4 @@
 
 #include <assert.h>
 
-#define ieo_assert(EXPR) assert(EXPR)
+#define IEO_ASSERT(EXPR) assert(EXPR)

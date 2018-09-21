@@ -31,23 +31,23 @@ ieo_none_unwrap(void)
 IEO_PURE IeoResult
 ieo_is_none(IEO_NOTNULL const IeoTerm *term)
 {
-  ieo_assert(term != NULL);
-  ieo_assert(term->head.ty != NULL);
+  IEO_ASSERT(term != NULL);
+  IEO_ASSERT(term->head.ty != NULL);
   return IEO_BOOL(term->head.ty == &ieo_std_type_none);
 }
 
 static IEO_PURE IeoResult
 unary_math_func(const IeoTerm *self)
 {
-  ieo_assert(IEO_OK(ieo_is_none(self)));
+  IEO_ASSERT(IEO_OK(ieo_is_none(self)));
   return ieo_none();
 }
 
 static IEO_PURE IeoResult
 binary_math_func(const IeoTerm *self, const IeoTerm *other)
 {
-  ieo_assert(IEO_OK(ieo_is_none(self)));
-  IEO_TRY_(ieo_is_none(other));
+  IEO_ASSERT(IEO_OK(ieo_is_none(self)));
+  IEO_TYPECK(other, none);
   return ieo_none();
 }
 
@@ -66,8 +66,8 @@ neq_func(const IeoTerm *self, const IeoTerm *other)
 static IEO_PURE IeoResult
 compare_func(const IeoTerm *self, const IeoTerm *other)
 {
-  ieo_assert(IEO_OK(ieo_is_none(self)));
-  ieo_assert(IEO_OK(ieo_is_none(other)));
+  IEO_ASSERT(IEO_OK(ieo_is_none(self)));
+  IEO_ASSERT(IEO_OK(ieo_is_none(other)));
   return ieo_int_new(0);
 }
 

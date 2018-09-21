@@ -17,12 +17,6 @@ ieo_none_always_succeeds_and_is_none(IEO_UNUSED void **state)
   {                                                                            \
     assert_ieo_ok_cond(ieo_##OP(ieo_none_unwrap(), ieo_none_unwrap()),         \
                        IEO_OK(ieo_is_none(it)));                               \
-  }                                                                            \
-                                                                               \
-  static void OP##_with_other(IEO_UNUSED void **state)                         \
-  {                                                                            \
-    IEO_STATIC_STRING_P(other, "hello");                                       \
-    assert_ieo_err(ieo_##OP(ieo_none_unwrap(), other));                        \
   }
 
 TEST_MATH_OP(add)
@@ -57,13 +51,9 @@ main(void)
     cmocka_unit_test(ieo_none_always_succeeds_and_is_none),
 
     cmocka_unit_test(add_with_none),
-    cmocka_unit_test(add_with_other),
     cmocka_unit_test(div_with_none),
-    cmocka_unit_test(div_with_other),
     cmocka_unit_test(mul_with_none),
-    cmocka_unit_test(mul_with_other),
     cmocka_unit_test(sub_with_none),
-    cmocka_unit_test(sub_with_other),
 
     cmocka_unit_test(eq_with_none),
     cmocka_unit_test(eq_with_other),

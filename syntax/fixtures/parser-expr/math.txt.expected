@@ -251,6 +251,65 @@
         "BinAnd",
         {
           "contents": [
+            "BinNeq",
+            {
+              "contents": {
+                "contents": "3",
+                "tag": "Integer"
+              },
+              "tag": "LitExpr"
+            },
+            {
+              "contents": [
+                "BinAdd",
+                {
+                  "contents": {
+                    "contents": "1",
+                    "tag": "Integer"
+                  },
+                  "tag": "LitExpr"
+                },
+                {
+                  "contents": {
+                    "contents": "1",
+                    "tag": "Integer"
+                  },
+                  "tag": "LitExpr"
+                }
+              ],
+              "tag": "BinExpr"
+            }
+          ],
+          "tag": "BinExpr"
+        },
+        {
+          "contents": [
+            "BinLt",
+            {
+              "contents": {
+                "contents": "4",
+                "tag": "Integer"
+              },
+              "tag": "LitExpr"
+            },
+            {
+              "contents": {
+                "contents": "9",
+                "tag": "Integer"
+              },
+              "tag": "LitExpr"
+            }
+          ],
+          "tag": "BinExpr"
+        }
+      ],
+      "tag": "BinExpr"
+    },
+    {
+      "contents": [
+        "BinAnd",
+        {
+          "contents": [
             "BinGtEq",
             {
               "contents": [
@@ -307,6 +366,72 @@
             }
           ],
           "tag": "BinExpr"
+        }
+      ],
+      "tag": "BinExpr"
+    },
+    {
+      "contents": [
+        "BinOr",
+        {
+          "contents": [
+            "BinAnd",
+            {
+              "contents": [
+                "BinXor",
+                {
+                  "contents": {
+                    "contents": "succ",
+                    "tag": "Special"
+                  },
+                  "tag": "LitExpr"
+                },
+                {
+                  "contents": {
+                    "contents": "fail",
+                    "tag": "Special"
+                  },
+                  "tag": "LitExpr"
+                }
+              ],
+              "tag": "BinExpr"
+            },
+            {
+              "contents": {
+                "contents": "fail",
+                "tag": "Special"
+              },
+              "tag": "LitExpr"
+            }
+          ],
+          "tag": "BinExpr"
+        },
+        {
+          "contents": {
+            "contents": "succ",
+            "tag": "Special"
+          },
+          "tag": "LitExpr"
+        }
+      ],
+      "tag": "BinExpr"
+    },
+    {
+      "contents": [
+        "BinEqEqEq",
+        {
+          "contents": {
+            "contents": "0",
+            "tag": "Integer"
+          },
+          "tag": "LitExpr"
+        },
+        {
+          "contents": {
+            "contents": "0.0",
+            "tag": "Float"
+          },
+          "tag": "LitExpr"
         }
       ],
       "tag": "BinExpr"

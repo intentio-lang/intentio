@@ -11,7 +11,6 @@ module Language.Intentio.Lexer
   , anyOperator
   , ident
   , literal
-  , none'
   , integer
   , float
   , anyString
@@ -170,6 +169,7 @@ tok TOpDollar     = tokOp TOpDollar
 tok TOpPercent    = tokOp TOpPercent
 tok TInteger      = integer
 tok TFloat        = float
+tok TSpecial      = special
 tok TString       = string'
 tok TRawString    = rawstring
 tok TRegexString  = regexstring
@@ -201,11 +201,17 @@ anyOperator = anyReserved operators <?> "operator"
 
 -- | Parse any valid literal.
 literal :: Parser Token
-literal = try none' <|> try float <|> try integer <|> try anyString
+literal = try special <|> try float <|> try integer <|> try anyString
 
--- | Parse none literal
-none' :: Parser Token
-none' = tok TKwNone
+-- | Parse special literal
+special :: Parser Token
+special = lexeme p >>= mkt TSpecial <?> "special literal"
+  where 
+    p = try n <|> try s <|> try f
+
+    n = string "none"
+    s = string "succ"
+    f = string "fail"
 
 -- | Parse any valid integer literal.
 integer :: Parser Token

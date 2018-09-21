@@ -6,6 +6,8 @@
     -2 and bar();
     not x and b or not c;
     2 == 1 + 1;
-# FIXME:     3 /= 1 + 1 and 4 < 9;
+    3 != 1 + 1 and 4 < 9;
     6 * 5 >= 0 and not 2 <= 9;
+    succ xor fail and fail or succ;
+    0 === 0.0;
 }

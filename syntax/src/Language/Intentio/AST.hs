@@ -102,6 +102,7 @@ data Literal
   | String Text
   | RawString Text
   | RegexString Text
+  | Special Text
   deriving (Show, Eq, Generic)
 
 instance ToJSON Literal
@@ -122,6 +123,7 @@ data BinOp
   | BinNeqEq
   | BinOr
   | BinSub
+  | BinXor
   deriving (Show, Eq, Generic)
 
 instance ToJSON BinOp
@@ -157,6 +159,7 @@ makeLenses ''ScopeId
 instance Convertible TokenType BinOp where
   safeConvert TKwAnd    = Right BinAnd
   safeConvert TKwOr     = Right BinOr
+  safeConvert TKwXor    = Right BinXor
   safeConvert TOpAdd    = Right BinAdd
   safeConvert TOpSub    = Right BinSub
   safeConvert TOpMul    = Right BinMul
@@ -189,4 +192,5 @@ instance Convertible Token Literal where
   safeConvert Token{_ty=TString, _text}      = Right $ String _text
   safeConvert Token{_ty=TRawString, _text}   = Right $ RawString _text
   safeConvert Token{_ty=TRegexString, _text} = Right $ RegexString _text
+  safeConvert Token{_ty=TSpecial, _text}     = Right $ Special _text
   safeConvert x = convError "Not a literal" x

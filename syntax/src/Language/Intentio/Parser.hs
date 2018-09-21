@@ -125,15 +125,15 @@ opexpr = makeExprParser term table
     [ [prefix TKwNot, prefix TOpSub, prefix TOpAdd]
     , [infixL TOpMul, infixL TOpDiv]
     , [infixL TOpAdd, infixL TOpSub]
+    , [infixL TOpEqEqEq, infixL TOpNeqEq]
     , [ infixL TOpEqEq
-      , infixL TOpEqEqEq
       , infixL TOpNeq
-      , infixL TOpNeqEq
       , infixL TOpLtEq
       , infixL TOpGtEq
       , infixL TOpLt
       , infixL TOpGt
       ]
+    , [infixL TKwXor]
     , [infixL TKwAnd]
     , [infixL TKwOr]
     ]

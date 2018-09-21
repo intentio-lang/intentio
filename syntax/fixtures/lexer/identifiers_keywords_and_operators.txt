@@ -19,6 +19,6 @@ a + b
 fun + a
 
 a==a
-# FIXME: a/=a
+a!=a
 
 none

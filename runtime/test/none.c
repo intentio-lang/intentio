@@ -15,17 +15,14 @@ ieo_none_always_succeeds_and_is_none(IEO_UNUSED void **state)
 #define TEST_MATH_OP(OP)                                                       \
   static void OP##_with_none(IEO_UNUSED void **state)                          \
   {                                                                            \
-    IeoTerm *none;                                                             \
-    TRY_UNWRAP(none, ieo_none());                                              \
-    assert_ieo_ok_cond(ieo_##OP(none, none), IEO_OK(ieo_is_none(it)));         \
+    assert_ieo_ok_cond(ieo_##OP(ieo_none_unwrap(), ieo_none_unwrap()),         \
+                       IEO_OK(ieo_is_none(it)));                               \
   }                                                                            \
                                                                                \
   static void OP##_with_other(IEO_UNUSED void **state)                         \
   {                                                                            \
-    IeoTerm *none, *other;                                                     \
-    TRY_UNWRAP(none, ieo_none());                                              \
-    TRY_UNWRAP(other, IEO_STRING_ALLOC("hello"));                              \
-    assert_ieo_err(ieo_##OP(none, other));                                     \
+    IEO_STATIC_STRING_P(other, "hello");                                       \
+    assert_ieo_err(ieo_##OP(ieo_none_unwrap(), other));                        \
   }
 
 TEST_MATH_OP(add)
@@ -36,17 +33,14 @@ TEST_MATH_OP(sub)
 #define TEST_COMPARISON_OP(OP, STATE_WITH_NONE, STATE_WITH_OTHER)              \
   static void OP##_with_none(IEO_UNUSED void **state)                          \
   {                                                                            \
-    IeoTerm *none;                                                             \
-    TRY_UNWRAP(none, ieo_none());                                              \
-    assert_ieo_X(ieo_##OP(none, none), STATE_WITH_NONE);                       \
+    assert_ieo_X(ieo_##OP(ieo_none_unwrap(), ieo_none_unwrap()),               \
+                 STATE_WITH_NONE);                                             \
   }                                                                            \
                                                                                \
   static void OP##_with_other(IEO_UNUSED void **state)                         \
   {                                                                            \
-    IeoTerm *none, *other;                                                     \
-    TRY_UNWRAP(none, ieo_none());                                              \
-    TRY_UNWRAP(other, IEO_STRING_ALLOC("hello"));                              \
-    assert_ieo_X(ieo_##OP(none, other), STATE_WITH_OTHER);                     \
+    IEO_STATIC_STRING_P(other, "hello");                                       \
+    assert_ieo_X(ieo_##OP(ieo_none_unwrap(), other), STATE_WITH_OTHER);        \
   }
 
 TEST_COMPARISON_OP(eq, 1, 0)

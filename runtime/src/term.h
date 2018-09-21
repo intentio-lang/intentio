@@ -8,12 +8,20 @@
 #include "type.h"
 #include "util.h"
 
-#define IEO_TP(P) (_Generic((P), IeoTerm * : (P), default : ((IeoTerm *)&(P))))
+/**
+ * Cast pointer to term pointer.
+ */
+#define IEO_TP(P) ((IeoTerm *)(P))
+
+/**
+ * Produce term pointer to static term value.
+ */
+#define IEO_STP(VAL) (IEO_TP(&(VAL)))
 
 #define IEO_SUCCT(TERM_PTR)                                                    \
-  ((IeoResult){ .succ = true, .term = (IeoTerm *)(TERM_PTR) })
+  ((IeoResult){ .succ = true, .term = IEO_TP(TERM_PTR) })
 #define IEO_FAILT(TERM_PTR)                                                    \
-  ((IeoResult){ .succ = false, .term = (IeoTerm *)(TERM_PTR) })
+  ((IeoResult){ .succ = false, .term = IEO_TP(TERM_PTR) })
 
 #define IEO_SUCC(RESULT) ((IeoResult){ .succ = true, .term = (RESULT).term })
 #define IEO_FAIL(RESULT) ((IeoResult){ .succ = false, .term = (RESULT).term })
@@ -77,8 +85,10 @@ typedef atomic_uint_fast32_t AtomicIeoRefCount;
 
 typedef struct IeoTermFlags
 {
-  /// This term is stored in static memory: it is not refcounted and cannot be
-  /// freed.
+  /**
+   * This term is stored in static memory: it is not reference counted and
+   * freeing it is no-op.
+   */
   bool is_static : 1;
 } IeoTermFlags;
 static_assert(sizeof(IeoTermFlags) <= sizeof(uint8_t),
@@ -93,8 +103,8 @@ typedef struct IeoTermHeader
 
 /**
  * Represents Intentio term objects.
- * @warning NEVER TOUCH FIELDS OF THIS STRUCTURE DIRECTLY, USE ACCESSOR
- * FUNCTIONS!
+ * @warning NEVER TOUCH FIELDS OF THIS STRUCTURE DIRECTLY, USE
+ * ACCESSOR FUNCTIONS!
  */
 typedef struct IeoTerm
 {
@@ -192,8 +202,8 @@ IEO_MALLOC IEO_WARN_UNUSED_RESULT IeoTerm *
 ieo_term_alloc(IeoType *ty);
 
 /**
- * Allocate and initialize a new term object with additional `size` bytes
- * of data after term header.
+ * Allocate and initialize a new term object with additional `size`
+ * bytes of data after term header.
  *
  * The object starts with reference count equal to 1.
  *
@@ -213,8 +223,8 @@ IeoTerm *
 ieo_term_ref(IeoTerm *p);
 
 /**
- * Decrement reference counter of given term object, and free it if it
- * reaches zero.
+ * Decrement reference counter of given term object, and free it if
+ * it reaches zero.
  *
  * @param p a pointer to term object, set to null if term is freed
  */
@@ -224,8 +234,8 @@ ieo_term_unref(IeoTerm **p);
 /**
  * Force free term from memory and set remaining pointer to null.
  *
- * @warning This is dangerous, avoid this function as much as possible and use
- * reference counting instead.
+ * @warning This is dangerous, avoid this function as much as
+ * possible and use reference counting instead.
  *
  * @param p a pointer to term object
  */

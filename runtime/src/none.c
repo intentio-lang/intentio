@@ -19,7 +19,13 @@ static IeoNone ieo_none_singleton = { .head = {
 IEO_CONST IeoResult
 ieo_none(void)
 {
-  return IEO_SUCCT(&ieo_none_singleton);
+  return IEO_SUCCT(IEO_STP(ieo_none_singleton));
+}
+
+IEO_CONST IeoTerm *
+ieo_none_unwrap(void)
+{
+  return IEO_STP(ieo_none_singleton);
 }
 
 IEO_PURE IeoResult
@@ -31,14 +37,14 @@ ieo_is_none(IEO_NOTNULL const IeoTerm *term)
 }
 
 static IEO_PURE IeoResult
-unary_math_method(const IeoTerm *self)
+unary_math_func(const IeoTerm *self)
 {
   ieo_assert(IEO_OK(ieo_is_none(self)));
   return ieo_none();
 }
 
 static IEO_PURE IeoResult
-binary_math_method(const IeoTerm *self, const IeoTerm *other)
+binary_math_func(const IeoTerm *self, const IeoTerm *other)
 {
   ieo_assert(IEO_OK(ieo_is_none(self)));
   IEO_TRY_(ieo_is_none(other));
@@ -46,19 +52,19 @@ binary_math_method(const IeoTerm *self, const IeoTerm *other)
 }
 
 static IEO_PURE IeoResult
-eq_method(const IeoTerm *self, const IeoTerm *other)
+eq_func(const IeoTerm *self, const IeoTerm *other)
 {
   return IEO_BOOL(IEO_OK(ieo_is_none(self)) && IEO_OK(ieo_is_none(other)));
 }
 
 static IEO_PURE IeoResult
-neq_method(const IeoTerm *self, const IeoTerm *other)
+neq_func(const IeoTerm *self, const IeoTerm *other)
 {
   return IEO_BOOL(IEO_ERR(ieo_is_none(self)) || IEO_ERR(ieo_is_none(other)));
 }
 
 static IEO_PURE IeoResult
-compare_method(const IeoTerm *self, const IeoTerm *other)
+compare_func(const IeoTerm *self, const IeoTerm *other)
 {
   ieo_assert(IEO_OK(ieo_is_none(self)));
   ieo_assert(IEO_OK(ieo_is_none(other)));
@@ -69,12 +75,12 @@ IeoType ieo_std_type_none = {
   .type_name = &ieo_none_type_name,
   .term_size = sizeof(IeoNone),
   .deleter = ieo_term_deleter,
-  .neg_func = unary_math_method,
-  .add_func = binary_math_method,
-  .div_func = binary_math_method,
-  .mul_func = binary_math_method,
-  .sub_func = binary_math_method,
-  .eq_func = eq_method,
-  .neq_func = neq_method,
-  .compare_func = compare_method,
+  .neg_func = unary_math_func,
+  .add_func = binary_math_func,
+  .div_func = binary_math_func,
+  .mul_func = binary_math_func,
+  .sub_func = binary_math_func,
+  .eq_func = eq_func,
+  .neq_func = neq_func,
+  .compare_func = compare_func,
 };

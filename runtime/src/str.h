@@ -5,6 +5,10 @@
 #define IEO_STATIC_STRING(NAME, STR)                                           \
   static IeoString NAME = IEO_STATIC_STRING_DECL(STR)
 
+#define IEO_STATIC_STRING_P(NAME, STR)                                         \
+  IEO_STATIC_STRING(NAME##_str_, STR);                                         \
+  IeoTerm *NAME = IEO_STP(NAME##_str_);
+
 #define IEO_STATIC_STRING_DECL(STR)                                            \
   {                                                                            \
     .head =                                                                    \
@@ -32,7 +36,7 @@ typedef struct IeoStringValue
 } IeoStringValue;
 
 /**
- * @brief A string term implementation, conforming to Intentio reference.
+ * A string term implementation, conforming to Intentio reference.
  *
  * Strings in Intentio are immutable.
  *
@@ -68,11 +72,3 @@ ieo_string_data(IEO_NOTNULL const IeoTerm *p)
   ieo_assert(IEO_OK(ieo_is_string(p)));
   return ((IeoString *)p)->value.data;
 }
-
-IEO_PURE IeoResult
-ieo_string_equal(IEO_NOTNULL const IeoTerm *lhs,
-                 IEO_NOTNULL const IeoTerm *rhs);
-
-IEO_PURE IeoResult
-ieo_string_compare(IEO_NOTNULL const IeoTerm *lhs,
-                   IEO_NOTNULL const IeoTerm *rhs);

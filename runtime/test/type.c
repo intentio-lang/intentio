@@ -13,7 +13,7 @@ iteration(IEO_UNUSED void **state)
   IeoType *ty;
   while ((ty = ieo_type_iterate(&opaque))) {
     count++;
-    found_none = found_none || ty == ieo_none().term->head.ty;
+    found_none = found_none || ty == ieo_none_unwrap()->head.ty;
   }
 
   assert_null(ty);

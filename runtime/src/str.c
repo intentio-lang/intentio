@@ -9,7 +9,7 @@
 IEO_STATIC_STRING(ieo_str_type_name, "String");
 
 /**
- * @brief Special structure of allocated strings.
+ * Special structure of allocated strings.
  *
  * Allocated strings contain character data right next to the term, the usage of
  * the `value` fields ensures correct alignment. Freeing allocated string also
@@ -23,11 +23,7 @@ typedef struct IeoStringAllocated
   const char value[];
 } IeoStringAllocated;
 
-IeoType ieo_std_type_string = {
-  .type_name = &ieo_str_type_name,
-  .term_size = sizeof(IeoStringAllocated),
-  .deleter = ieo_term_deleter,
-};
+extern IeoType ieo_std_type_string;
 
 IeoResult
 ieo_string_new(const char *str, size_t strsz)
@@ -44,7 +40,7 @@ ieo_string_new(const char *str, size_t strsz)
 
   memcpy((void *)p->value, str, strsz);
 
-  return IEO_SUCCT(p);
+  return IEO_SUCCT(IEO_TP(p));
 }
 
 IEO_PURE IeoResult
@@ -61,11 +57,11 @@ ieo_string_size(IEO_NOTNULL const IeoTerm *p);
 extern inline IEO_PURE const char *
 ieo_string_data(IEO_NOTNULL const IeoTerm *p);
 
-IEO_PURE IeoResult
-ieo_string_equal(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
+static IEO_PURE IeoResult
+eq_impl(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 {
-  IEO_TRY_(ieo_is_string(lhs));
-  IEO_TRY_(ieo_is_string(rhs));
+  ieo_assert(IEO_OK(ieo_is_string(lhs)));
+  ieo_assert(IEO_OK(ieo_is_string(rhs)));
 
   if (lhs == rhs) {
     return ieo_none();
@@ -85,12 +81,26 @@ ieo_string_equal(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
   return ieo_none();
 }
 
-IEO_PURE IeoResult
-ieo_string_compare(IEO_NOTNULL const IeoTerm *lhs,
-                   IEO_NOTNULL const IeoTerm *rhs)
+static IEO_PURE IeoResult
+eq_func(const IeoTerm *self, const IeoTerm *rhs)
 {
-  IEO_TRY_(ieo_is_string(lhs));
-  IEO_TRY_(ieo_is_string(rhs));
+  ieo_assert(IEO_OK(ieo_is_string(self)));
+  return !IEO_OK(ieo_is_string(rhs)) ? IEO_BOOL(false) : eq_impl(self, rhs);
+}
+
+static IEO_PURE IeoResult
+neq_func(const IeoTerm *self, const IeoTerm *rhs)
+{
+  ieo_assert(IEO_OK(ieo_is_string(self)));
+  return IEO_OK(ieo_is_string(rhs)) ? IEO_NOT(eq_impl(self, rhs))
+                                    : IEO_BOOL(true);
+}
+
+static IEO_PURE IeoResult
+compare_func(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
+{
+  ieo_assert(IEO_OK(ieo_is_string(lhs)));
+  ieo_assert(IEO_OK(ieo_is_string(rhs)));
 
   if (lhs == rhs) {
     return ieo_int_new(0);
@@ -99,8 +109,8 @@ ieo_string_compare(IEO_NOTNULL const IeoTerm *lhs,
   const IeoStringValue *lhs_val = ieo_term_value(lhs);
   const IeoStringValue *rhs_val = ieo_term_value(rhs);
 
-  int cmp =
-    strncmp(lhs_val->data, rhs_val->data, MIN(lhs_val->size, rhs_val->size));
+  size_t common_size = MIN(lhs_val->size, rhs_val->size);
+  int cmp = strncmp(lhs_val->data, rhs_val->data, common_size);
 
   if (cmp == 0) {
     if (lhs_val->size < rhs_val->size) {
@@ -112,3 +122,12 @@ ieo_string_compare(IEO_NOTNULL const IeoTerm *lhs,
 
   return ieo_int_new(cmp);
 }
+
+IeoType ieo_std_type_string = {
+  .type_name = &ieo_str_type_name,
+  .term_size = sizeof(IeoStringAllocated),
+  .deleter = ieo_term_deleter,
+  .eq_func = eq_func,
+  .neq_func = neq_func,
+  .compare_func = compare_func,
+};

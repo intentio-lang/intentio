@@ -44,23 +44,21 @@ ieo_term_refcount_increments_and_decrements(IEO_UNUSED void **state)
 static void
 ieo_term_free_on_static_is_noop(IEO_UNUSED void **state)
 {
-  IEO_STATIC_STRING(str, "foo");
-  IeoTerm *term = (IeoTerm *)&str;
-  ieo_term_free(&term);
-  assert_non_null(term);
+  IEO_STATIC_STRING_P(str, "foo");
+  ieo_term_free(&str);
+  assert_non_null(str);
 }
 
 static void
 ieo_term_refcount_on_static_is_noop(IEO_UNUSED void **state)
 {
-  IEO_STATIC_STRING(str, "foo");
-  IeoTerm *term = (IeoTerm *)&str;
-  assert_int_equal(0, ieo_term_refcount(term));
-  ieo_term_ref(term);
-  assert_int_equal(0, ieo_term_refcount(term));
-  ieo_term_unref(&term);
-  assert_int_equal(0, ieo_term_refcount(term));
-  assert_non_null(term);
+  IEO_STATIC_STRING_P(str, "foo");
+  assert_int_equal(0, ieo_term_refcount(str));
+  ieo_term_ref(str);
+  assert_int_equal(0, ieo_term_refcount(str));
+  ieo_term_unref(&str);
+  assert_int_equal(0, ieo_term_refcount(str));
+  assert_non_null(str);
 }
 
 int

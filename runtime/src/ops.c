@@ -56,7 +56,7 @@
     {                                                                          \
       const IeoTerm *cmp_;                                                     \
       IEO_TRY_UNWRAP(cmp_, CALL_BINARY(compare, LHS, RHS));                    \
-      IEO_TRY_ERR_(ieo_is_int(cmp_), IEO_TP(COMPARE_RETURNED_NON_INT));        \
+      IEO_TRY_ERR_(ieo_is_int(cmp_), IEO_STP(COMPARE_RETURNED_NON_INT));       \
       int64_t it = ieo_int_value(cmp_);                                        \
       bool r_ = (COND);                                                        \
       return IEO_BOOL(r_);                                                     \
@@ -65,7 +65,7 @@
     {                                                                          \
       const IeoTerm *cmp_;                                                     \
       IEO_TRY_UNWRAP(cmp_, CALL_BINARY(compare, RHS, LHS));                    \
-      IEO_TRY_ERR_(ieo_is_int(cmp_), IEO_TP(COMPARE_RETURNED_NON_INT));        \
+      IEO_TRY_ERR_(ieo_is_int(cmp_), IEO_STP(COMPARE_RETURNED_NON_INT));       \
       int64_t it = -ieo_int_value(cmp_);                                       \
       bool r_ = (COND);                                                        \
       return IEO_BOOL(r_);                                                     \

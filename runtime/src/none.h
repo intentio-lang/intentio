@@ -12,5 +12,8 @@ typedef struct IeoNone
 IEO_CONST IeoResult
 ieo_none(void);
 
+IEO_CONST IeoTerm *
+ieo_none_unwrap(void);
+
 IEO_PURE IeoResult
 ieo_is_none(IEO_NOTNULL const IeoTerm *term);

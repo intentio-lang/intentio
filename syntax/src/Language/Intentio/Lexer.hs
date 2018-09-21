@@ -15,7 +15,6 @@ module Language.Intentio.Lexer
   , float
   , anyString
   , string'
-  , charstring
   , regexstring
   , rawstring
   )
@@ -171,7 +170,6 @@ tok TOpPercent    = tokOp TOpPercent
 tok TInteger      = integer
 tok TFloat        = float
 tok TString       = string'
-tok TCharString   = charstring
 tok TRawString    = rawstring
 tok TRegexString  = regexstring
 
@@ -250,15 +248,11 @@ exponent = do
 -- | Parse any valid string literal.
 anyString :: Parser Token
 anyString =
-  try string' <|> try charstring <|> try regexstring <|> try rawstring
+  try string' <|> try regexstring <|> try rawstring
 
 -- | Parse valid regular string literal.
 string' :: Parser Token
 string' = lexeme (stringprefix <~> istring') >>= mkt TString
-
--- | Parse valid character literal.
-charstring :: Parser Token
-charstring = lexeme (stringprefix <~> icharstring) >>= mkt TCharString
 
 -- | Parse valid regex literal.
 regexstring :: Parser Token
@@ -274,9 +268,6 @@ istring' =
     <~> (T.concat <$> many strchr)
     <~> string "\""
     <?> "regular string"
-
-icharstring :: Parser Text
-icharstring = string "c\"" <~> strchr <~> string "\"" <?> "char string"
 
 iregexstring :: Parser Text
 iregexstring =
@@ -301,7 +292,7 @@ stringprefix = option "" stringmod
 
 stringmod :: Parser Text
 stringmod = toS <$> some (satisfy isStringModChar) <?> "string modifier"
-  where isStringModChar c = c /= 'c' && c /= 'r' && c /= 'x' && isLower c
+  where isStringModChar c = c /= 'r' && c /= 'x' && isLower c
 
 strchr :: Parser Text
 strchr =

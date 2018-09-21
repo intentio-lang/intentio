@@ -100,7 +100,6 @@ data Literal
   = Integer Text
   | Float Text
   | String Text
-  | CharString Text
   | RawString Text
   | RegexString Text
   deriving (Show, Eq, Generic)
@@ -188,7 +187,6 @@ instance Convertible Token Literal where
   safeConvert Token{_ty=TInteger, _text}     = Right $ Integer _text
   safeConvert Token{_ty=TFloat, _text}       = Right $ Float _text
   safeConvert Token{_ty=TString, _text}      = Right $ String _text
-  safeConvert Token{_ty=TCharString, _text}  = Right $ CharString _text
   safeConvert Token{_ty=TRawString, _text}   = Right $ RawString _text
   safeConvert Token{_ty=TRegexString, _text} = Right $ RegexString _text
   safeConvert x = convError "Not a literal" x

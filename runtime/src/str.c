@@ -58,6 +58,25 @@ extern inline IEO_PURE const char *
 ieo_string_data(IEO_NOTNULL const IeoTerm *p);
 
 static IEO_PURE IeoResult
+add_func(const IeoTerm *self, const IeoTerm *other)
+{
+  IEO_ASSERT(IEO_OK(ieo_is_string(self)));
+  IEO_TYPECK(other, string);
+
+  const IeoStringValue *lhs = ieo_term_value(self);
+  const IeoStringValue *rhs = ieo_term_value(other);
+
+  IeoTerm *result;
+  IEO_TRY_UNWRAP(result, ieo_string_new("", lhs->size + rhs->size));
+
+  IeoStringValue *res = ieo_term_value(result);
+  memcpy((void *)res->data, lhs->data, lhs->size);
+  memcpy((void *)(res->data + lhs->size), rhs->data, rhs->size);
+
+  return IEO_SUCCT(result);
+}
+
+static IEO_PURE IeoResult
 eq_impl(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 {
   IEO_ASSERT(IEO_OK(ieo_is_string(lhs)));
@@ -127,6 +146,7 @@ IeoType ieo_std_type_string = {
   .type_name = &ieo_str_type_name,
   .term_size = sizeof(IeoStringAllocated),
   .deleter = ieo_term_deleter,
+  .add_func = add_func,
   .eq_func = eq_func,
   .neq_func = neq_func,
   .compare_func = compare_func,

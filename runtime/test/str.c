@@ -85,6 +85,19 @@ string_compare(IEO_UNUSED void **state)
   assert_ieo_ok(ieo_gteq(foobar, foobar));
 }
 
+static void
+add_with_string(IEO_UNUSED void **state)
+{
+  IEO_STATIC_STRING_P(empty, "");
+  IEO_STATIC_STRING_P(foo, "foo");
+  IEO_STATIC_STRING_P(bar, "bar");
+  IEO_STATIC_STRING_P(foobar, "foobar");
+
+  assert_ieo_ok_cond(ieo_add(empty, foo), IEO_OK(ieo_eq(it, foo)));
+  assert_ieo_ok_cond(ieo_add(foo, empty), IEO_OK(ieo_eq(it, foo)));
+  assert_ieo_ok_cond(ieo_add(foo, bar), IEO_OK(ieo_eq(it, foobar)));
+}
+
 int
 main(void)
 {
@@ -95,6 +108,7 @@ main(void)
     cmocka_unit_test(allocate_nonempty_string),
     cmocka_unit_test(string_equal),
     cmocka_unit_test(string_compare),
+    cmocka_unit_test(add_with_string),
   };
 
   return cmocka_run_group_tests(tests, NULL, NULL);

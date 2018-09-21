@@ -11,6 +11,7 @@ module Language.Intentio.Lexer
   , anyOperator
   , ident
   , literal
+  , none'
   , integer
   , float
   , anyString
@@ -200,7 +201,11 @@ anyOperator = anyReserved operators <?> "operator"
 
 -- | Parse any valid literal.
 literal :: Parser Token
-literal = try float <|> try integer <|> try anyString
+literal = try none' <|> try float <|> try integer <|> try anyString
+
+-- | Parse none literal
+none' :: Parser Token
+none' = tok TKwNone
 
 -- | Parse any valid integer literal.
 integer :: Parser Token

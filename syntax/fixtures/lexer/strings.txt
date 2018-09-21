@@ -4,9 +4,6 @@ r"Quick brown fox jumps over the lazy dog"
 
 xr"Quick brown fox jumps over the lazy dog"
 
-c"a"
-
-c"\u{1f436}"
 
 "Quick brown fox
  jumps over

@@ -114,5 +114,9 @@
   {
     "_text": "a",
     "_ty": "TIdent"
+  },
+  {
+    "_text": "none",
+    "_ty": "TKwNone"
   }
 ]

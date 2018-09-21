@@ -20,3 +20,5 @@ fun + a
 
 a==a
 # FIXME: a/=a
+
+none

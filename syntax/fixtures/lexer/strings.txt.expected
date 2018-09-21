@@ -12,14 +12,6 @@
     "_ty": "TRegexString"
   },
   {
-    "_text": "c\"a\"",
-    "_ty": "TCharString"
-  },
-  {
-    "_text": "c\"\\u{1f436}\"",
-    "_ty": "TCharString"
-  },
-  {
     "_text": "\"Quick brown fox\n jumps over\n the lazy dog\"",
     "_ty": "TString"
   },

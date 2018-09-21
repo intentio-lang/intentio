@@ -9,8 +9,8 @@ typedef struct IeoNone
   IeoTermHeader head;
 } IeoNone;
 
-IEO_PURE IeoResult
+IEO_CONST IeoResult
 ieo_none(void);
 
 IEO_PURE IeoResult
-ieo_is_none(IEO_NOTNULL IeoTerm *term);
+ieo_is_none(IEO_NOTNULL const IeoTerm *term);

@@ -12,13 +12,15 @@
 
 #include <cmocka.h>
 
-#define assert_ieo_ok(EXPR) assert_ieo_ok_cond(EXPR, 1);
-#define assert_ieo_err(EXPR) assert_ieo_err_cond(EXPR, 1);
+#define assert_ieo_ok(EXPR) assert_ieo_ok_cond(EXPR, 1)
+#define assert_ieo_err(EXPR) assert_ieo_err_cond(EXPR, 1)
 
-#define assert_ieo_ok_cond(EXPR, COND) assert_ieo_X_cond_impl(EXPR, 1, COND);
-#define assert_ieo_err_cond(EXPR, COND) assert_ieo_X_cond_impl(EXPR, 0, COND);
+#define assert_ieo_ok_cond(EXPR, COND) assert_ieo_X_cond(EXPR, 1, COND)
+#define assert_ieo_err_cond(EXPR, COND) assert_ieo_X_cond(EXPR, 0, COND)
 
-#define assert_ieo_X_cond_impl(EXPR, SUCC, COND)                               \
+#define assert_ieo_X(EXPR, SUCC) assert_ieo_X_cond(EXPR, SUCC, 1)
+
+#define assert_ieo_X_cond(EXPR, SUCC, COND)                                    \
   do {                                                                         \
     IeoResult tmp__ = (EXPR);                                                  \
     if ((SUCC)) {                                                              \

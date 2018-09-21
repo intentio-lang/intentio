@@ -17,7 +17,7 @@
 
 #define IEO_SUCC(RESULT) ((IeoResult){ .succ = true, .term = (RESULT).term })
 #define IEO_FAIL(RESULT) ((IeoResult){ .succ = false, .term = (RESULT).term })
-#define IEO_NOT(RESULT) (ieo_not((RESULT)))
+#define IEO_NOT(RESULT) (ieo_not_impl_((RESULT)))
 #define IEO_SSET(STATE, RESULT)                                                \
   ((IeoResult){ .succ = (STATE), .term = (RESULT).term })
 
@@ -42,7 +42,7 @@
   do {                                                                         \
     (RESULT_VAR) = (EXPR);                                                     \
     if (IEO_ERR(RESULT_VAR)) {                                                 \
-      return IEO_FAILT((ERR));                                                            \
+      return IEO_FAILT((ERR));                                                 \
     }                                                                          \
   } while (0)
 
@@ -66,7 +66,7 @@
   do {                                                                         \
     IeoResult tmp_ = (EXPR);                                                   \
     if (IEO_ERR(tmp_)) {                                                       \
-      return IEO_FAILT((ERR));                                                            \
+      return IEO_FAILT((ERR));                                                 \
     } else {                                                                   \
       (TERM_VAR) = tmp_.term;                                                  \
     }                                                                          \
@@ -92,7 +92,7 @@ typedef struct IeoTermHeader
 } IeoTermHeader;
 
 /**
- * @brief Represents Intentio term objects.
+ * Represents Intentio term objects.
  * @warning NEVER TOUCH FIELDS OF THIS STRUCTURE DIRECTLY, USE ACCESSOR
  * FUNCTIONS!
  */
@@ -112,13 +112,13 @@ typedef struct IeoResult
  * @private
  */
 inline IEO_CONST IeoResult
-ieo_not(IeoResult r)
+ieo_not_impl_(IeoResult r)
 {
   return (IeoResult){ .succ = !r.succ, .term = r.term };
 }
 
 /**
- * @brief Get pointer to term type.
+ * Get pointer to term type.
  */
 inline IEO_PURE const IeoType *
 ieo_term_ty(IEO_NOTNULL const IeoTerm *p)
@@ -129,7 +129,7 @@ ieo_term_ty(IEO_NOTNULL const IeoTerm *p)
 }
 
 /**
- * @brief Get pointer to term type with mutable access.
+ * Get pointer to term type with mutable access.
  * @warning Use this only when needed.
  */
 inline IEO_PURE IeoType *
@@ -141,7 +141,7 @@ ieo_term_ty_mut(IEO_NOTNULL const IeoTerm *p)
 }
 
 /**
- * @brief Get current reference count of given term object.
+ * Get current reference count of given term object.
  */
 inline IeoRefCount
 ieo_term_refcount(IEO_NOTNULL const IeoTerm *p)
@@ -151,7 +151,7 @@ ieo_term_refcount(IEO_NOTNULL const IeoTerm *p)
 }
 
 /**
- * @brief Get term flags.
+ * Get term flags.
  */
 inline IEO_PURE IeoTermFlags
 ieo_term_flags(IEO_NOTNULL const IeoTerm *p)
@@ -161,7 +161,7 @@ ieo_term_flags(IEO_NOTNULL const IeoTerm *p)
 }
 
 /**
- * @brief Get pointer to value memory of given term.
+ * Get pointer to value memory of given term.
  */
 inline IEO_PURE IEO_NOTNULL const void *
 ieo_term_value(IEO_NOTNULL const IeoTerm *p)
@@ -171,7 +171,7 @@ ieo_term_value(IEO_NOTNULL const IeoTerm *p)
 }
 
 /**
- * @brief Get pointer to mutable value memory of given term.
+ * Get pointer to mutable value memory of given term.
  */
 inline IEO_PURE IEO_NOTNULL void *
 ieo_term_value_mut(IEO_NOTNULL IeoTerm *p)
@@ -181,7 +181,7 @@ ieo_term_value_mut(IEO_NOTNULL IeoTerm *p)
 }
 
 /**
- * @brief Allocate and initialize a new term object.
+ * Allocate and initialize a new term object.
  *
  * The object starts with reference count equal to 1.
  *
@@ -192,7 +192,7 @@ IEO_MALLOC IEO_WARN_UNUSED_RESULT IeoTerm *
 ieo_term_alloc(IeoType *ty);
 
 /**
- * @brief Allocate and initialize a new term object with additional `size` bytes
+ * Allocate and initialize a new term object with additional `size` bytes
  * of data after term header.
  *
  * The object starts with reference count equal to 1.
@@ -204,7 +204,7 @@ IEO_MALLOC IEO_WARN_UNUSED_RESULT IeoTerm *
 ieo_term_alloc_s(IeoType *ty, size_t size);
 
 /**
- * @brief Increment reference counter of given term object.
+ * Increment reference counter of given term object.
  *
  * @param p a pointer to term object
  * @return IeoTerm* a pointer to same term object
@@ -213,7 +213,7 @@ IeoTerm *
 ieo_term_ref(IeoTerm *p);
 
 /**
- * @brief Decrement reference counter of given term object, and free it if it
+ * Decrement reference counter of given term object, and free it if it
  * reaches zero.
  *
  * @param p a pointer to term object, set to null if term is freed
@@ -222,7 +222,7 @@ void
 ieo_term_unref(IeoTerm **p);
 
 /**
- * @brief Force free term from memory and set remaining pointer to null.
+ * Force free term from memory and set remaining pointer to null.
  *
  * @warning This is dangerous, avoid this function as much as possible and use
  * reference counting instead.
@@ -233,7 +233,7 @@ void
 ieo_term_free(IeoTerm **p);
 
 /**
- * @brief Default deleter of term objects.
+ * Default deleter of term objects.
  */
 void
 ieo_term_deleter(IeoTerm *p);

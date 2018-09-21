@@ -38,12 +38,6 @@ IeoResult
 ieo_regex_new(const char *val);
 
 //----------------------------------------------------------------------------
-// Result operations
-
-IeoResult
-ieo_not(IeoResult r);
-
-//----------------------------------------------------------------------------
 // Operators
 
 IeoResult
@@ -54,6 +48,12 @@ ieo_add(const IeoTerm *lhs, const IeoTerm *rhs);
 
 IeoResult
 ieo_div(const IeoTerm *lhs, const IeoTerm *rhs);
+
+IeoResult
+ieo_mul(const IeoTerm *lhs, const IeoTerm *rhs);
+
+IeoResult
+ieo_sub(const IeoTerm *lhs, const IeoTerm *rhs);
 
 IeoResult
 ieo_eq(const IeoTerm *lhs, const IeoTerm *rhs);
@@ -71,22 +71,16 @@ IeoResult
 ieo_lteq(const IeoTerm *lhs, const IeoTerm *rhs);
 
 IeoResult
-ieo_mul(const IeoTerm *lhs, const IeoTerm *rhs);
-
-IeoResult
 ieo_neq(const IeoTerm *lhs, const IeoTerm *rhs);
 
 IeoResult
-ieo_sub(const IeoTerm *lhs, const IeoTerm *rhs);
+ieo_compare(const IeoTerm *lhs, const IeoTerm *rhs);
 
 IeoResult
 ieo_seq(const IeoTerm *lhs, const IeoTerm *rhs);
 
 IeoResult
 ieo_sneq(const IeoTerm *lhs, const IeoTerm *rhs);
-
-IeoResult
-ieo_compare(const IeoTerm *lhs, const IeoTerm *rhs);
 
 //----------------------------------------------------------------------------
 // Runtime metadata functions

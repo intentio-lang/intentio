@@ -1,0 +1,6 @@
+BasedOnStyle: Mozilla
+AccessModifierOffset: '-2'
+ColumnLimit: 80
+IndentCaseLabels: 'false'
+IndentWidth: '2'
+PointerAlignment: Right

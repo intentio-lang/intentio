@@ -1,0 +1,5 @@
+COMPILE main.ieo adder.ieo
+RUN
+>>> 2
+>>> 2
+... 4

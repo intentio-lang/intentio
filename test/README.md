@@ -42,7 +42,7 @@ RUN
 COMPILE arg0 [arg1...]
 ```
 
-Execute tested Intentio Compiler with given arguments. For single-file test cases this command, if not provided, this command is implicitly prepended, with test file as the single argument. The compilation is expected to pass successfully, without warnings.
+Execute tested Intentio Compiler with given arguments. For single-file test cases this command, if not provided, is implicitly prepended, with test file as the single argument. The compilation is expected to pass successfully, without warnings.
 
 ### `RUN`
 

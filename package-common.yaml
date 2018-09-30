@@ -38,6 +38,7 @@
   - RankNTypes
   - RecordWildCards
   - ScopedTypeVariables
+  - StandaloneDeriving
   - TemplateHaskell
   - TupleSections
   - TypeApplications

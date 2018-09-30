@@ -7,6 +7,7 @@ packages:
   - intentioc
   - prelude
   - syntax
+  - test-runner
   - test-utils
 
 extra-deps:

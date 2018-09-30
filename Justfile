@@ -1,7 +1,7 @@
 # Just is awesome: https://github.com/casey/just
 
 # Build everything
-build : build-c build-haskell
+build : build-haskell build-c
 
 # Build C code
 build-c :
@@ -12,7 +12,10 @@ build-haskell :
   stack build
 
 # Test everything
-test : test-c test-haskell
+test : test-unit test-suite
+
+# Run compiler & runtime unit tests
+test-unit : test-haskell test-c
 
 # Test C code
 test-c : build-c
@@ -21,6 +24,10 @@ test-c : build-c
 # Test Haskell code
 test-haskell : build-haskell
   stack test
+
+# Run Intentio Reference Test Suite
+test-suite : build
+  stack build test-runner --exec "test-runner"
 
 # Watch for changes in Haskell code
 watch-haskell STACK_CMD='test' :

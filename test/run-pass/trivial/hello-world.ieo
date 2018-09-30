@@ -1,5 +1,5 @@
-# RUN
-# ... Hello World!
+# - run:
+#     stdout: Hello World!...
 
 fun main() {
   println("Hello World!");

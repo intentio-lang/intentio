@@ -1,7 +1,9 @@
-# RUN
-# >>> 2
-# >>> 2
-# ... 4
+# - run:
+#     stdin:
+#       - "2"
+#       - "2"
+#     stdout:
+#       - "4"
 
 fun main() {
   a = int(scanln());

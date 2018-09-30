@@ -1,0 +1,9 @@
+- compile:
+    - main.ieo
+    - adder.ieo
+- run:
+    stdin:
+      - "2"
+      - "2"
+    stdout:
+      - "4"

@@ -11,5 +11,4 @@ cmake-build-*/
 # Lots of folks will probably play with intentioc in this directory,
 # so also ignore common intentioc garbage.
 .intentio-work/
-.test-work/
 a.out

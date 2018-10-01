@@ -20,11 +20,8 @@ import           Data.Algorithm.Diff            ( Diff(..)
 import           Data.Algorithm.DiffOutput      ( ppDiff )
 import qualified Data.String                   as Str
 import qualified Data.Text                     as T
-import           System.Directory               ( createDirectoryIfMissing
-                                                , removePathForcibly
-                                                , withCurrentDirectory
-                                                )
-import           System.FilePath                ( (</>) )
+import           System.Directory               ( withCurrentDirectory )
+import           System.IO.Temp                 ( withSystemTempDirectory )
 import qualified System.Process.Typed          as P
 
 import           TestRunner.Loader              ( LoaderError
@@ -36,7 +33,7 @@ import           TestRunner.Model               ( TestCase
                                                 , TestCommand(..)
                                                 , IOSpec(..)
                                                 , commands
-                                                , testCaseName
+                                                , compileCommandArgs
                                                 , runCommandStdin
                                                 , runCommandStdout
                                                 , runCommandStderr
@@ -72,9 +69,6 @@ type CommandMT = StateT CommandState RunSpecMT
 makeLenses ''TestResult
 makeLenses ''CommandState
 
-workdirPath :: FilePath
-workdirPath = ".test-work"
-
 prettyTestError :: TestError -> Text
 prettyTestError (LoaderError e) = prettyLoaderError e
 prettyTestError RunCalledWithoutCompile =
@@ -107,12 +101,10 @@ loadTestSpec' testCase =
 
 runTestSpec :: Opts -> TestCase -> TestSpec -> RunSpecMT ()
 runTestSpec opts testCase spec = do
-  let cwd = workdirPath </> testCase ^. testCaseName
-  liftIO $ removePathForcibly cwd
-  liftIO $ createDirectoryIfMissing True cwd
-  hoist (withCurrentDirectory cwd) $ do
-    void $ execStateT (mapM_ runCommand (spec ^. commands))
-                      (emptyCommandState opts testCase)
+  withSystemTempDirectory "intentio-test" $ \cwd ->
+    hoist (withCurrentDirectory cwd) $ do
+      void $ execStateT (mapM_ runCommand (spec ^. commands))
+                        (emptyCommandState opts testCase)
 
 emptyCommandState :: Opts -> TestCase -> CommandState
 emptyCommandState _stateOpts _stateTestCase =

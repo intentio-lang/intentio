@@ -58,8 +58,8 @@ runAndLog opts testCase = do
   result <- runTestCase opts testCase
   let name = result ^. testResultCase . testCaseName
   case result ^. testResultState of
-    Right _ -> putText $ "[ OK ] " <> toS name
-    Left  _ -> putText $ "[FAIL] " <> toS name
+    Right _ -> putText $ "[ OK ] " <> name
+    Left  _ -> putText $ "[FAIL] " <> name
   return result
 
 collectSummary :: [TestResult] -> Summary
@@ -91,6 +91,6 @@ printSummary summary
     forM_ (summary ^. failedTests) $ \(testCase, err) -> do
       let n = testCase ^. testCaseName
       let p = prettyTestError err
-      putText $ "=== " <> toS n <> " ==="
+      putText $ "=== " <> n <> " ==="
       putText p
       putText ""

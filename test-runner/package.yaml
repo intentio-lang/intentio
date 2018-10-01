@@ -15,6 +15,7 @@ dependencies:
   - mmorph
   - mtl
   - optparse-applicative
+  - temporary
   - text
   - transformers
   - typed-process

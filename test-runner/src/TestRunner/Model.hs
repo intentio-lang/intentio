@@ -19,7 +19,7 @@ data TestCaseType = MultiFile | SingleFile
 
 data TestCase = TestCase
   { _testCaseType :: TestCaseType
-  , _testCaseName :: FilePath
+  , _testCaseName :: Text
   , _testCasePath :: FilePath
   }
   deriving (Show, Eq)

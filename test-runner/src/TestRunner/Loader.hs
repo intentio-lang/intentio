@@ -19,6 +19,10 @@ import           Data.Yaml.Include              ( decodeFileEither )
 import           TestRunner.Model               ( TestCaseType(..)
                                                 , TestCase
                                                 , TestSpec
+                                                , TestCommand(..)
+                                                , CompileCommandSpec(..)
+                                                , Arguments(..)
+                                                , commands
                                                 , testCaseType
                                                 , testCasePath
                                                 )
@@ -47,11 +51,19 @@ loadSingle testCase = do
     (hd : _) -> do
       let prefixLength = 1 + (TL.length . TL.takeWhile isSpace . TL.tail $ hd)
       let yamlText     = TL.unlines . fmap (TL.drop prefixLength) $ commentLines
-      return . wrapDecode . decodeEither' . toS $ yamlText
+      return
+        . over _Right (prependCompile testCase)
+        . over _Left  ParseException
+        . decodeEither'
+        . toS
+        $ yamlText
 
 loadMulti :: TestCase -> IO (Either LoaderError TestSpec)
-loadMulti testCase = wrapDecode <$> decodeFileEither (testCase ^. testCasePath)
+loadMulti testCase =
+  over _Left ParseException <$> decodeFileEither (testCase ^. testCasePath)
 
-wrapDecode :: Either ParseException TestSpec -> Either LoaderError TestSpec
-wrapDecode (Left  err) = Left $ ParseException err
-wrapDecode (Right r  ) = Right r
+prependCompile :: TestCase -> TestSpec -> TestSpec
+prependCompile testCase spec = spec & (commands %~ (cmd :))
+ where
+  cmd = CompileCommand
+    $ CompileCommandSpec (Arguments [toS $ testCase ^. testCasePath])

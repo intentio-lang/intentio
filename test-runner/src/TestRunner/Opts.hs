@@ -3,6 +3,7 @@ module TestRunner.Opts
   , rootDir
   , readOpts
   , compilerPath
+  , runEntrypointPath
   )
 where
 
@@ -19,24 +20,31 @@ import           Options.Applicative            ( Parser
                                                 , info
                                                 , long
                                                 , metavar
-                                                , short
+                                                , optional
                                                 , strOption
                                                 )
 
-data Opts = Opts { _rootDir :: FilePath, _compilerPath :: FilePath }
+data Opts = Opts
+  { _rootDir            :: FilePath
+  , _compilerPath       :: FilePath
+  , _runEntrypointPath  :: Maybe FilePath
+  }
   deriving (Show)
 
 makeLenses ''Opts
 
 options :: Parser Opts
-options = Opts <$> rootDirO <*> compilerPathO
+options = Opts <$> rootDirO <*> compilerPathO <*> runEntrypointPathO
  where
-  rootDirO = strOption $ long "root" <> short 'd' <> metavar "path" <> help
+  rootDirO = strOption $ long "root" <> metavar "path" <> help
     "Test suite root directory"
 
-  compilerPathO =
-    strOption $ long "compiler" <> short 'c' <> metavar "path" <> help
-      "Path to the tested Intentio Compiler executable"
+  compilerPathO = strOption $ long "compiler" <> metavar "path" <> help
+    "Path to the tested Intentio Compiler executable"
+
+  runEntrypointPathO =
+    optional . strOption $ long "run-entrypoint" <> metavar "path" <> help
+      "Path to the executable that wraps RUN commands"
 
 opts :: ParserInfo Opts
 opts = info (helper <*> options) fullDesc

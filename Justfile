@@ -27,7 +27,7 @@ test-haskell : build-haskell
 
 # Run Intentio Reference Test Suite
 test-suite : build
-  stack build test-runner --exec "test-runner"
+  stack exec test-runner -- --root ./test --compiler ./bin/test-intentioc.sh
 
 # Watch for changes in Haskell code
 watch-haskell STACK_CMD='test' :
@@ -35,6 +35,13 @@ watch-haskell STACK_CMD='test' :
 
 # Watch for changes in C code
 watch-c CMD='just test-c' :
+  #!/usr/bin/env bash
+  while :; do
+    rg --files | entr -d bash -c '{{ CMD }}'
+  done
+
+# Watch for changes anywhere and run test suite
+watch-suite CMD='just test-suite' :
   #!/usr/bin/env bash
   while :; do
     rg --files | entr -d bash -c '{{ CMD }}'

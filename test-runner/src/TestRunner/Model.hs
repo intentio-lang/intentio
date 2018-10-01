@@ -19,7 +19,7 @@ data TestCaseType = MultiFile | SingleFile
 
 data TestCase = TestCase
   { _testCaseType :: TestCaseType
-  , _testCaseName :: Text
+  , _testCaseName :: FilePath
   , _testCasePath :: FilePath
   }
   deriving (Show, Eq)
@@ -32,16 +32,18 @@ data TestCommand
   | RunCommand RunCommandSpec
   deriving (Show, Eq)
 
-newtype CompileCommandSpec = CompileCommandSpec { _compileArgs :: Arguments }
+newtype CompileCommandSpec = CompileCommandSpec
+  { _compileCommandArgs :: Arguments
+  }
   deriving (Show, Eq)
 
 newtype Arguments = Arguments { _argv :: [Text] }
   deriving (Show, Eq)
 
 data RunCommandSpec = RunCommandSpec
-  { _stdin  :: Maybe IOSpec
-  , _stdout :: Maybe IOSpec
-  , _stderr :: Maybe IOSpec
+  { _runCommandStdin  :: Maybe IOSpec
+  , _runCommandStdout :: Maybe IOSpec
+  , _runCommandStderr :: Maybe IOSpec
   }
   deriving (Show, Eq)
 

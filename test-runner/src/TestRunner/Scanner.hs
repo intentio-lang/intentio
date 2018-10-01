@@ -10,8 +10,9 @@ import           System.Directory               ( listDirectory
                                                 , doesDirectoryExist
                                                 )
 import           System.FilePath                ( (</>)
-                                                , dropFileName
+                                                , dropExtensions
                                                 , makeRelative
+                                                , takeDirectory
                                                 , takeExtensions
                                                 )
 
@@ -45,13 +46,13 @@ scanDirectory' root cwd = do
   processTestFile :: FilePath -> IO [TestCase]
   processTestFile testFilePath = do
     let _testCaseType = MultiFile
-    let _testCaseName = toS . makeRelative root $ dropFileName testFilePath
+    let _testCaseName = makeRelative root . takeDirectory $ testFilePath
     let _testCasePath = testFilePath
     return [TestCase {..}]
 
   processSingleFile :: FilePath -> IO [TestCase]
   processSingleFile filePath = do
     let _testCaseType = SingleFile
-    let _testCaseName = toS $ makeRelative root filePath
+    let _testCaseName = makeRelative root . dropExtensions $ filePath
     let _testCasePath = filePath
     return [TestCase {..}]

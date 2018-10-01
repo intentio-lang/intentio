@@ -23,6 +23,7 @@ import           Options.Applicative            ( Parser
                                                 , optional
                                                 , strOption
                                                 )
+import           System.Directory               ( makeAbsolute )
 
 data Opts = Opts
   { _rootDir            :: FilePath
@@ -50,4 +51,13 @@ opts :: ParserInfo Opts
 opts = info (helper <*> options) fullDesc
 
 readOpts :: IO Opts
-readOpts = execParser opts
+readOpts = execParser opts >>= absPaths
+
+absPaths :: Opts -> IO Opts
+absPaths o = do
+  _rootDir           <- makeAbsolute $ o ^. rootDir
+  _compilerPath      <- makeAbsolute $ o ^. compilerPath
+  _runEntrypointPath <- case o ^. runEntrypointPath of
+    Nothing -> return Nothing
+    Just p  -> Just <$> makeAbsolute p
+  return Opts { .. }

@@ -32,11 +32,12 @@ import           TestRunner.Model               ( TestCase
                                                 , TestSpec
                                                 , TestCommand(..)
                                                 , IOSpec(..)
+                                                , argv
                                                 , commands
                                                 , compileCommandArgs
+                                                , runCommandStderr
                                                 , runCommandStdin
                                                 , runCommandStdout
-                                                , runCommandStderr
                                                 )
 import           TestRunner.Opts                ( Opts
                                                 , compilerPath
@@ -45,6 +46,7 @@ import           TestRunner.Opts                ( Opts
 
 data TestError
   = LoaderError LoaderError
+  | CompilationFailure Int ByteString
   | RunCalledWithoutCompile
   | RunExitFailure Int ByteString ByteString
   | StdoutMismatch [Diff [String]]
@@ -59,7 +61,6 @@ data TestResult = TestResult
 
 data CommandState = CommandState
   { _stateOpts      :: Opts
-  , _stateTestCase  :: TestCase
   , _compiledBinary :: Maybe FilePath
   }
 
@@ -69,8 +70,15 @@ type CommandMT = StateT CommandState RunSpecMT
 makeLenses ''TestResult
 makeLenses ''CommandState
 
+outputBinaryPath :: FilePath
+outputBinaryPath = "testbin.out"
+
 prettyTestError :: TestError -> Text
-prettyTestError (LoaderError e) = prettyLoaderError e
+prettyTestError (LoaderError e            ) = prettyLoaderError e
+prettyTestError (CompilationFailure ec out) = T.unlines $ [ecs, ""] <> outs
+ where
+  ecs  = "Compilation failed with exit code: " <> show ec
+  outs = T.lines $ toS out
 prettyTestError RunCalledWithoutCompile =
   "Bad test specification: RUN command called without preceding COMPILE command"
 prettyTestError (RunExitFailure ec out err) =
@@ -91,28 +99,35 @@ prettyTestError (StderrMismatch d) =
 runTestCase :: Opts -> TestCase -> IO TestResult
 runTestCase opts testCase = do
   let _testResultCase = testCase
-  _testResultState <-
-    runExceptT $ loadTestSpec' testCase >>= runTestSpec opts testCase
+  _testResultState <- runExceptT $ loadTestSpec' testCase >>= runTestSpec opts
   return TestResult { .. }
 
 loadTestSpec' :: TestCase -> RunSpecMT TestSpec
 loadTestSpec' testCase =
   testCase & loadTestSpec & liftIO <&> (_Left %~ LoaderError) >>= liftEither
 
-runTestSpec :: Opts -> TestCase -> TestSpec -> RunSpecMT ()
-runTestSpec opts testCase spec = do
+runTestSpec :: Opts -> TestSpec -> RunSpecMT ()
+runTestSpec opts spec = do
   withSystemTempDirectory "intentio-test" $ \cwd ->
     hoist (withCurrentDirectory cwd) $ do
       void $ execStateT (mapM_ runCommand (spec ^. commands))
-                        (emptyCommandState opts testCase)
+                        (emptyCommandState opts)
 
-emptyCommandState :: Opts -> TestCase -> CommandState
-emptyCommandState _stateOpts _stateTestCase =
-  CommandState { _compiledBinary = Nothing, .. }
+emptyCommandState :: Opts -> CommandState
+emptyCommandState _stateOpts = CommandState { _compiledBinary = Nothing, .. }
 
 runCommand :: TestCommand -> CommandMT ()
-runCommand (CompileCommand spec) = return ()
-runCommand (RunCommand     spec) = do
+runCommand (CompileCommand spec) = do
+  myCompilerPath <- use (stateOpts . compilerPath)
+  let myCompilerArgs =
+        ["-o", outputBinaryPath] <> (spec ^. compileCommandArgs . argv <&> toS)
+  (exitCode, compilerStdout) <- P.readProcessStdout
+    $ P.proc myCompilerPath myCompilerArgs
+  case exitCode of
+    ExitSuccess    -> compiledBinary .= Just outputBinaryPath
+    ExitFailure ec -> throwError $ CompilationFailure ec (toS compilerStdout)
+
+runCommand (RunCommand spec) = do
   myRunEntrypointPath <- use (stateOpts . runEntrypointPath)
   myCompiledBinary    <- use compiledBinary >>= \case
     Just p  -> return p

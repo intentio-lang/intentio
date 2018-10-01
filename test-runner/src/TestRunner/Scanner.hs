@@ -6,7 +6,6 @@ where
 import           Intentio.Prelude
 
 import           System.Directory               ( listDirectory
-                                                , makeAbsolute
                                                 , doesDirectoryExist
                                                 )
 import           System.FilePath                ( (</>)
@@ -25,9 +24,7 @@ testYaml :: String
 testYaml = "test.yaml"
 
 scanDirectory :: FilePath -> IO TestSuite
-scanDirectory root = do
-  rootAbs <- makeAbsolute root
-  TestSuite <$> scanDirectory' rootAbs rootAbs
+scanDirectory root = TestSuite <$> scanDirectory' root root
 
 scanDirectory' :: FilePath -> FilePath -> IO [TestCase]
 scanDirectory' root cwd = do

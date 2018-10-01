@@ -47,13 +47,11 @@ loadSingle testCase = do
     (hd : _) -> do
       let prefixLength = 1 + (TL.length . TL.takeWhile isSpace . TL.tail $ hd)
       let yamlText     = TL.unlines . fmap (TL.drop prefixLength) $ commentLines
-      return . normalizeDecodeResult . decodeEither' . toS $ yamlText
+      return . wrapDecode . decodeEither' . toS $ yamlText
 
 loadMulti :: TestCase -> IO (Either LoaderError TestSpec)
-loadMulti testCase =
-  normalizeDecodeResult <$> decodeFileEither (testCase ^. testCasePath)
+loadMulti testCase = wrapDecode <$> decodeFileEither (testCase ^. testCasePath)
 
-normalizeDecodeResult
-  :: Either ParseException TestSpec -> Either LoaderError TestSpec
-normalizeDecodeResult (Left  err) = Left $ ParseException err
-normalizeDecodeResult (Right r  ) = Right r
+wrapDecode :: Either ParseException TestSpec -> Either LoaderError TestSpec
+wrapDecode (Left  err) = Left $ ParseException err
+wrapDecode (Right r  ) = Right r

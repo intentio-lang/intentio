@@ -13,14 +13,13 @@ where
 import           Intentio.Prelude
 
 import           Control.Monad.Except           ( liftEither )
-import           Control.Monad.Morph            ( hoist )
 import           Data.Algorithm.Diff            ( Diff(..)
                                                 , getGroupedDiff
                                                 )
 import           Data.Algorithm.DiffOutput      ( ppDiff )
 import qualified Data.String                   as Str
 import qualified Data.Text                     as T
-import           System.Directory               ( withCurrentDirectory )
+import           System.FilePath                ( takeDirectory )
 import           System.IO.Temp                 ( withSystemTempDirectory )
 import qualified System.Process.Typed          as P
 
@@ -38,6 +37,7 @@ import           TestRunner.Model               ( TestCase
                                                 , runCommandStderr
                                                 , runCommandStdin
                                                 , runCommandStdout
+                                                , testCasePath
                                                 )
 import           TestRunner.Opts                ( Opts
                                                 , compilerPath
@@ -46,7 +46,7 @@ import           TestRunner.Opts                ( Opts
 
 data TestError
   = LoaderError LoaderError
-  | CompilationFailure Int ByteString
+  | CompilationFailure Int ByteString ByteString
   | RunCalledWithoutCompile
   | RunExitFailure Int ByteString ByteString
   | StdoutMismatch [Diff [String]]
@@ -61,6 +61,8 @@ data TestResult = TestResult
 
 data CommandState = CommandState
   { _stateOpts      :: Opts
+  , _stateTmpDir    :: FilePath
+  , _stateTestCase  :: TestCase
   , _compiledBinary :: Maybe FilePath
   }
 
@@ -73,12 +75,18 @@ makeLenses ''CommandState
 outputBinaryPath :: FilePath
 outputBinaryPath = "testbin.out"
 
+testCaseCwd :: TestCase -> FilePath
+testCaseCwd testCase = testCase ^. testCasePath & takeDirectory
+
 prettyTestError :: TestError -> Text
-prettyTestError (LoaderError e            ) = prettyLoaderError e
-prettyTestError (CompilationFailure ec out) = T.unlines $ [ecs, ""] <> outs
+prettyTestError (LoaderError e) = prettyLoaderError e
+prettyTestError (CompilationFailure ec out err) =
+  T.unlines $ [ecs, ""] <> outs <> errs err
  where
   ecs  = "Compilation failed with exit code: " <> show ec
   outs = T.lines $ toS out
+  errs "" = []
+  errs bs = ["", "--- Standard error ---"] <> T.lines (toS bs)
 prettyTestError RunCalledWithoutCompile =
   "Bad test specification: RUN command called without preceding COMPILE command"
 prettyTestError (RunExitFailure ec out err) =
@@ -99,42 +107,50 @@ prettyTestError (StderrMismatch d) =
 runTestCase :: Opts -> TestCase -> IO TestResult
 runTestCase opts testCase = do
   let _testResultCase = testCase
-  _testResultState <- runExceptT $ loadTestSpec' testCase >>= runTestSpec opts
+  _testResultState <-
+    runExceptT $ loadTestSpec' testCase >>= runTestSpec opts testCase
   return TestResult { .. }
 
 loadTestSpec' :: TestCase -> RunSpecMT TestSpec
 loadTestSpec' testCase =
   testCase & loadTestSpec & liftIO <&> (_Left %~ LoaderError) >>= liftEither
 
-runTestSpec :: Opts -> TestSpec -> RunSpecMT ()
-runTestSpec opts spec = do
-  withSystemTempDirectory "intentio-test" $ \cwd ->
-    hoist (withCurrentDirectory cwd) $ do
-      void $ execStateT (mapM_ runCommand (spec ^. commands))
-                        (emptyCommandState opts)
+runTestSpec :: Opts -> TestCase -> TestSpec -> RunSpecMT ()
+runTestSpec opts testCase spec = void $ do
+  withSystemTempDirectory "intentio-test" $ \tmpdir -> do
+    execStateT (mapM_ runCommand (spec ^. commands))
+               (emptyCommandState opts tmpdir testCase)
 
-emptyCommandState :: Opts -> CommandState
-emptyCommandState _stateOpts = CommandState { _compiledBinary = Nothing, .. }
+emptyCommandState :: Opts -> FilePath -> TestCase -> CommandState
+emptyCommandState _stateOpts _stateTmpDir _stateTestCase =
+  CommandState { _compiledBinary = Nothing, .. }
 
 runCommand :: TestCommand -> CommandMT ()
 runCommand (CompileCommand spec) = do
   myCompilerPath <- use (stateOpts . compilerPath)
+  myTmpdir       <- use stateTmpDir
+  myCwd          <- testCaseCwd <$> use stateTestCase
   let myCompilerArgs =
-        ["-o", outputBinaryPath] <> (spec ^. compileCommandArgs . argv <&> toS)
-  (exitCode, compilerStdout) <- P.readProcessStdout
-    $ P.proc myCompilerPath myCompilerArgs
+        ["--workdir", myTmpdir, "-o", outputBinaryPath]
+          <> (spec ^. compileCommandArgs . argv <&> toS)
+  (exitCode, compilerStdout, compilerStderr) <-
+    P.readProcess . P.setWorkingDir myCwd $ P.proc myCompilerPath myCompilerArgs
   case exitCode of
     ExitSuccess    -> compiledBinary .= Just outputBinaryPath
-    ExitFailure ec -> throwError $ CompilationFailure ec (toS compilerStdout)
+    ExitFailure ec -> throwError
+      $ CompilationFailure ec (toS compilerStdout) (toS compilerStderr)
 
 runCommand (RunCommand spec) = do
   myRunEntrypointPath <- use (stateOpts . runEntrypointPath)
   myCompiledBinary    <- use compiledBinary >>= \case
     Just p  -> return p
     Nothing -> throwError RunCalledWithoutCompile
+  let myCwd    = takeDirectory myCompiledBinary
   let procPath = decorateProcPath myRunEntrypointPath (myCompiledBinary, [])
   let procConf =
-        P.setStdin (buildStdinSpec $ spec ^. runCommandStdin) $ mkProc procPath
+        P.setStdin (buildStdinSpec $ spec ^. runCommandStdin)
+          . P.setWorkingDir myCwd
+          $ mkProc procPath
   (exitCode, actualStdout, actualStderr) <- P.readProcess procConf
   case exitCode of
     ExitFailure ec ->

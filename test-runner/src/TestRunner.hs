@@ -5,6 +5,7 @@ where
 
 import           Intentio.Prelude
 
+import           Control.Concurrent.Async       ( mapConcurrently )
 import           System.Exit                    ( exitSuccess
                                                 , exitFailure
                                                 )
@@ -43,7 +44,7 @@ runDriver = do
   putText $ "Running " <> show (suite ^. testCases & length) <> " tests..."
   putText ""
 
-  results <- mapM (runAndLog opts) $ suite ^. testCases
+  results <- mapConcurrently (runAndLog opts) $ suite ^. testCases
 
   let summary = collectSummary results
 
@@ -65,7 +66,8 @@ runAndLog opts testCase = do
 collectSummary :: [TestResult] -> Summary
 collectSummary = foldr' f init
  where
-  init = Summary {_totalTestCount = 0, _failedTestCount = 0, _failedTests = []}
+  init =
+    Summary { _totalTestCount = 0, _failedTestCount = 0, _failedTests = [] }
 
   f result summary =
     let testCase = result ^. testResultCase

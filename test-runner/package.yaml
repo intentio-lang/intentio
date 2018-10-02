@@ -6,13 +6,13 @@ name: test-runner
 
 dependencies:
   - aeson
+  - async
   - base
   - containers
   - Diff
   - directory
   - filepath
   - intentio-prelude
-  - mmorph
   - mtl
   - optparse-applicative
   - temporary

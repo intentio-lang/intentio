@@ -1,23 +1,29 @@
-module Intentio.Cache.WorkDir where
+module Intentio.Cache.WorkDir
+  ( WorkDirComponent(..)
+  , getWorkDirRoot
+  , getWorkDir
+  )
+where
 
 import           Intentio.Prelude
 
-import           System.Directory               ( getCurrentDirectory
-                                                , createDirectoryIfMissing
-                                                )
 import           System.FilePath                ( (</>) )
+import           System.Directory               ( createDirectoryIfMissing
+                                                , makeAbsolute
+                                                )
 
 import           Intentio.Compiler              ( Compile
+                                                , getComponent
                                                 , liftIOE
                                                 )
 
-workDirRootName :: FilePath
-workDirRootName = ".intentio-work"
+newtype WorkDirComponent = WorkDirComponent { unWorkDirComponent :: FilePath }
+  deriving (Show, Eq)
 
 getWorkDirRoot :: Compile FilePath
 getWorkDirRoot = do
-  cwd <- liftIOE getCurrentDirectory
-  let wd = cwd </> workDirRootName
+  wdc <- getComponent @WorkDirComponent
+  wd  <- liftIO . makeAbsolute . unWorkDirComponent $ wdc
   liftIOE $ createDirectoryIfMissing True wd
   return wd
 

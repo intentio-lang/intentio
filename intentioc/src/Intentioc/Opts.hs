@@ -28,21 +28,25 @@ import           Options.Applicative            ( Parser
                                                 )
 import           System.FilePath                ( takeBaseName )
 
-import           Intentio.Compiler              ( Assembly
+import           Intentio.Cache.WorkDir         ( WorkDirComponent(..) )
+import           Intentio.Compiler              ( Compile
+                                                , Assembly
                                                 , AssemblyName(..)
                                                 , AssemblyType(..)
                                                 , showAssemblyTypeAbbr
                                                 , fromAssemblyTypeAbbr
                                                 , mkAssembly
+                                                , component
                                                 )
 import           Language.Intentio.Compiler     ( SourceFile(..) )
 
 data Opts = Opts
   { assemblyName :: Maybe Text
   , assemblyType :: AssemblyType
-  , outputPath :: FilePath
-  , mainModule :: FilePath
+  , outputPath   :: FilePath
+  , mainModule   :: FilePath
   , otherModules :: [FilePath]
+  , workDir      :: FilePath
   }
   deriving (Show)
 
@@ -54,6 +58,7 @@ options =
     <*> outputPath
     <*> mainModule
     <*> otherModules
+    <*> workDir
  where
   assemblyName =
     (optional <$> strOption) $ long "assembly-name" <> metavar "name" <> help
@@ -86,15 +91,23 @@ options =
   otherModules = many $ argument str $ metavar "filename..." <> help
     "Other input modules/files to be included in output assembly"
 
+  workDir =
+    strOption
+      $  long "workdir"
+      <> metavar "path"
+      <> value ".intentio-work"
+      <> showDefault
+      <> help "Path to the compiler working directory"
+
 opts :: ParserInfo Opts
 opts = info (helper <*> options) fullDesc
 
-mkAssemblyFromOpts :: Opts -> Assembly SourceFile
-mkAssemblyFromOpts o = mkAssembly (assemblyType o) name (outputPath o) modlist
- where
-  name    = AssemblyName $ fromMaybe defName (assemblyName o)
-  defName = toS . takeBaseName . mainModule $ o
-  modlist = SourceFile <$> mainModule o :| otherModules o
-
-buildInputAssembly :: IO (Assembly SourceFile)
-buildInputAssembly = mkAssemblyFromOpts <$> execParser opts
+buildInputAssembly :: Compile (Assembly SourceFile)
+buildInputAssembly = do
+  o <- liftIO $ execParser opts
+  let defName = toS . takeBaseName . mainModule $ o
+  let name    = AssemblyName $ fromMaybe defName (assemblyName o)
+  let modlist = SourceFile <$> mainModule o :| otherModules o
+  let asm     = mkAssembly (assemblyType o) name (outputPath o) modlist
+  component .= Just (WorkDirComponent (workDir o))
+  return asm

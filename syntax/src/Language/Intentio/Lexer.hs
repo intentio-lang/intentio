@@ -169,7 +169,9 @@ tok TOpDollar     = tokOp TOpDollar
 tok TOpPercent    = tokOp TOpPercent
 tok TInteger      = integer
 tok TFloat        = float
-tok TSpecial      = special
+tok TNone         = none'
+tok TSucc         = succ'
+tok TFail         = fail'
 tok TString       = string'
 tok TRawString    = rawstring
 tok TRegexString  = regexstring
@@ -201,16 +203,29 @@ anyOperator = anyReserved operators <?> "operator"
 
 -- | Parse any valid literal.
 literal :: Parser Token
-literal = try special <|> try float <|> try integer <|> try anyString
+literal = try none' 
+  <|> try succ' 
+  <|> try fail' 
+  <|> try float 
+  <|> try integer 
+  <|> try anyString
 
--- | Parse special literal
-special :: Parser Token
-special = lexeme p >>= mkt TSpecial <?> "special literal"
+-- | Parse none literal
+none' :: Parser Token
+none' = lexeme n >>= mkt TNone <?> "none literal"
   where 
-    p = try n <|> try s <|> try f
-
     n = string "none"
+
+-- | Parse succ literal
+succ' :: Parser Token
+succ' = lexeme s >>= mkt TSucc <?> "succ literal"
+  where 
     s = string "succ"
+
+-- | Parse fail literal
+fail' :: Parser Token
+fail' = lexeme f >>= mkt TFail <?> "fail literal"
+  where 
     f = string "fail"
 
 -- | Parse any valid integer literal.

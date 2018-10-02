@@ -75,7 +75,9 @@ data TokenType
 
   | TInteger
   | TFloat
-  | TSpecial
+  | TNone
+  | TSucc
+  | TFail
 
   | TString
   | TCharString

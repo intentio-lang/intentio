@@ -382,14 +382,14 @@
                 {
                   "contents": {
                     "contents": "succ",
-                    "tag": "Special"
+                    "tag": "Succ'"
                   },
                   "tag": "LitExpr"
                 },
                 {
                   "contents": {
                     "contents": "fail",
-                    "tag": "Special"
+                    "tag": "Fail'"
                   },
                   "tag": "LitExpr"
                 }
@@ -399,7 +399,7 @@
             {
               "contents": {
                 "contents": "fail",
-                "tag": "Special"
+                "tag": "Fail'"
               },
               "tag": "LitExpr"
             }
@@ -409,7 +409,7 @@
         {
           "contents": {
             "contents": "succ",
-            "tag": "Special"
+            "tag": "Succ'"
           },
           "tag": "LitExpr"
         }

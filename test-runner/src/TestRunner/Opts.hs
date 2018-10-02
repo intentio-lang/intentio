@@ -60,4 +60,4 @@ absPaths o = do
   _runEntrypointPath <- case o ^. runEntrypointPath of
     Nothing -> return Nothing
     Just p  -> Just <$> makeAbsolute p
-  return Opts { .. }
+  return Opts {..}

@@ -15,7 +15,6 @@ import           Intentio.Compiler              ( Assembly
                                                 , Module
                                                 , Compile
                                                 , impurify
-                                                , liftIOE
                                                 , compileDiagnostics
                                                 , runCompileFresh
                                                 )
@@ -48,7 +47,7 @@ runDriver = do
     Nothing -> exitFailure
 
 runCompiler :: Compile ()
-runCompiler = liftIOE buildInputAssembly >>= compilerPipeline
+runCompiler = buildInputAssembly >>= compilerPipeline
 
 --------------------------------------------------------------------------------
 -- Helpers

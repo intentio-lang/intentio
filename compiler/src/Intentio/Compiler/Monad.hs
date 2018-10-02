@@ -7,6 +7,7 @@ module Intentio.Compiler.Monad
 
     -- ** Lenses
   , component
+  , getComponent
 
     -- * Compile monad
   , Compile
@@ -49,6 +50,9 @@ import           Control.Monad.Fix              ( MonadFix )
 import           Control.Monad.Trans.Class      ( MonadTrans(..) )
 import           Control.Monad.Trans.Maybe      ( MaybeT(..) )
 import           Control.Monad.State.Strict     ( StateT(..) )
+import           Data.Typeable                  ( Proxy
+                                                , typeRep
+                                                )
 import           System.IO.Error                ( tryIOError )
 
 import           Intentio.Diagnostics           ( Diagnostic
@@ -74,10 +78,16 @@ makeLenses ''CompileCtx
 -- | Construct empty compile context
 mkCompileCtx :: CompileCtx
 mkCompileCtx =
-  CompileCtx {_compileDiagnostics = empty, _compileComponents = TM.empty}
+  CompileCtx { _compileDiagnostics = empty, _compileComponents = TM.empty }
 
 component :: forall a . Typeable a => Lens' CompileCtx (Maybe a)
 component = compileComponents . TM.at @a
+
+getComponent :: forall a m . (Typeable a, Monad m) => CompileT m a
+getComponent = use (component @a) >>= \case
+  Just c  -> return c
+  Nothing -> pushIceFor () $ "no component named " <> name
+  where name = show $ typeRep (Proxy @a)
 
 --------------------------------------------------------------------------------
 -- Compile monad

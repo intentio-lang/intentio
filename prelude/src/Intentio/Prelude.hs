@@ -39,6 +39,14 @@ import           Control.Monad.Reader          as X
                                                 , mapReader
                                                 , mapReaderT
                                                 )
+import           Control.Monad.RWS             as X
+                                                ( RWS
+                                                , RWST
+                                                , execRWS
+                                                , execRWST
+                                                , mapRWS
+                                                , mapRWST
+                                                )
 import           Control.Monad.Writer          as X
                                                 ( Writer
                                                 , WriterT
@@ -60,6 +68,9 @@ import           Data.Convertible              as X
                                                 , convert
                                                 , safeConvert
                                                 )
+
+import           Data.HashSet                  as X
+                                                ( HashSet )
 
 import           GHC.Exts                      as X
                                                 ( IsList(fromList, fromListN) )

@@ -25,7 +25,7 @@ steps:
     sudo tar xz --wildcards --strip-components=1 -C /usr/local/bin '*/stack'
   displayName: 'Install Haskell Stack'
 
-- script: sudo stack --no-terminal setup
+- script: stack --no-terminal setup
   displayName: 'Install GHC'
 
 - script: |

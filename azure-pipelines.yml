@@ -3,24 +3,30 @@ pool:
 
 steps:
 - script: |
-    add-apt-repository ppa:ubuntu-toolchain-r/test -y
-    apt-get update
+    sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+    sudo apt-get update
+  displayName: 'Add APT repositories'
 
-    apt-get install -y \
+- script: |
+    sudo apt-get install -y \
       g++-8 \
       gcc-8 \
       libgmp-dev \
       ninja-build
 
-    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 60
-    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 40
-    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 60
-    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 40
+    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 60
+    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 40
+    sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 60
+    sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 40
+  displayName: 'Install C build tools'
 
-    curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C /usr/local/bin '*/stack'
+- script: >
+    curl -L https://www.stackage.org/stack/linux-x86_64 |
+    sudo tar xz --wildcards --strip-components=1 -C /usr/local/bin '*/stack'
+  displayName: 'Install Haskell Stack'
 
-    stack --no-terminal setup
-  displayName: 'Install build tools'
+- script: sudo stack --no-terminal setup
+  displayName: 'Install GHC'
 
 - script: |
     echo Add other tasks to build, test, and deploy your project.

@@ -2,8 +2,7 @@ pool:
   vmImage: 'Ubuntu 16.04'
 
 steps:
-- displayName: 'Install build tools'
-  script: |
+- script: |
     add-apt-repository ppa:ubuntu-toolchain-r/test -y
     apt-get update
 
@@ -12,7 +11,7 @@ steps:
       gcc-8 \
       libgmp-dev \
       ninja-build
-    
+
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 60
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 40
     update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 60
@@ -21,6 +20,7 @@ steps:
     curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C /usr/local/bin '*/stack'
 
     stack --no-terminal setup
+  displayName: 'Install build tools'
 
 - script: |
     echo Add other tasks to build, test, and deploy your project.

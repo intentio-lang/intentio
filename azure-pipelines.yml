@@ -18,7 +18,7 @@ steps:
       sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 40
       sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 60
       sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 40
-    displayName: "Install C build tools"
+    displayName: "Install build tools"
 
   - script: >
       curl -L https://www.stackage.org/stack/linux-x86_64 |
@@ -34,10 +34,9 @@ steps:
   - script: stack test --no-run-tests
     displayName: "Build Haskell code"
 
-  - task: CMake@1
-    inputs:
-      cwd: "cmake-build"
-      cmakeArgs: -G "Ninja"
+  - script: cmake -G "Ninja" ..
+    displayName: "Build C code"
+    workingDirectory: "cmake-build"
 
   - script: stack --no-terminal test intentio-syntax
     displayName: "Run intentio-syntax tests"

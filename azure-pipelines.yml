@@ -47,6 +47,7 @@ steps:
   - script: |
       mkdir -p cmake-build
       cd cmake-build && cmake -G "Ninja" ..
+      ninja
     displayName: "Build C code"
 
   - script: stack --no-terminal test intentio-syntax

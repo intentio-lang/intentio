@@ -28,7 +28,12 @@ steps:
 - script: stack --no-terminal setup
   displayName: 'Install GHC'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+- script: stack --no-terminal test --only-dependencies
+  displayName: 'Install Haskell dependencies'
+
+- script: stack build --test --no-run-test
+  displayName: 'Build Haskell code'
+
+- task: CMake@1
+  cwd: 'cmake-build'
+  cmakeArgs: -G "Ninja"

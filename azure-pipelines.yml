@@ -34,9 +34,10 @@ steps:
   - script: stack test --no-run-tests
     displayName: "Build Haskell code"
 
-  - script: cmake -G "Ninja" ..
+  - script: |
+      mkdir -p cmake-build
+      cd cmake-build && cmake -G "Ninja" ..
     displayName: "Build C code"
-    workingDirectory: "cmake-build"
 
   - script: stack --no-terminal test intentio-syntax
     displayName: "Run intentio-syntax tests"

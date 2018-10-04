@@ -1,0 +1,71 @@
+pool:
+  vmImage: "Ubuntu 16.04"
+
+steps:
+  - script: |
+      sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+      sudo apt-get update
+    displayName: "Add APT repositories"
+
+  - script: |
+      sudo apt-get install -y \
+        g++-8 \
+        gcc-8 \
+        libgmp-dev \
+        ninja-build
+
+      sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 60
+      sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 40
+      sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 60
+      sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 40
+    displayName: "Install build tools"
+
+  - script: |
+      mkdir -p /tmp/cmocka-src /tmp/cmocka-build
+      curl -L https://cmocka.org/files/1.1/cmocka-1.1.3.tar.xz | \
+        tar xJ --strip-components=1 -C /tmp/cmocka-src
+      cd /tmp/cmocka-build
+      cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release /tmp/cmocka-src
+      ninja
+      sudo ninja install
+    displayName: "Build & Install CMocka"
+
+  - script: >
+      curl -L https://www.stackage.org/stack/linux-x86_64 |
+      sudo tar xz --wildcards --strip-components=1 -C /usr/local/bin '*/stack'
+    displayName: "Install Haskell Stack"
+
+  - script: stack setup
+    displayName: "Install GHC"
+
+  - script: stack test --only-dependencies
+    displayName: "Install Haskell dependencies"
+
+  - script: stack test --no-run-tests
+    displayName: "Build Haskell code"
+
+  - script: |
+      mkdir -p cmake-build
+      cd cmake-build && cmake -G "Ninja" ..
+      ninja
+    displayName: "Build C code"
+
+  - script: stack --no-terminal test intentio-syntax
+    displayName: "Run intentio-syntax tests"
+
+  - script: stack --no-terminal test intentio-compiler
+    displayName: "Run intentio-compiler tests"
+
+  - script: stack --no-terminal test intentioc
+    displayName: "Run intentioc tests"
+
+  - script: stack --no-terminal test test-runner
+    displayName: "Run test-runner tests"
+
+  - script: ctest -j 4 --output-on-failure
+    displayName: "Run Runtime tests"
+    workingDirectory: "cmake-build"
+
+  - script: stack exec test-runner -- --root test --compiler bin/test-intentioc.sh
+    displayName: "Run Reference Test Suite"
+    continueOnError: true

@@ -1,6 +1,6 @@
 # Intentio
 
-[![Build Status](https://travis-ci.org/intentio-lang/intentio.svg?branch=master)](https://travis-ci.org/intentio-lang/intentio)
+[![Build Status](https://dev.azure.com/intentio-lang/intentio/_apis/build/status/intentio-lang.intentio)](https://dev.azure.com/intentio-lang/intentio/_build/latest?definitionId=1)
 
 This is the main source code repository for [Intentio]. It contains the compiler, runtime library and standard library.
 

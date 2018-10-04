@@ -35,5 +35,6 @@ steps:
   displayName: 'Build Haskell code'
 
 - task: CMake@1
-  cwd: 'cmake-build'
-  cmakeArgs: -G "Ninja"
+  inputs:
+    cwd: 'cmake-build'
+    cmakeArgs: -G "Ninja"

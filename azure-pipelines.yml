@@ -1,40 +1,59 @@
 pool:
-  vmImage: 'Ubuntu 16.04'
+  vmImage: "Ubuntu 16.04"
 
 steps:
-- script: |
-    sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-    sudo apt-get update
-  displayName: 'Add APT repositories'
+  - script: |
+      sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+      sudo apt-get update
+    displayName: "Add APT repositories"
 
-- script: |
-    sudo apt-get install -y \
-      g++-8 \
-      gcc-8 \
-      libgmp-dev \
-      ninja-build
+  - script: |
+      sudo apt-get install -y \
+        g++-8 \
+        gcc-8 \
+        libgmp-dev \
+        ninja-build
 
-    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 60
-    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 40
-    sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 60
-    sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 40
-  displayName: 'Install C build tools'
+      sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 60
+      sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 40
+      sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 60
+      sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 40
+    displayName: "Install C build tools"
 
-- script: >
-    curl -L https://www.stackage.org/stack/linux-x86_64 |
-    sudo tar xz --wildcards --strip-components=1 -C /usr/local/bin '*/stack'
-  displayName: 'Install Haskell Stack'
+  - script: >
+      curl -L https://www.stackage.org/stack/linux-x86_64 |
+      sudo tar xz --wildcards --strip-components=1 -C /usr/local/bin '*/stack'
+    displayName: "Install Haskell Stack"
 
-- script: stack --no-terminal setup
-  displayName: 'Install GHC'
+  - script: stack setup
+    displayName: "Install GHC"
 
-- script: stack --no-terminal test --only-dependencies
-  displayName: 'Install Haskell dependencies'
+  - script: stack test --only-dependencies
+    displayName: "Install Haskell dependencies"
 
-- script: stack build --test --no-run-test
-  displayName: 'Build Haskell code'
+  - script: stack test --no-run-tests
+    displayName: "Build Haskell code"
 
-- task: CMake@1
-  inputs:
-    cwd: 'cmake-build'
-    cmakeArgs: -G "Ninja"
+  - task: CMake@1
+    inputs:
+      cwd: "cmake-build"
+      cmakeArgs: -G "Ninja"
+
+  - script: stack --no-terminal test intentio-syntax
+    displayName: "Run intentio-syntax tests"
+
+  - script: stack --no-terminal test intentio-compiler
+    displayName: "Run intentio-compiler tests"
+
+  - script: stack --no-terminal test intentioc
+    displayName: "Run intentioc tests"
+
+  - script: stack --no-terminal test test-runner
+    displayName: "Run test-runner tests"
+
+  - script: ctest -j 4 --output-on-failure
+    displayName: "Run Runtime tests"
+    workingDirectory: "cmake-build"
+
+  - script: stack exec test-runner -- --root test --compiler bin/test-intentioc.sh
+    displayName: "Run Reference Test Suite"

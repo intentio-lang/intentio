@@ -1,3 +1,9 @@
+name: Build & Test
+
+trigger:
+  - staging
+  - trying
+
 pool:
   vmImage: "Ubuntu 16.04"
 

@@ -300,10 +300,13 @@ emitCModule' f = do
 
   let header = [cunit| $esc:headerText |]
 
-  let _cModuleDefDefinitions = header <> _cModuleDefDefinitions'
+  let includeIntentioH = [cunit| $esc:("#include <intentio.h>") |]
+
+  let _cModuleDefDefinitions =  header
+                             <> includeIntentioH
+                             <> _cModuleDefDefinitions'
 
   return CModuleDef {..}
-
 
 getItemById :: H.ItemId -> MEmit H.Item
 getItemById itemId = do

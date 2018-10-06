@@ -221,7 +221,8 @@ emitLitExpr lit = case lit ^. H.litKind of
   H.FloatLit   x -> return [cexp| ieo_float_new( $ldouble:x ) |]
   H.CharLit    x -> return [cexp| ieo_char_new( $char:x ) |]
   H.StringLit  x -> let s = toS x
-                    in return [cexp| ieo_string_new( $string:s ) |]
+                        n = T.length x
+                    in return [cexp| ieo_string_new( $string:s , $uint:n ) |]
   H.RegexLit   x -> let s = toS x
                     in return [cexp| ieo_regex_new( $string:s ) |]
 

@@ -45,8 +45,9 @@ steps:
     displayName: "Build Haskell code"
 
   - script: |
-      mkdir -p cmake-build
-      cd cmake-build && cmake -G "Ninja" ..
+      mkdir -p cmake-build-vsc
+      cd cmake-build-vsc
+      cmake -G "Ninja" ..
       ninja
     displayName: "Build C code"
 
@@ -64,7 +65,7 @@ steps:
 
   - script: ctest -j 4 --output-on-failure
     displayName: "Run Runtime tests"
-    workingDirectory: "cmake-build"
+    workingDirectory: "cmake-build-vsc"
 
   - script: stack exec test-runner -- --root test --compiler bin/test-intentioc.sh
     displayName: "Run Reference Test Suite"

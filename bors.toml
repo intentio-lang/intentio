@@ -1,0 +1,5 @@
+status = [
+  "intentio-lang.intentio"
+]
+
+delete_merged_branches = true

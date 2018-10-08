@@ -49,17 +49,17 @@ import           Intentio.Codegen.SymbolNames   ( GetCModuleFileName(..)
 -- Emitter monad
 
 type Emit r = ReaderT r CompilePure
-type MEmit = Emit H.Module
-type IEmit = Emit (H.Module, H.Item)
-type BEmit = Emit (H.Module, H.Item, H.Body)
+type MEmit = Emit (H.Module ())
+type IEmit = Emit (H.Module (), H.Item ())
+type BEmit = Emit (H.Module (), H.Item (), H.Body ())
 
-withI :: H.Item -> IEmit a -> MEmit a
+withI :: H.Item () -> IEmit a -> MEmit a
 withI i = withReaderT (, i)
 
-withB :: H.Body -> BEmit a -> IEmit a
+withB :: H.Body () -> BEmit a -> IEmit a
 withB b = withReaderT $ \(m, i) -> (m, i, b)
 
-withIB :: H.Item -> H.Body -> BEmit a -> MEmit a
+withIB :: H.Item () -> H.Body () -> BEmit a -> MEmit a
 withIB i b = withReaderT (, i, b)
 
 unI :: MEmit a -> IEmit a
@@ -74,7 +74,7 @@ unIB = withReaderT $ view _1
 --------------------------------------------------------------------------------
 -- Emitter entry points
 
-emitCAssembly :: Assembly H.Module -> CompilePure (Assembly (CModuleDef Void))
+emitCAssembly :: Assembly (H.Module ()) -> CompilePure (Assembly (CModuleDef Void))
 emitCAssembly = fmap addMainName . concatMapModulesM emit
  where
   addMainName asm = asm & (assemblyMainModuleName %~ fmap mkMainName)
@@ -86,16 +86,16 @@ emitCAssembly = fmap addMainName . concatMapModulesM emit
     source <- cModuleEraseType <$> emitCModuleSource modul
     return [header, source]
 
-emitCModuleHeader :: H.Module -> CompilePure (CModuleDef CModuleHeader)
+emitCModuleHeader :: (H.Module ()) -> CompilePure (CModuleDef CModuleHeader)
 emitCModuleHeader = runReaderT (emitCModule' emitItemHeader')
 
-emitCModuleSource :: H.Module -> CompilePure (CModuleDef CModuleSource)
+emitCModuleSource :: (H.Module ()) -> CompilePure (CModuleDef CModuleSource)
 emitCModuleSource = runReaderT (emitCModule' emitItemSource')
 
-emitItemHeader :: H.Module -> H.ItemId -> CompilePure [C.Definition]
+emitItemHeader :: (H.Module ()) -> H.ItemId -> CompilePure [C.Definition]
 emitItemHeader modul itemId = runReaderT (emitItemHeader' itemId) modul
 
-emitItemSource :: H.Module -> H.ItemId -> CompilePure [C.Definition]
+emitItemSource :: (H.Module ()) -> H.ItemId -> CompilePure [C.Definition]
 emitItemSource modul itemId = runReaderT (emitItemSource' itemId) modul
 
 --------------------------------------------------------------------------------
@@ -128,14 +128,14 @@ emitImportItem modName = return [cunit| $esc:f |]
 --------------------------------------------------------------------------------
 -- Function declaration emitter
 
-emitFnHeader :: H.Item -> H.BodyId -> MEmit [C.Definition]
+emitFnHeader :: (H.Item ()) -> H.BodyId -> MEmit [C.Definition]
 emitFnHeader item bodyId = do
   fname   <- getCItemName item
   body    <- getBodyById bodyId
   fparams <- withIB item body emitFnParams
   return [cunit| $ty:tyResult $id:fname ($params:fparams) ; |]
 
-emitFnItem :: H.Item -> H.BodyId -> MEmit [C.Definition]
+emitFnItem :: (H.Item ()) -> H.BodyId -> MEmit [C.Definition]
 emitFnItem item bodyId = do
   fname   <- getCItemName item
   body    <- getBodyById bodyId
@@ -146,7 +146,7 @@ emitFnItem item bodyId = do
 emitFnParams :: BEmit [C.Param]
 emitFnParams = view (_3 . H.bodyParams) >>= mapM emitFnParam
 
-emitFnParam :: H.Param -> BEmit C.Param
+emitFnParam :: H.Param () -> BEmit C.Param
 emitFnParam param = do
   v <- cVarName <$> getParamVar param
   return [cparam| $ty:tyResult $id:v |]
@@ -163,7 +163,7 @@ emitFnVars = do
   forM_ nonParamVarIds
     $ \i -> lift (getVarById i) >>= lift . emitFnVar >>= tell . pure
 
-emitFnVar :: H.Var -> BEmit C.BlockItem
+emitFnVar :: H.Var () -> BEmit C.BlockItem
 emitFnVar var = return [citem| $ty:tyResult $id:v ; |] where v = cVarName var
 
 emitFnBodyValue :: WriterT (Seq C.BlockItem) BEmit ()
@@ -172,7 +172,7 @@ emitFnBodyValue = view (_3 . H.bodyValue) >>= emitTopLevelExpr
 --------------------------------------------------------------------------------
 -- Expression emitter
 
-emitTopLevelExpr :: H.Expr -> WriterT (Seq C.BlockItem) BEmit ()
+emitTopLevelExpr :: H.Expr () -> WriterT (Seq C.BlockItem) BEmit ()
 emitTopLevelExpr expr = case expr ^. H.exprKind of
   H.PathExpr{}       -> wrap
   H.LitExpr{}        -> wrap
@@ -194,7 +194,7 @@ emitTopLevelExpr expr = case expr ^. H.exprKind of
     e <- lift $ emitExpr expr
     tell $ fromList [citems| $e; |]
 
-emitExpr :: H.Expr -> BEmit C.Exp
+emitExpr :: H.Expr () -> BEmit C.Exp
 emitExpr expr = case expr ^. H.exprKind of
   H.PathExpr path          -> emitPathExpr path
   H.LitExpr lit            -> emitLitExpr lit
@@ -208,13 +208,13 @@ emitExpr expr = case expr ^. H.exprKind of
   H.IfExpr{}     -> lift $ pushIceFor expr "HirImp Bug: if in inner"
   H.ReturnExpr{} -> lift $ pushIceFor expr "HirImp Bug: return in inner"
 
-emitPathExpr :: H.Path -> BEmit C.Exp
+emitPathExpr :: H.Path () -> BEmit C.Exp
 emitPathExpr path = case path ^. H.pathKind of
   H.Local  varId  -> getVarById varId <&> cVarName <&> mkExp
   H.Global itemId -> unIB (getItemById itemId >>= getCItemName) <&> mkExp
   where mkExp v = [cexp| $id:v |]
 
-emitLitExpr :: H.Lit -> BEmit C.Exp
+emitLitExpr :: H.Lit () -> BEmit C.Exp
 emitLitExpr lit = case lit ^. H.litKind of
   H.NoneLit      -> return [cexp| ieo_none |]
   H.IntegerLit x -> return [cexp| ieo_int_new( $llint:x ) |]
@@ -226,7 +226,7 @@ emitLitExpr lit = case lit ^. H.litKind of
   H.RegexLit   x -> let s = toS x
                     in return [cexp| ieo_regex_new( $string:s ) |]
 
-emitCallExpr :: H.Expr -> [H.Expr] -> BEmit C.Exp
+emitCallExpr :: H.Expr () -> [H.Expr ()] -> BEmit C.Exp
 emitCallExpr callee args = do
   ccallee <- emitExpr callee
   let arity = length args
@@ -234,14 +234,14 @@ emitCallExpr callee args = do
   let cargsArray = [cexp| ($ty:tyResult [$arity]){ $inits:cargs } |]
   return [cexp| ieo_call( $ccallee, $arity, $cargsArray) |]
 
-emitAssignExpr :: H.VarId -> H.Expr -> BEmit C.Exp
+emitAssignExpr :: H.VarId -> H.Expr () -> BEmit C.Exp
 emitAssignExpr varId expr = do
   vname <- cVarName <$> getVarById varId
   cexpr <- emitExpr expr
   let vid = [cexp| $id:vname |]
   return [cexp| $vid = $cexpr |]
 
-emitUnExpr :: H.UnOp -> H.Expr -> BEmit C.Exp
+emitUnExpr :: H.UnOp () -> H.Expr () -> BEmit C.Exp
 emitUnExpr unOp expr = do
   f :: String <- case unOp ^. H.unOpKind of
     H.UnNot -> return "ieo_not"
@@ -250,7 +250,7 @@ emitUnExpr unOp expr = do
   cexpr <- emitExpr expr
   return [cexp| $cf ( $cexpr ) |]
 
-emitBinExpr :: H.BinOp -> H.Expr -> H.Expr -> BEmit C.Exp
+emitBinExpr :: H.BinOp () -> H.Expr () -> H.Expr () -> BEmit C.Exp
 emitBinExpr binOp lhs rhs = do
   f :: String <- case binOp ^. H.binOpKind of
     H.BinAdd  -> return "ieo_add"
@@ -309,33 +309,33 @@ emitCModule' f = do
 
   return CModuleDef {..}
 
-getItemById :: H.ItemId -> MEmit H.Item
+getItemById :: H.ItemId -> MEmit (H.Item ())
 getItemById itemId = do
   modul <- ask
   case modul ^? H.moduleItem itemId of
     Just x  -> return x
     Nothing -> lift $ pushIceFor modul $ "Bad HIR: miss item " <> show itemId
 
-getBodyById :: H.BodyId -> MEmit H.Body
+getBodyById :: H.BodyId -> MEmit (H.Body ())
 getBodyById bodyId = do
   modul <- ask
   case modul ^? H.moduleBody bodyId of
     Just x  -> return x
     Nothing -> lift $ pushIceFor modul $ "Bad HIR: miss body " <> show bodyId
 
-getVarById :: H.VarId -> BEmit H.Var
+getVarById :: H.VarId -> BEmit (H.Var ())
 getVarById varId = do
   body <- view _3
   case body ^? H.bodyVar varId of
     Just x  -> return x
     Nothing -> lift $ pushIceFor body $ "Bad HIR: miss var " <> show varId
 
-getCItemName :: H.Item -> MEmit String
+getCItemName :: (H.Item ()) -> MEmit String
 getCItemName item = case item ^. H.itemKind of
   H.ImportItem m i -> cImportedItemName m i & toS & return
   _                -> ask <&> flip cItemName item <&> toS
 
-getParamVar :: H.Param -> BEmit H.Var
+getParamVar :: H.Param () -> BEmit (H.Var ())
 getParamVar param = do
   item <- view _2
   body <- view _3

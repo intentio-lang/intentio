@@ -36,7 +36,7 @@ instance GetCModuleFileName CModuleSource where
 instance GetCModuleFileName CModuleHeader where
   cModuleFileName m = cModuleFileNameBase m <> ".h"
 
-cItemName :: H.Module -> H.Item -> Text
+cItemName :: (Eq a, Show a) => H.Module a -> H.Item a -> Text
 cItemName modul item = cItemName' (modul ^. moduleName) iname
  where
   iname   = fromMaybe unnamed (item ^. H.itemName)
@@ -48,5 +48,5 @@ cImportedItemName = cItemName'
 cItemName' :: H.ModuleName -> H.ItemName -> Text
 cItemName' modul item = mangle [modul ^. _Wrapped, item ^. _Wrapped]
 
-cVarName :: H.Var -> String
+cVarName :: (Eq a, Show a) => H.Var a -> String
 cVarName var = var ^. H.varIdent . H.identName & sanitize & toS

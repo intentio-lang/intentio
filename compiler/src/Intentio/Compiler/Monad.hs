@@ -7,7 +7,7 @@ module Intentio.Compiler.Monad
 
     -- ** Lenses
   , component
-  , getComponent
+  , requireComponent
 
     -- * Compile monad
   , Compile
@@ -83,8 +83,8 @@ mkCompileCtx =
 component :: forall a . Typeable a => Lens' CompileCtx (Maybe a)
 component = compileComponents . TM.at @a
 
-getComponent :: forall a m . (Typeable a, Monad m) => CompileT m a
-getComponent = use (component @a) >>= \case
+requireComponent :: forall a m . (Typeable a, Monad m) => CompileT m a
+requireComponent = use (component @a) >>= \case
   Just c  -> return c
   Nothing -> pushIceFor () $ "no component named " <> name
   where name = show $ typeRep (Proxy @a)

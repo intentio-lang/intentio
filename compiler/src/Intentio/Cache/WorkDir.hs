@@ -13,7 +13,7 @@ import           System.Directory               ( createDirectoryIfMissing
                                                 )
 
 import           Intentio.Compiler              ( Compile
-                                                , getComponent
+                                                , requireComponent
                                                 , liftIOE
                                                 )
 
@@ -22,7 +22,7 @@ newtype WorkDirComponent = WorkDirComponent { unWorkDirComponent :: FilePath }
 
 getWorkDirRoot :: Compile FilePath
 getWorkDirRoot = do
-  wdc <- getComponent @WorkDirComponent
+  wdc <- requireComponent @WorkDirComponent
   wd  <- liftIO . makeAbsolute . unWorkDirComponent $ wdc
   liftIOE $ createDirectoryIfMissing True wd
   return wd

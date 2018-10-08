@@ -22,7 +22,7 @@ import           Intentio.Compiler              ( Assembly
                                                 , assemblyType
                                                 , assemblyModules
                                                 , assemblyOutputPath
-                                                , getComponent
+                                                , requireComponent
                                                 , pushDiagnostic
                                                 )
 import           Intentio.Diagnostics           ( SourcePos(..)
@@ -50,7 +50,7 @@ runGCC asm = do
   let runARProc  = runProc "AR" arExec
 
   objwd <- getWorkDir "obj"
-  opts  <- getComponent @GCCOptionsComponent
+  opts  <- requireComponent @GCCOptionsComponent
 
   let sharedGCCArgs =
         (opts ^. gccIncludeDirs & concatMap (\p -> ["-I", p]))

@@ -109,6 +109,7 @@ tok :: TokenType -> Parser Token
 tok TIdent        = ident
 tok TKwAbstract   = tokKw TKwAbstract
 tok TKwAnd        = tokKw TKwAnd
+tok TKwAs         = tokKw TKwAs
 tok TKwBreak      = tokKw TKwBreak
 tok TKwCase       = tokKw TKwCase
 tok TKwConst      = tokKw TKwConst
@@ -380,6 +381,7 @@ keywords :: BM.Bimap Text TokenType
 keywords = BM.fromList
   [ ("abstract", TKwAbstract)
   , ("and"     , TKwAnd)
+  , ("as"      , TKwAs)
   , ("break"   , TKwBreak)
   , ("case"    , TKwCase)
   , ("const"   , TKwConst)

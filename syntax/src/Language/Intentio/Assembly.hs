@@ -30,6 +30,8 @@ module Language.Intentio.Assembly
   , unModuleName
   , Module(..)
   , moduleName
+  , moduleExport
+  , moduleImports
   , moduleItems
 
    -- * Item type class
@@ -206,12 +208,16 @@ concatMapModulesM f srcAsm = do
 --------------------------------------------------------------------------------
 -- Module class
 
-class (Eq a, Show a, HasSourcePos a, Item (ItemTy a)) => Module a where
+class (Eq a, Show a, HasSourcePos a, Item (ItemTy a), ModuleExport (ExportTy a), ModuleImport (ImportTy a)) => Module a where
   -- | A type of items declared by this module type.
   type ItemTy a
 
   -- | Name of this module.
   _moduleName :: a -> ModuleName
+
+  -- | Export and imports in this module
+  _moduleExport :: a -> ExportTy a
+  _moduleImports :: a -> [ImportTy a]
 
   -- | A list of items declared in this module.
   --
@@ -222,6 +228,14 @@ moduleName
   :: (Profunctor p, Contravariant f, Module a) => Optic' p f a ModuleName
 moduleName = to _moduleName
 
+moduleExport
+  :: (Profunctor p, Contravariant f, Module a) => Optic' p f a ModuleExport
+moduleExport = to _moduleExport
+
+moduleImports
+  :: (Profunctor p, Contravariant f, Module a) => Optic' p f a [ModuleImport a]
+moduleImports = to _moduleImports
+
 moduleItems
   :: (Profunctor p, Contravariant f, Module a) => Optic' p f a [ItemTy a]
 moduleItems = to _moduleItems
@@ -229,6 +243,8 @@ moduleItems = to _moduleItems
 instance Module Void where
   type ItemTy Void = Void
   _moduleName = unreachable
+  _moduleExport = unrechable
+  _moduleImport = unrechable
   _moduleItems = unreachable
 
 --------------------------------------------------------------------------------

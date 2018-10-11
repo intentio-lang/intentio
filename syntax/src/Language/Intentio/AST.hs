@@ -17,6 +17,8 @@ import           Language.Intentio.SourcePos    ( HasSourcePos(..) )
 
 data ModuleSource = ModuleSource {
     _moduleSourceName :: Text,
+    _moduleSourceExport :: ExportDecl,
+    _moduleSourceImport :: [ImportDecl],
     _moduleSourceItems :: [ItemDecl]
   }
   deriving (Show, Eq, Generic)
@@ -29,8 +31,27 @@ instance FromJSON ModuleSource
 
 instance Module ModuleSource where
   type ItemTy ModuleSource = ItemDecl
-  _moduleName = ModuleName . _moduleSourceName
-  _moduleItems = _moduleSourceItems
+  _moduleName   = ModuleName . _moduleSourceName
+  _moduleExport = _moduleSourceExport
+  _moduleImport = _moduleSourceImport
+  _moduleItems  = _moduleSourceItems
+
+data ExportDecl
+  = ExportFuns ExportItems
+  deriving (Show, Eq, Generic)
+
+instance ToJSON ExportDecl
+instance FromJSON ExportDecl
+
+data ImportDecl
+  = ImportQidAs ModId ScopeId ScopeId
+  | ImportQid ModId ScopeId
+  | ImportIdAs ScopeId ScopeId
+  | ImportId ScopeId
+  deriving (Show, Eq, Generic)
+
+instance ToJSON ImportDecl
+instance FromJSON ImportDecl
 
 data ItemDecl
   = FunDecl {
@@ -70,6 +91,12 @@ newtype FunParam = FunParam ScopeId
   deriving (Show, Eq, Generic, ToJSON, FromJSON)
 
 newtype FunBody = FunBody Block
+  deriving (Show, Eq, Generic, ToJSON, FromJSON)
+
+newtype ExportItems = ExportItems [ExportItem]
+  deriving (Show, Eq, Generic, ToJSON, FromJSON)
+
+newtype ExportItem = ExportItem ScopeId
   deriving (Show, Eq, Generic, ToJSON, FromJSON)
 
 data Expr
@@ -169,7 +196,7 @@ instance Convertible TokenType BinOp where
   safeConvert TOpEqEq   = Right BinEqEq
   safeConvert TOpEqEqEq = Right BinEqEqEq
   safeConvert TOpNeq    = Right BinNeq
-  safeConvert TOpNeq    = Right BinNeqEq
+  safeConvert TOpNeqEq  = Right BinNeqEq
   safeConvert TOpLt     = Right BinLt
   safeConvert TOpLtEq   = Right BinLtEq
   safeConvert TOpGt     = Right BinGt

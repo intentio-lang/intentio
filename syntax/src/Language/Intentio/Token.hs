@@ -10,6 +10,7 @@ data TokenType
 
   | TKwAbstract
   | TKwAnd
+  | TKwAs
   | TKwBreak
   | TKwCase
   | TKwConst

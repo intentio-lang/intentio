@@ -14,6 +14,7 @@ import           Intentio.Prelude        hiding ( Prefix
                                                 , many
                                                 , mod
                                                 , try
+                                                , id
                                                 )
 
 import           Text.Megaparsec                ( (<?>)
@@ -70,6 +71,8 @@ parseExpr = M.parse expr
 
 mod :: Text -> Parser ModuleSource
 mod _moduleSourceName = do
+  _moduleExport      <- optional exportDecl
+  _moduleImports     <- many importDecl
   _moduleSourceItems <- many itemDecl
   _                  <- eof
   return ModuleSource {..}
@@ -91,13 +94,69 @@ scopeId = ScopeId . (^. text) <$> ident
 
 anyId :: Parser AnyId
 anyId = try qid <|> try id
- where
-  id  = Id <$> scopeId
-  qid = do
-    m <- modId
-    _ <- tok TOpColon
-    s <- scopeId
-    return $ Qid m s
+
+qid :: Parser AnyId
+qid = do
+  m <- modId
+  _ <- tok TOpColon
+  s <- scopeId
+  return $ Qid m s
+
+id :: Parser AnyId
+id  = Id <$> scopeId
+
+--------------------------------------------------------------------------------
+-- Import - export declarations
+-- test, czy najpierw nie zeżre id
+
+exportDecl :: Parser ExportDecl
+exportDecl = do
+  _       <- tok TKwExport
+  f       <- funNames
+  return $ ExportFuns f
+  where 
+    funNames    = ExportItems <$> parens exportItems
+    exportItems = sepEndBy exportItem comma
+    exportItem  = ExportItem <$> scopeId
+
+importDecl :: Parser ImportDecl
+importDecl = 
+  try importqidas 
+  <|> try importqid 
+  <|> try importidas 
+  <|> try importid
+
+importqidas :: Parser ImportDecl
+importqidas = do
+  _        <- tok TKwImport
+  m        <- modId
+  _        <- tok TOpColon
+  s        <- scopeId
+  _        <- tok TKwAs
+  n        <- scopeId
+  return $ ImportQidAs m s n
+
+importqid :: Parser ImportDecl
+importqid = do
+  _        <- tok TKwImport
+  m        <- modId
+  _        <- tok TOpColon
+  s        <- scopeId
+  return $ ImportQid m s
+
+importidas :: Parser ImportDecl
+importidas = do
+  _        <- tok TKwImport
+  s        <- scopeId
+  _        <- tok TKwAs
+  n        <- scopeId
+  return $ ImportIdAs s n
+
+importid :: Parser ImportDecl
+importid = do
+  _        <- tok TKwImport
+  s        <- scopeId
+  return $ ImportId s
 
 --------------------------------------------------------------------------------
 -- Item declarations

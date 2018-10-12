@@ -14,13 +14,12 @@ import qualified Data.Map.Strict               as M
 
 import           Intentio.Annotated             ( Annotated(..) )
 import qualified Intentio.Compiler             as C
-import           Intentio.Diagnostics           ( SourcePos(..)
-                                                , HasSourcePos(..)
-                                                )
-
 import           Intentio.Compiler             as X
                                                 ( ModuleName(..)
                                                 , ItemName(..)
+                                                )
+import           Intentio.Diagnostics           ( SourcePos(..)
+                                                , HasSourcePos(..)
                                                 )
 
 --------------------------------------------------------------------------------
@@ -96,7 +95,7 @@ data Body a = Body
   , _bodyParams  :: [Param a]
   , _bodyVars    :: IM.IntMap (Var a)
   , _bodyVarIds  :: [VarId]
-  , _bodyValue   :: (Expr a)
+  , _bodyValue   :: Expr a
   }
   deriving (Show, Eq, Generic)
 

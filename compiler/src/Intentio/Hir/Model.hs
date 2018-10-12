@@ -25,13 +25,13 @@ import           Intentio.Diagnostics           ( SourcePos(..)
 --------------------------------------------------------------------------------
 -- HIR data structures
 
-newtype ItemId = ItemId IM.Key
+newtype ItemId = ItemId { _unItemId :: IM.Key }
   deriving (Show, Eq, Ord, Hashable, Enum, Bounded, Generic, ToJSON, FromJSON)
 
-newtype BodyId = BodyId IM.Key
+newtype BodyId = BodyId { _unBodyId :: IM.Key }
   deriving (Show, Eq, Ord, Hashable, Enum, Bounded, Generic, ToJSON, FromJSON)
 
-newtype VarId = VarId IM.Key
+newtype VarId = VarId { _unVarId :: IM.Key }
   deriving (Show, Eq, Ord, Hashable, Enum, Bounded, Generic, ToJSON, FromJSON)
 
 data Module a = Module
@@ -62,7 +62,7 @@ instance (Eq a, Show a) => C.Module (Module a) where
   type ItemTy (Module a) = Item a
   _moduleName = Intentio.Hir.Model._moduleName
   _moduleItems Module { _moduleItems = i, _moduleItemIds = n } =
-    toList $ (\w -> i ^?! ix (w ^. _Wrapped)) <$> n
+    toList $ (\w -> i ^?! ix (_unItemId w)) <$> n
 
 data Item a = Item
   { _itemAnn        :: a
@@ -280,51 +280,26 @@ instance FromJSON BinOpKind
 --------------------------------------------------------------------------------
 -- Lenses
 
-makeWrapped ''ItemId
-makeWrapped ''BodyId
-makeWrapped ''VarId
-
+makeLenses ''ItemId
+makeLenses ''BodyId
+makeLenses ''VarId
 makeLenses ''Module
-
 makeLenses ''Item
-
-makeLenses ''ItemKind
 makePrisms ''ItemKind
-
 makeLenses ''Body
-
 makeLenses ''Var
-
 makeLenses ''Param
-makeWrapped ''Param
-
 makeLenses ''Expr
-
-makeLenses ''ExprKind
 makePrisms ''ExprKind
-
 makeLenses ''Ident
-
 makeLenses ''Lit
-
-makeLenses ''LitKind
 makePrisms ''LitKind
-
 makeLenses ''Block
-
 makeLenses ''Path
-
-makeLenses ''PathKind
 makePrisms ''PathKind
-
 makeLenses ''UnOp
-
-makeLenses ''UnOpKind
 makePrisms ''UnOpKind
-
 makeLenses ''BinOp
-
-makeLenses ''BinOpKind
 makePrisms ''BinOpKind
 
 moduleItem :: ItemId -> Traversal' (Module a) (Item a)
@@ -371,4 +346,4 @@ instance Annotated BinOp where
 
 findParamVar :: Body a -> Param a -> Maybe (Var a)
 findParamVar body param = body ^? (bodyVars . ix i)
-  where i = param ^. paramVarId . _Wrapped
+  where i = param ^. paramVarId . unVarId

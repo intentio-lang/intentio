@@ -157,7 +157,7 @@ emitFnBody = toList <$> execWriterT (emitFnVars >> emitFnBodyValue)
 emitFnVars :: WriterT (Seq C.BlockItem) BEmit ()
 emitFnVars = do
   body <- view _3
-  let paramVarIds    = body ^. H.bodyParams <&> view _Wrapped
+  let paramVarIds    = body ^. H.bodyParams <&> view H.paramVarId
   let allVarIds      = body ^. H.bodyVarIds
   let nonParamVarIds = allVarIds List.\\ paramVarIds
   forM_ nonParamVarIds

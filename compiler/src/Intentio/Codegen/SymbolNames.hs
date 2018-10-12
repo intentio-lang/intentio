@@ -40,7 +40,7 @@ cItemName :: (Eq a, Show a) => H.Module a -> H.Item a -> Text
 cItemName modul item = cItemName' (modul ^. moduleName) iname
  where
   iname   = fromMaybe unnamed (item ^. H.itemName)
-  unnamed = H.ItemName $ "$" <> (item ^. H.itemId . _Wrapped & show)
+  unnamed = H.ItemName $ "$" <> (item ^. H.itemId . H.unItemId & show)
 
 cImportedItemName :: H.ModuleName -> H.ItemName -> Text
 cImportedItemName = cItemName'

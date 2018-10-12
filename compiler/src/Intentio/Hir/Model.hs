@@ -1,6 +1,9 @@
 module Intentio.Hir.Model
   ( module Intentio.Hir.Model
   , module X
+  , getAnn
+  , setAnn
+  , ann
   )
 where
 

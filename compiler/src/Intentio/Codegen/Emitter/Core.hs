@@ -74,7 +74,8 @@ unIB = withReaderT $ view _1
 --------------------------------------------------------------------------------
 -- Emitter entry points
 
-emitCAssembly :: Assembly (H.Module ()) -> CompilePure (Assembly (CModuleDef Void))
+emitCAssembly
+  :: Assembly (H.Module ()) -> CompilePure (Assembly (CModuleDef Void))
 emitCAssembly = fmap addMainName . concatMapModulesM emit
  where
   addMainName asm = asm & (assemblyMainModuleName %~ fmap mkMainName)

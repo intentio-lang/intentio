@@ -109,7 +109,7 @@ runTestCase opts testCase = do
   let _testResultCase = testCase
   _testResultState <-
     runExceptT $ loadTestSpec' testCase >>= runTestSpec opts testCase
-  return TestResult {..}
+  return TestResult { .. }
 
 loadTestSpec' :: TestCase -> RunSpecMT TestSpec
 loadTestSpec' testCase =
@@ -123,7 +123,7 @@ runTestSpec opts testCase spec = void $ do
 
 emptyCommandState :: Opts -> FilePath -> TestCase -> CommandState
 emptyCommandState _stateOpts _stateTmpDir _stateTestCase =
-  CommandState {_compiledBinary = Nothing, ..}
+  CommandState { _compiledBinary = Nothing, .. }
 
 runCommand :: TestCommand -> CommandMT ()
 runCommand (CompileCommand spec) = do

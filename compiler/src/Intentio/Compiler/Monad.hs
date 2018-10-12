@@ -76,7 +76,7 @@ makeLenses ''CompileCtx
 -- | Construct empty compile context
 mkCompileCtx :: CompileCtx
 mkCompileCtx =
-  CompileCtx {_compileDiagnostics = empty, _compileComponents = TM.empty}
+  CompileCtx { _compileDiagnostics = empty, _compileComponents = TM.empty }
 
 component :: forall a . Typeable a => Lens' CompileCtx (Maybe a)
 component = compileComponents . TM.at @a

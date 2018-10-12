@@ -66,7 +66,8 @@ runAndLog opts testCase = do
 collectSummary :: [TestResult] -> Summary
 collectSummary = foldr' f init
  where
-  init = Summary {_totalTestCount = 0, _failedTestCount = 0, _failedTests = []}
+  init =
+    Summary { _totalTestCount = 0, _failedTestCount = 0, _failedTests = [] }
 
   f result summary =
     let testCase = result ^. testResultCase

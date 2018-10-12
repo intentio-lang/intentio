@@ -86,16 +86,16 @@ emitCAssembly = fmap addMainName . concatMapModulesM emit
     source <- cModuleEraseType <$> emitCModuleSource modul
     return [header, source]
 
-emitCModuleHeader :: (H.Module ()) -> CompilePure (CModuleDef CModuleHeader)
+emitCModuleHeader :: H.Module () -> CompilePure (CModuleDef CModuleHeader)
 emitCModuleHeader = runReaderT (emitCModule' emitItemHeader')
 
-emitCModuleSource :: (H.Module ()) -> CompilePure (CModuleDef CModuleSource)
+emitCModuleSource :: H.Module () -> CompilePure (CModuleDef CModuleSource)
 emitCModuleSource = runReaderT (emitCModule' emitItemSource')
 
-emitItemHeader :: (H.Module ()) -> H.ItemId -> CompilePure [C.Definition]
+emitItemHeader :: H.Module () -> H.ItemId -> CompilePure [C.Definition]
 emitItemHeader modul itemId = runReaderT (emitItemHeader' itemId) modul
 
-emitItemSource :: (H.Module ()) -> H.ItemId -> CompilePure [C.Definition]
+emitItemSource :: H.Module () -> H.ItemId -> CompilePure [C.Definition]
 emitItemSource modul itemId = runReaderT (emitItemSource' itemId) modul
 
 --------------------------------------------------------------------------------
@@ -128,14 +128,14 @@ emitImportItem modName = return [cunit| $esc:f |]
 --------------------------------------------------------------------------------
 -- Function declaration emitter
 
-emitFnHeader :: (H.Item ()) -> H.BodyId -> MEmit [C.Definition]
+emitFnHeader :: H.Item () -> H.BodyId -> MEmit [C.Definition]
 emitFnHeader item bodyId = do
   fname   <- getCItemName item
   body    <- getBodyById bodyId
   fparams <- withIB item body emitFnParams
   return [cunit| $ty:tyResult $id:fname ($params:fparams) ; |]
 
-emitFnItem :: (H.Item ()) -> H.BodyId -> MEmit [C.Definition]
+emitFnItem :: H.Item () -> H.BodyId -> MEmit [C.Definition]
 emitFnItem item bodyId = do
   fname   <- getCItemName item
   body    <- getBodyById bodyId
@@ -330,7 +330,7 @@ getVarById varId = do
     Just x  -> return x
     Nothing -> lift $ pushIceFor body $ "Bad HIR: miss var " <> show varId
 
-getCItemName :: (H.Item ()) -> MEmit String
+getCItemName :: H.Item () -> MEmit String
 getCItemName item = case item ^. H.itemKind of
   H.ImportItem m i -> cImportedItemName m i & toS & return
   _                -> ask <&> flip cItemName item <&> toS

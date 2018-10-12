@@ -9,6 +9,7 @@ import           Intentio.Prelude
 import qualified Data.IntMap.Strict            as IM
 import qualified Data.Map.Strict               as M
 
+import           Intentio.Annotated             ( Annotated(..) )
 import qualified Intentio.Compiler             as C
 import           Intentio.Diagnostics           ( SourcePos(..)
                                                 , HasSourcePos(..)
@@ -333,9 +334,39 @@ moduleBody (BodyId i) = moduleBodies . ix i
 bodyVar :: VarId -> Traversal' (Body a) (Var a)
 bodyVar (VarId i) = bodyVars . ix i
 
+instance Annotated Module where
+  ann = moduleAnn
+
+instance Annotated Item where
+  ann = itemAnn
+
+instance Annotated Body where
+  ann = bodyAnn
+
+instance Annotated Var where
+  ann = varAnn
+
+instance Annotated Expr where
+  ann = exprAnn
+
+instance Annotated Ident where
+  ann = identAnn
+
+instance Annotated Lit where
+  ann = litAnn
+
+instance Annotated Path where
+  ann = pathAnn
+
+instance Annotated UnOp where
+  ann = unOpAnn
+
+instance Annotated BinOp where
+  ann = binOpAnn
+
 --------------------------------------------------------------------------------
 -- Helper accessors
 
-findParamVar :: (Body a) -> (Param a) -> Maybe (Var a)
+findParamVar :: Body a -> Param a -> Maybe (Var a)
 findParamVar body param = body ^? (bodyVars . ix i)
   where i = param ^. paramVarId . _Wrapped

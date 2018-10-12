@@ -25,6 +25,17 @@ import           Language.C.Quote.C             ( cexp
                                                 )
 import           NeatInterpolation              ( text )
 
+import           Intentio.Codegen.Emitter.Types ( CModuleHeader
+                                                , CModuleSource
+                                                , CModuleDef(..)
+                                                , cModuleEraseType
+                                                )
+import qualified Intentio.Codegen.Imp          as I
+import           Intentio.Codegen.SymbolNames   ( GetCModuleFileName(..)
+                                                , cItemName
+                                                , cImportedItemName
+                                                , cVarName
+                                                )
 import           Intentio.Compiler              ( ModuleName(..)
                                                 , Assembly
                                                 , assemblyMainModuleName
@@ -33,17 +44,6 @@ import           Intentio.Compiler              ( ModuleName(..)
                                                 , pushIceFor
                                                 )
 import qualified Intentio.Hir                  as H
-
-import           Intentio.Codegen.Emitter.Types ( CModuleHeader
-                                                , CModuleSource
-                                                , CModuleDef(..)
-                                                , cModuleEraseType
-                                                )
-import           Intentio.Codegen.SymbolNames   ( GetCModuleFileName(..)
-                                                , cItemName
-                                                , cImportedItemName
-                                                , cVarName
-                                                )
 
 --------------------------------------------------------------------------------
 -- Emitter monad

@@ -332,6 +332,9 @@ instance Annotated Ident where
 instance Annotated Lit where
   ann = litAnn
 
+instance Annotated Block where
+  ann = blockAnn
+
 instance Annotated Path where
   ann = pathAnn
 

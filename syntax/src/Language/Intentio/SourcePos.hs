@@ -18,6 +18,7 @@ import           Intentio.Prelude        hiding ( sourceFile
 import           Data.Aeson                     ( ToJSON(..)
                                                 , FromJSON(..)
                                                 )
+import qualified GHC.Generics                  as G
 
 -- This part of code is inspired by Megaparsec's SourcePos structure.
 

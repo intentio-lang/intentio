@@ -50,9 +50,7 @@ import           Control.Monad.Fix              ( MonadFix )
 import           Control.Monad.Trans.Class      ( MonadTrans(..) )
 import           Control.Monad.Trans.Maybe      ( MaybeT(..) )
 import           Control.Monad.State.Strict     ( StateT(..) )
-import           Data.Typeable                  ( Proxy
-                                                , typeRep
-                                                )
+import           Data.Typeable                  ( typeRep )
 import           System.IO.Error                ( tryIOError )
 
 import           Intentio.Diagnostics           ( Diagnostic

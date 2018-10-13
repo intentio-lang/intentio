@@ -72,7 +72,7 @@ mod :: Text -> Parser ModuleSource
 mod _moduleSourceName = do
   _moduleSourceItems <- many itemDecl
   _                  <- eof
-  return ModuleSource {..}
+  return ModuleSource { .. }
 
 itemDecl :: Parser ItemDecl
 itemDecl = funDecl
@@ -108,7 +108,7 @@ funDecl = do
   _itemDeclName  <- scopeId
   _funDeclParams <- params
   _funDeclBody   <- body
-  return FunDecl {..}
+  return FunDecl { .. }
  where
   params    = FunParams <$> parens paramList
   paramList = sepEndBy param comma
@@ -159,14 +159,14 @@ letdeclexpr = do
   _letDeclName <- scopeId
   _            <- tok TOpEq
   _letDeclVal  <- expr
-  return LetDeclExpr {..}
+  return LetDeclExpr { .. }
 
 whileexpr :: Parser Expr
 whileexpr = do
   _               <- tok TKwWhile
   _whileCondition <- expr
   _whileBody      <- block
-  return WhileExpr {..}
+  return WhileExpr { .. }
 
 ifelseexpr :: Parser Expr
 ifelseexpr = do

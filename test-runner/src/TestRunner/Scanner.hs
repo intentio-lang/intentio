@@ -45,11 +45,11 @@ scanDirectory' root cwd = do
     let _testCaseType = MultiFile
     let _testCaseName = toS . makeRelative root . takeDirectory $ testFilePath
     let _testCasePath = testFilePath
-    return [TestCase {..}]
+    return [TestCase { .. }]
 
   processSingleFile :: FilePath -> IO [TestCase]
   processSingleFile filePath = do
     let _testCaseType = SingleFile
     let _testCaseName = toS . makeRelative root . dropExtensions $ filePath
     let _testCasePath = filePath
-    return [TestCase {..}]
+    return [TestCase { .. }]

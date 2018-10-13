@@ -112,7 +112,7 @@ readSourceFile_ f = do
   let _sourceTextFilePath   = f ^. sourceFilePath
   let _sourceTextModuleName = filePathToModName _sourceTextFilePath
   _sourceTextContent <- readFile _sourceTextFilePath
-  return $ SourceText {..}
+  return $ SourceText { .. }
 
 parseSourceFile_ :: SourceFile -> IO (Either ParserError ModuleSource)
 parseSourceFile_ = fmap parseSourceText_ . readSourceFile_

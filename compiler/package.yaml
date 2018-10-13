@@ -17,6 +17,7 @@ dependencies:
   - megaparsec
   - mtl
   - neat-interpolation
+  - srcloc
   - text
   - transformers
   - typed-process

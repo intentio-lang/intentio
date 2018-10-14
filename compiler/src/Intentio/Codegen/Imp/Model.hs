@@ -40,7 +40,6 @@ import           Intentio.Hir                  as X
                                                 , _IntegerLit
                                                 , _FloatLit
                                                 , _StringLit
-                                                , _CharLit
                                                 , _RegexLit
                                                 , _NoneLit
                                                 , Path(..)

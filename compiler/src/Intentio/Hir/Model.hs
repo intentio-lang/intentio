@@ -180,7 +180,6 @@ data LitKind
   = IntegerLit Integer
   | FloatLit Double
   | StringLit Text
-  | CharLit Char
   | RegexLit Text
   | NoneLit
   deriving (Show, Eq, Generic)

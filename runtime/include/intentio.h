@@ -29,9 +29,6 @@ IeoResult
 ieo_float_new(long double val);
 
 IeoResult
-ieo_char_new(char val);
-
-IeoResult
 ieo_string_new(const char *str, size_t strsz);
 
 IeoResult

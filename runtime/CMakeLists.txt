@@ -4,7 +4,6 @@ add_library(
     include/intentio.h
 
     src/alltypes.c src/alltypes.h
-    src/char.c src/char.h
     src/float.c src/float.h
     src/int.c src/int.h
     src/memory.c src/memory.h

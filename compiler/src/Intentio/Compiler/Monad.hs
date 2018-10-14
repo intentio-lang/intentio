@@ -45,7 +45,7 @@ where
 
 import           Intentio.Prelude        hiding ( StateT(..) )
 
-import           Control.Monad.Fail             ( MonadFail )
+import qualified Control.Monad.Fail            as Fail
 import           Control.Monad.Fix              ( MonadFix )
 import           Control.Monad.Trans.Class      ( MonadTrans(..) )
 import           Control.Monad.Trans.Maybe      ( MaybeT(..) )
@@ -94,31 +94,45 @@ type Compile = CompileT IO
 
 type CompilePure = CompileT Identity
 
-newtype CompileT m a = CompileT (MaybeT (StateT CompileCtx m) a)
-  deriving (Functor, Applicative, Alternative, Monad, MonadFail, MonadPlus,
-            MonadFix, MonadIO)
+newtype CompileT m a = CompileT { unCompileT :: MaybeT (StateT CompileCtx m) a }
+  deriving (Functor, Applicative, Alternative, MonadPlus, MonadFix, MonadIO)
 
-instance MonadTrans CompileT where
-  lift = CompileT . lift . lift
-  {-# INLINABLE lift #-}
+instance Monad m => Monad (CompileT m) where
+  (CompileT m) >>= k = CompileT $ m >>= (unCompileT . k)
+  {-# INLINE (>>=) #-}
+
+  (>>) = (*>)
+  {-# INLINE (>>) #-}
+
+  return = pure
+  {-# INLINE return #-}
+
+  fail = Fail.fail
+  {-# INLINE fail #-}
+
+instance Monad m => Fail.MonadFail (CompileT m) where
+  fail = pushIceFor () . toS
+  {-# INLINE fail #-}
 
 instance Monad m => MonadState CompileCtx (CompileT m) where
   state = CompileT . lift . state
-  {-# INLINABLE state #-}
+  {-# INLINE state #-}
 
   get = CompileT . lift $ get
-  {-# INLINABLE get #-}
+  {-# INLINE get #-}
 
   put = CompileT . lift . put
-  {-# INLINABLE put #-}
+  {-# INLINE put #-}
+
+instance MonadTrans CompileT where
+  lift = CompileT . lift . lift
+  {-# INLINE lift #-}
 
 liftIOE :: (MonadIO m) => IO a -> CompileT m a
 liftIOE m = liftIO (tryIOError m) >>= perr
  where
   perr (Right x ) = return x
-  perr (Left  ex) = pushDiagnostic (mkDiag ex) >> unreachable
-
-  mkDiag = iceFor () . show
+  perr (Left  ex) = pushIceFor () $ show ex
 
 --------------------------------------------------------------------------------
 -- Running compilation

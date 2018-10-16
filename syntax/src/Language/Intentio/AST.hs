@@ -104,7 +104,7 @@ instance ToJSON Stmt
 instance FromJSON Stmt
 
 data Assign
-  = Assign { _name :: ScopeId, _val :: Expr }
+  = Assign { _assignId :: ScopeId, _assignVal :: Expr }
   deriving (Show, Eq, Generic)
 
 instance ToJSON Assign

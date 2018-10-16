@@ -16,10 +16,10 @@ import           Language.Intentio.SourcePos    ( HasSourcePos(..) )
 -- AST data structures
 
 data ModuleSource = ModuleSource {
-    _moduleSourceName :: Text,
-    _moduleSourceExport :: ExportDecl,
-    _moduleSourceImport :: [ImportDecl],
-    _moduleSourceItems :: [ItemDecl]
+    _moduleSourceName     :: Text
+  ,  _moduleSourceExport  ::  Maybe ExportDecl
+  ,  _moduleSourceImports :: [ImportDecl]
+  ,  _moduleSourceItems   :: [ItemDecl]
   }
   deriving (Show, Eq, Generic)
 
@@ -32,12 +32,9 @@ instance FromJSON ModuleSource
 instance Module ModuleSource where
   type ItemTy ModuleSource = ItemDecl
   _moduleName   = ModuleName . _moduleSourceName
-  _moduleExport = _moduleSourceExport
-  _moduleImport = _moduleSourceImport
   _moduleItems  = _moduleSourceItems
 
-data ExportDecl
-  = ExportFuns ExportItems
+newtype ExportDecl = ExportDecl ExportItems
   deriving (Show, Eq, Generic)
 
 instance ToJSON ExportDecl

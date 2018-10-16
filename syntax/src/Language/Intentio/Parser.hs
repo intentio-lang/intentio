@@ -71,10 +71,10 @@ parseExpr = M.parse expr
 
 mod :: Text -> Parser ModuleSource
 mod _moduleSourceName = do
-  _moduleExport      <- optional exportDecl
-  _moduleImports     <- many importDecl
-  _moduleSourceItems <- many itemDecl
-  _                  <- eof
+  _moduleSourceExport   <- optional exportDecl
+  _moduleSourceImports  <- many importDecl
+  _moduleSourceItems    <- many itemDecl
+  _                     <- eof
   return ModuleSource {..}
 
 itemDecl :: Parser ItemDecl
@@ -111,9 +111,9 @@ id  = Id <$> scopeId
 
 exportDecl :: Parser ExportDecl
 exportDecl = do
-  _       <- tok TKwExport
-  f       <- funNames
-  return $ ExportFuns f
+  _  <- tok TKwExport
+  f  <- funNames
+  return $ ExportDecl f
   where 
     funNames    = ExportItems <$> parens exportItems
     exportItems = sepEndBy exportItem comma
@@ -128,34 +128,34 @@ importDecl =
 
 importqidas :: Parser ImportDecl
 importqidas = do
-  _        <- tok TKwImport
-  m        <- modId
-  _        <- tok TOpColon
-  s        <- scopeId
-  _        <- tok TKwAs
-  n        <- scopeId
+  _  <- tok TKwImport
+  m  <- modId
+  _  <- tok TOpColon
+  s  <- scopeId
+  _  <- tok TKwAs
+  n  <- scopeId
   return $ ImportQidAs m s n
 
 importqid :: Parser ImportDecl
 importqid = do
-  _        <- tok TKwImport
-  m        <- modId
-  _        <- tok TOpColon
-  s        <- scopeId
+  _  <- tok TKwImport
+  m  <- modId
+  _  <- tok TOpColon
+  s  <- scopeId
   return $ ImportQid m s
 
 importidas :: Parser ImportDecl
 importidas = do
-  _        <- tok TKwImport
-  s        <- scopeId
-  _        <- tok TKwAs
-  n        <- scopeId
+  _  <- tok TKwImport
+  s  <- scopeId
+  _  <- tok TKwAs
+  n  <- scopeId
   return $ ImportIdAs s n
 
 importid :: Parser ImportDecl
 importid = do
-  _        <- tok TKwImport
-  s        <- scopeId
+  _  <- tok TKwImport
+  s  <- scopeId
   return $ ImportId s
 
 --------------------------------------------------------------------------------

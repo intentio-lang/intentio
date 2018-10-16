@@ -22,6 +22,7 @@
   default-extensions:
   - ApplicativeDo
   - BangPatterns
+  - DefaultSignatures
   - DeriveGeneric
   - FlexibleContexts
   - FlexibleInstances
@@ -38,6 +39,7 @@
   - RankNTypes
   - RecordWildCards
   - ScopedTypeVariables
+  - StandaloneDeriving
   - TemplateHaskell
   - TupleSections
   - TypeApplications

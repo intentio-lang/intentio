@@ -1,0 +1,6 @@
+#pragma once
+
+#define INTENTIO_VERSION_MAJOR @intentio_VERSION_MAJOR@
+#define INTENTIO_VERSION_MINOR @intentio_VERSION_MINOR@
+#define INTENTIO_VERSION_PATCH @intentio_VERSION_PATCH@
+#define INTENTIO_VERSION_STRING "@intentio_VERSION@"

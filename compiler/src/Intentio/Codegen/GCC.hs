@@ -1,5 +1,8 @@
 module Intentio.Codegen.GCC
-  ( runGCC
+  ( GCCOptionsComponent(..)
+  , gccIncludeDirs
+  , gccLibraryDirs
+  , runGCC
   )
 where
 
@@ -19,6 +22,7 @@ import           Intentio.Compiler              ( Assembly
                                                 , assemblyType
                                                 , assemblyModules
                                                 , assemblyOutputPath
+                                                , requireComponent
                                                 , pushDiagnostic
                                                 )
 import           Intentio.Diagnostics           ( SourcePos(..)
@@ -29,6 +33,14 @@ import           Intentio.Codegen.Emitter.Types ( CFile(..)
                                                 , cFilePath
                                                 )
 
+data GCCOptionsComponent = GCCOptionsComponent
+  { _gccIncludeDirs :: [FilePath]
+  , _gccLibraryDirs :: [FilePath]
+  }
+  deriving (Show, Eq)
+
+makeLenses ''GCCOptionsComponent
+
 runGCC :: Assembly CFile -> Compile ()
 runGCC asm = do
   let gccExec    = "gcc"
@@ -38,19 +50,25 @@ runGCC asm = do
   let runARProc  = runProc "AR" arExec
 
   objwd <- getWorkDir "obj"
+  opts  <- requireComponent @GCCOptionsComponent
+
+  let sharedGCCArgs =
+        (opts ^. gccIncludeDirs & concatMap (\p -> ["-I", p]))
+          <> (opts ^. gccLibraryDirs & concatMap (\p -> ["-L", p]))
 
   let getObjFile f = f `replaceDirectory` objwd -<.> ".o"
 
   getFilesByExt ".c" `forM_` \f -> do
     let o = getObjFile f
-    runGCCProc o ["-c", "-o", o, f]
+    runGCCProc o (sharedGCCArgs <> ["-c", "-o", o, f])
 
   let objFiles = getObjFile <$> getFilesByExt ".c"
   let outFile  = asm ^. assemblyOutputPath
 
   case asm ^. assemblyType of
     Library -> runARProc outFile (["rcs", outFile] <> objFiles)
-    Program -> runGCCProc outFile (["-o", outFile] <> objFiles)
+    Program ->
+      runGCCProc outFile (sharedGCCArgs <> ["-o", outFile] <> objFiles)
  where
   getFilesByExt ext =
     asm ^. assemblyModules <&> view cFilePath & toList & filter

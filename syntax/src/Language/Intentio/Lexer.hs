@@ -353,7 +353,7 @@ escseq = try charesc <|> try asciiesc <|> try unicodeesc
 -- Utilities
 
 mkt :: TokenType -> Text -> Parser Token
-mkt _ty _text = return Token {..}
+mkt _ty _text = return Token { .. }
 
 sc :: Parser ()
 sc = L.space space1 lineComment empty

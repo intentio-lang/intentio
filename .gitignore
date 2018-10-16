@@ -5,6 +5,9 @@
 .stack-work/
 *.cabal
 
+# C + CMake garbage
+cmake-build-*/
+
 # Lots of folks will probably play with intentioc in this directory,
 # so also ignore common intentioc garbage.
 .intentio-work/

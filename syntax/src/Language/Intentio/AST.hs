@@ -17,7 +17,7 @@ import           Language.Intentio.SourcePos    ( HasSourcePos(..) )
 
 data ModuleSource = ModuleSource {
     _moduleSourceName     :: Text
-  ,  _moduleSourceExport  ::  Maybe ExportDecl
+  ,  _moduleSourceExport  :: Maybe ExportDecl
   ,  _moduleSourceImports :: [ImportDecl]
   ,  _moduleSourceItems   :: [ItemDecl]
   }

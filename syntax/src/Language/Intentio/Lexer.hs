@@ -194,7 +194,7 @@ ident = (try . lexeme $ (p >>= nonReserved)) >>= mkt TIdent <?> "identifier"
   p = identStart >:> many identContinue
 
   nonReserved :: Text -> Parser Text
-  nonReserved w | isKeyword w = P.fail $ "Illegal identifier: " ++ toS w
+  nonReserved w | isKeyword w = P.fail $ "Illegal identifier: " <> toS w
                 | otherwise   = return w
 
   isKeyword :: Text -> Bool

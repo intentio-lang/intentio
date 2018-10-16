@@ -1,11 +1,14 @@
 {
-  "_letDeclName": "e",
-  "_letDeclVal": {
-    "contents": {
-      "contents": "r#\"my sweet \"string\"\"#",
-      "tag": "RawString"
+  "contents": {
+    "_letDeclName": "e",
+    "_letDeclVal": {
+      "contents": {
+        "contents": "r#\"my sweet \"string\"\"#",
+        "tag": "RawString"
+      },
+      "tag": "LitExpr"
     },
-    "tag": "LitExpr"
+    "tag": "LetDeclExpr"
   },
-  "tag": "LetDeclExpr"
+  "tag": "ExprStmt"
 }

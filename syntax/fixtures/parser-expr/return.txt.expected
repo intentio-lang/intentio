@@ -1,19 +1,22 @@
 {
-  "contents": [
-    {
-      "contents": null,
-      "tag": "ReturnExpr"
-    },
-    {
-      "contents": {
-        "contents": {
-          "contents": "a",
-          "tag": "Id"
-        },
-        "tag": "IdExpr"
+  "contents": {
+    "contents": [
+      {
+        "contents": null,
+        "tag": "ReturnExpr"
       },
-      "tag": "ReturnExpr"
-    }
-  ],
-  "tag": "BlockExpr"
+      {
+        "contents": {
+          "contents": {
+            "contents": "a",
+            "tag": "Id"
+          },
+          "tag": "IdExpr"
+        },
+        "tag": "ReturnExpr"
+      }
+    ],
+    "tag": "BlockExpr"
+  },
+  "tag": "ExprStmt"
 }

@@ -25,6 +25,12 @@ import           Intentio.Prelude        hiding ( many
                                                 , some
                                                 , try
                                                 , exponent
+                                                , none
+                                                , succ
+                                                , fail
+                                                )
+import qualified Intentio.Prelude              as P (
+                                                fail
                                                 )
 
 import           Data.Char                      ( isLower )
@@ -170,9 +176,9 @@ tok TOpDollar     = tokOp TOpDollar
 tok TOpPercent    = tokOp TOpPercent
 tok TInteger      = integer
 tok TFloat        = float
-tok TNone         = none'
-tok TSucc         = succ'
-tok TFail         = fail'
+tok TNone         = none
+tok TSucc         = succ
+tok TFail         = fail
 tok TString       = string'
 tok TRawString    = rawstring
 tok TRegexString  = regexstring
@@ -188,7 +194,7 @@ ident = (try . lexeme $ (p >>= nonReserved)) >>= mkt TIdent <?> "identifier"
   p = identStart >:> many identContinue
 
   nonReserved :: Text -> Parser Text
-  nonReserved w | isKeyword w = fail $ "Illegal identifier: " ++ toS w
+  nonReserved w | isKeyword w = P.fail $ "Illegal identifier: " ++ toS w
                 | otherwise   = return w
 
   isKeyword :: Text -> Bool
@@ -204,28 +210,28 @@ anyOperator = anyReserved operators <?> "operator"
 
 -- | Parse any valid literal.
 literal :: Parser Token
-literal = try none' 
-  <|> try succ' 
-  <|> try fail' 
+literal = try none 
+  <|> try succ 
+  <|> try fail 
   <|> try float 
   <|> try integer 
   <|> try anyString
 
 -- | Parse none literal
-none' :: Parser Token
-none' = lexeme n >>= mkt TNone <?> "none literal"
+none :: Parser Token
+none = lexeme n >>= mkt TNone <?> "none literal"
   where 
     n = string "none"
 
 -- | Parse succ literal
-succ' :: Parser Token
-succ' = lexeme s >>= mkt TSucc <?> "succ literal"
+succ :: Parser Token
+succ = lexeme s >>= mkt TSucc <?> "succ literal"
   where 
     s = string "succ"
 
 -- | Parse fail literal
-fail' :: Parser Token
-fail' = lexeme f >>= mkt TFail <?> "fail literal"
+fail :: Parser Token
+fail = lexeme f >>= mkt TFail <?> "fail literal"
   where 
     f = string "fail"
 

@@ -3,10 +3,12 @@ module Language.Intentio.Parser
   , ParserError
   , parseModule
   , parseItemDecl
-  , parseExpr
+  , parseStmt
   , mod
   , itemDecl
-  , expr
+  , importDecl
+  , exportDecl
+  , stmt
   )
 where
 
@@ -15,6 +17,7 @@ import           Intentio.Prelude        hiding ( Prefix
                                                 , mod
                                                 , try
                                                 , id
+                                                , assign
                                                 )
 
 import           Text.Megaparsec                ( (<?>)
@@ -60,11 +63,11 @@ parseItemDecl
   -> Either ParserError ItemDecl
 parseItemDecl = M.parse itemDecl
 
-parseExpr
+parseStmt
   :: FilePath -- ^ Name of source file.
   -> Text     -- ^ Input for parser.
-  -> Either ParserError Expr
-parseExpr = M.parse expr
+  -> Either ParserError Stmt
+parseStmt = M.parse stmt
 
 --------------------------------------------------------------------------------
 -- Core parser productions
@@ -80,8 +83,10 @@ mod _moduleSourceName = do
 itemDecl :: Parser ItemDecl
 itemDecl = funDecl
 
-expr :: Parser Expr
-expr = opexpr
+stmt :: Parser Stmt
+stmt = 
+  (AssignStmt <$> try assign) 
+  <|> (ExprStmt <$> try opexpr)
 
 --------------------------------------------------------------------------------
 -- Identifiers
@@ -175,7 +180,20 @@ funDecl = do
   body      = FunBody <$> block
 
 --------------------------------------------------------------------------------
+-- Assignments 
+
+assign :: Parser Assign
+assign = do
+  _name   <- scopeId
+  _       <- tok TOpEq
+  _val    <- expr
+  return Assign {..}
+
+--------------------------------------------------------------------------------
 -- Expressions
+
+expr :: Parser Expr
+expr = opexpr
 
 opexpr :: Parser Expr
 opexpr = makeExprParser term table

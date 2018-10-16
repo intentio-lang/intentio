@@ -32,7 +32,7 @@ instance FromJSON ModuleSource
 instance Module ModuleSource where
   type ItemTy ModuleSource = ItemDecl
   _moduleName   = ModuleName . _moduleSourceName
-  _moduleItems  = _moduleSourceItems
+  _moduleItems  = _moduleSourceItems  
 
 newtype ExportDecl = ExportDecl ExportItems
   deriving (Show, Eq, Generic)
@@ -96,6 +96,20 @@ newtype ExportItems = ExportItems [ExportItem]
 newtype ExportItem = ExportItem ScopeId
   deriving (Show, Eq, Generic, ToJSON, FromJSON)
 
+data Stmt
+  = AssignStmt Assign | ExprStmt Expr
+  deriving (Show, Eq, Generic)
+
+instance ToJSON Stmt
+instance FromJSON Stmt
+
+data Assign
+  = Assign { _name :: ScopeId, _val :: Expr }
+  deriving (Show, Eq, Generic)
+
+instance ToJSON Assign
+instance FromJSON Assign
+
 data Expr
   = BinExpr BinOp Expr Expr
   | BlockExpr Block
@@ -126,9 +140,9 @@ data Literal
   | String Text
   | RawString Text
   | RegexString Text
-  | None' Text
-  | Succ' Text
-  | Fail' Text
+  | None Text
+  | Succ Text
+  | Fail Text
   deriving (Show, Eq, Generic)
 
 instance ToJSON Literal
@@ -218,7 +232,7 @@ instance Convertible Token Literal where
   safeConvert Token{_ty=TString, _text}      = Right $ String _text
   safeConvert Token{_ty=TRawString, _text}   = Right $ RawString _text
   safeConvert Token{_ty=TRegexString, _text} = Right $ RegexString _text
-  safeConvert Token{_ty=TNone, _text}        = Right $ None' _text
-  safeConvert Token{_ty=TSucc, _text}        = Right $ Succ' _text
-  safeConvert Token{_ty=TFail, _text}        = Right $ Fail' _text
+  safeConvert Token{_ty=TNone, _text}        = Right $ None _text
+  safeConvert Token{_ty=TSucc, _text}        = Right $ Succ _text
+  safeConvert Token{_ty=TFail, _text}        = Right $ Fail _text
   safeConvert x = convError "Not a literal" x

@@ -1,0 +1,47 @@
+[
+  {
+    "contents": [
+      "sinus",
+      "cosinus"
+    ],
+    "tag": "ExportDecl"
+  },
+  {
+    "contents": {
+      "contents": [
+        "math",
+        "sin",
+        "sinus"
+      ],
+      "tag": "ImportQidAs"
+    },
+    "tag": "ImportDecl"
+  },
+  {
+    "contents": {
+      "contents": [
+        "math",
+        "cos"
+      ],
+      "tag": "ImportQid"
+    },
+    "tag": "ImportDecl"
+  },
+  {
+    "contents": {
+      "contents": [
+        "tg",
+        "tangens"
+      ],
+      "tag": "ImportIdAs"
+    },
+    "tag": "ImportDecl"
+  },
+  {
+    "contents": {
+      "contents": "ctg",
+      "tag": "ImportId"
+    },
+    "tag": "ImportDecl"
+  }
+]

@@ -31,7 +31,7 @@ instance FromJSON ModuleSource
 
 instance Module ModuleSource where
   type ItemTy ModuleSource = ItemDecl
-  _moduleName   = ModuleName . _moduleSourceName
+  _moduleName  = ModuleName . _moduleSourceName
   _moduleItems  = _moduleSourceItems  
 
 newtype ExportDecl = ExportDecl ExportItems

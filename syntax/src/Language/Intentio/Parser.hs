@@ -77,7 +77,7 @@ mod _moduleSourceName = do
   _moduleSourceExport   <- optional exportDecl
   _moduleSourceImports  <- many importDecl
   _moduleSourceItems    <- many itemDecl
-  _                     <- eof
+  eof
   return ModuleSource {..}
 
 itemDecl :: Parser ItemDecl
@@ -103,7 +103,7 @@ anyId = try qid <|> try id
 qid :: Parser AnyId
 qid = do
   m <- modId
-  _ <- tok TOpColon
+  tok TOpColon
   s <- scopeId
   return $ Qid m s
 
@@ -116,7 +116,7 @@ id  = Id <$> scopeId
 
 exportDecl :: Parser ExportDecl
 exportDecl = do
-  _  <- tok TKwExport
+  tok TKwExport
   f  <- funNames
   return $ ExportDecl f
   where 
@@ -133,33 +133,33 @@ importDecl =
 
 importqidas :: Parser ImportDecl
 importqidas = do
-  _  <- tok TKwImport
+  tok TKwImport
   m  <- modId
-  _  <- tok TOpColon
+  tok TOpColon
   s  <- scopeId
-  _  <- tok TKwAs
+  tok TKwAs
   n  <- scopeId
   return $ ImportQidAs m s n
 
 importqid :: Parser ImportDecl
 importqid = do
-  _  <- tok TKwImport
+  tok TKwImport
   m  <- modId
-  _  <- tok TOpColon
+  tok TOpColon
   s  <- scopeId
   return $ ImportQid m s
 
 importidas :: Parser ImportDecl
 importidas = do
-  _  <- tok TKwImport
+  tok TKwImport
   s  <- scopeId
-  _  <- tok TKwAs
+  tok TKwAs
   n  <- scopeId
   return $ ImportIdAs s n
 
 importid :: Parser ImportDecl
 importid = do
-  _  <- tok TKwImport
+  tok TKwImport
   s  <- scopeId
   return $ ImportId s
 
@@ -168,7 +168,7 @@ importid = do
 
 funDecl :: Parser ItemDecl
 funDecl = do
-  _              <- tok TKwFun
+  tok TKwFun
   _itemDeclName  <- scopeId
   _funDeclParams <- params
   _funDeclBody   <- body
@@ -185,7 +185,7 @@ funDecl = do
 assign :: Parser Assign
 assign = do
   _name   <- scopeId
-  _       <- tok TOpEq
+  tok TOpEq
   _val    <- expr
   return Assign {..}
 
@@ -234,38 +234,38 @@ term =
 
 letdeclexpr :: Parser Expr
 letdeclexpr = do
-  _            <- tok TKwLet
+  tok TKwLet
   _letDeclName <- scopeId
-  _            <- tok TOpEq
+  tok TOpEq
   _letDeclVal  <- expr
   return LetDeclExpr {..}
 
 whileexpr :: Parser Expr
 whileexpr = do
-  _               <- tok TKwWhile
+  tok TKwWhile
   _whileCondition <- expr
   _whileBody      <- block
   return WhileExpr {..}
 
 ifelseexpr :: Parser Expr
 ifelseexpr = do
-  _ <- tok TKwIf
+  tok TKwIf
   i <- expr
   t <- block
-  _ <- tok TKwElse
+  tok TKwElse
   e <- block
   return $ IfElseExpr i t e
 
 ifexpr :: Parser Expr
 ifexpr = do
-  _ <- tok TKwIf
+  tok TKwIf
   e <- expr
   b <- block
   return $ IfExpr e b
 
 returnexpr :: Parser Expr
 returnexpr = do
-  _ <- tok TKwReturn
+  tok TKwReturn
   e <- optional expr
   return $ ReturnExpr e
 

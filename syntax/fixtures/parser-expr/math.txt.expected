@@ -381,38 +381,22 @@
                 "contents": [
                   "BinXor",
                   {
-                    "contents": {
-                      "contents": "succ",
-                      "tag": "Succ"
-                    },
-                    "tag": "LitExpr"
+                    "tag": "SuccExpr"
                   },
                   {
-                    "contents": {
-                      "contents": "fail",
-                      "tag": "Fail"
-                    },
-                    "tag": "LitExpr"
+                    "tag": "FailExpr"
                   }
                 ],
                 "tag": "BinExpr"
               },
               {
-                "contents": {
-                  "contents": "fail",
-                  "tag": "Fail"
-                },
-                "tag": "LitExpr"
+                "tag": "FailExpr"
               }
             ],
             "tag": "BinExpr"
           },
           {
-            "contents": {
-              "contents": "succ",
-              "tag": "Succ"
-            },
-            "tag": "LitExpr"
+            "tag": "SuccExpr"
           }
         ],
         "tag": "BinExpr"

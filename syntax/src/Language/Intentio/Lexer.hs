@@ -29,7 +29,7 @@ import           Intentio.Prelude        hiding ( many
                                                 , succ
                                                 , fail
                                                 )
-import qualified Intentio.Prelude              as P (
+import qualified Intentio.Prelude               (
                                                 fail
                                                 )
 
@@ -177,8 +177,6 @@ tok TOpPercent    = tokOp TOpPercent
 tok TInteger      = integer
 tok TFloat        = float
 tok TNone         = none
-tok TSucc         = succ
-tok TFail         = fail
 tok TString       = string'
 tok TRawString    = rawstring
 tok TRegexString  = regexstring
@@ -194,7 +192,7 @@ ident = (try . lexeme $ (p >>= nonReserved)) >>= mkt TIdent <?> "identifier"
   p = identStart >:> many identContinue
 
   nonReserved :: Text -> Parser Text
-  nonReserved w | isKeyword w = P.fail $ "Illegal identifier: " ++ toS w
+  nonReserved w | isKeyword w = Intentio.Prelude.fail $ "Illegal identifier: " <> toS w
                 | otherwise   = return w
 
   isKeyword :: Text -> Bool
@@ -211,8 +209,6 @@ anyOperator = anyReserved operators <?> "operator"
 -- | Parse any valid literal.
 literal :: Parser Token
 literal = try none 
-  <|> try succ 
-  <|> try fail 
   <|> try float 
   <|> try integer 
   <|> try anyString
@@ -222,18 +218,6 @@ none :: Parser Token
 none = lexeme n >>= mkt TNone <?> "none literal"
   where 
     n = string "none"
-
--- | Parse succ literal
-succ :: Parser Token
-succ = lexeme s >>= mkt TSucc <?> "succ literal"
-  where 
-    s = string "succ"
-
--- | Parse fail literal
-fail :: Parser Token
-fail = lexeme f >>= mkt TFail <?> "fail literal"
-  where 
-    f = string "fail"
 
 -- | Parse any valid integer literal.
 integer :: Parser Token

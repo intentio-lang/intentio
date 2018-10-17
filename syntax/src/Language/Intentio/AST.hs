@@ -123,6 +123,8 @@ data Expr
   | UnaryExpr UnaryOp Expr
   | ParenExpr Expr
   | ReturnExpr (Maybe Expr)
+  | SuccExpr
+  | FailExpr
   deriving (Show, Eq, Generic)
 
 instance ToJSON Expr
@@ -140,9 +142,7 @@ data Literal
   | String Text
   | RawString Text
   | RegexString Text
-  | None Text
-  | Succ Text
-  | Fail Text
+  | None 
   deriving (Show, Eq, Generic)
 
 instance ToJSON Literal
@@ -232,7 +232,5 @@ instance Convertible Token Literal where
   safeConvert Token{_ty=TString, _text}      = Right $ String _text
   safeConvert Token{_ty=TRawString, _text}   = Right $ RawString _text
   safeConvert Token{_ty=TRegexString, _text} = Right $ RegexString _text
-  safeConvert Token{_ty=TNone, _text}        = Right $ None _text
-  safeConvert Token{_ty=TSucc, _text}        = Right $ Succ _text
-  safeConvert Token{_ty=TFail, _text}        = Right $ Fail _text
+  safeConvert Token{_ty=TNone}               = Right None
   safeConvert x = convError "Not a literal" x

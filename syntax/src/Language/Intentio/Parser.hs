@@ -231,6 +231,8 @@ term =
     <|> try parenexpr
     <|> try litexpr
     <|> try idexpr
+    <|> try succexpr
+    <|> try failexpr
 
 letdeclexpr :: Parser Expr
 letdeclexpr = do
@@ -287,6 +289,17 @@ idexpr = IdExpr <$> anyId
 
 litexpr :: Parser Expr
 litexpr = LitExpr . convert <$> literal <?> "literal"
+
+succexpr :: Parser Expr
+succexpr = do 
+  tok TKwSucc
+  return SuccExpr
+
+failexpr :: Parser Expr
+failexpr = do 
+  tok TKwFail
+  return FailExpr
+
 
 --------------------------------------------------------------------------------
 -- Utilities

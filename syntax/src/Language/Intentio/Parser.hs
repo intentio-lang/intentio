@@ -184,9 +184,9 @@ funDecl = do
 
 assign :: Parser Assign
 assign = do
-  _name   <- scopeId
+  _assignId   <- scopeId
   tok TOpEq
-  _val    <- expr
+  _assignVal    <- expr
   return Assign {..}
 
 --------------------------------------------------------------------------------

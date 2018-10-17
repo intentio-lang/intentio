@@ -32,19 +32,19 @@ import           Language.Intentio.Compiler     ( SourceFile(..)
 
 import           Intentio.Hir                   ( Module )
 
-readHirDumpFiles :: Assembly SourceFile -> Compile (Assembly Module)
+readHirDumpFiles :: Assembly SourceFile -> Compile (Assembly (Module ()))
 readHirDumpFiles = mapModulesM readHirDumpFile
 
-readHirDumpFile :: SourceFile -> Compile Module
+readHirDumpFile :: SourceFile -> Compile (Module ())
 readHirDumpFile f =
   liftIOE (eitherDecodeFileStrict' (f ^. sourceFilePath)) >>= \case
     Right m -> return m
     Left  e -> err f e
 
-readHirDumpTexts :: Assembly SourceText -> CompilePure (Assembly Module)
+readHirDumpTexts :: Assembly SourceText -> CompilePure (Assembly (Module ()))
 readHirDumpTexts = mapModulesM readHirDumpText
 
-readHirDumpText :: SourceText -> CompilePure Module
+readHirDumpText :: SourceText -> CompilePure (Module ())
 readHirDumpText t = case eitherDecodeStrict' (t ^. sourceTextContent & toS) of
   Right m -> return m
   Left  e -> err t e

@@ -1,7 +1,7 @@
 # Just is awesome: https://github.com/casey/just
 
 # Build everything
-build : build-c build-haskell
+build : build-haskell build-c
 
 # Build C code
 build-c :
@@ -12,25 +12,39 @@ build-haskell :
   stack build
 
 # Test everything
-test : test-c test-haskell
+test : test-unit test-suite
+
+# Run compiler & runtime unit tests
+test-unit : test-haskell test-c
 
 # Test C code
-test-c :
-  @echo "No tests for C code yet!"
+test-c : build-c
+  cd cmake-build-vsc && ctest -j 4 --output-on-failure
 
 # Test Haskell code
-test-haskell :
+test-haskell : build-haskell
   stack test
 
+# Run Intentio Reference Test Suite
+test-suite : build
+  stack exec test-runner -- --root ./test --compiler ./bin/test-intentioc.sh
+
 # Watch for changes in Haskell code
-watch-haskell CMD='test' :
-  stack {{ CMD }} --file-watch
+watch-haskell STACK_CMD='test' :
+  stack {{ STACK_CMD }} --file-watch
 
 # Watch for changes in C code
-watch-c CMD='cmake --build .' :
+watch-c CMD='just test-c' :
   #!/usr/bin/env bash
   while :; do
-    rg --files | entr -d bash -c 'cd cmake-build-vsc && {{ CMD }}'
+    rg --files | entr -d bash -c '{{ CMD }}'
+  done
+
+# Watch for changes anywhere and run test suite
+watch-suite CMD='just test-suite' :
+  #!/usr/bin/env bash
+  while :; do
+    rg --files | entr -d bash -c '{{ CMD }}'
   done
 
 # Run all linters

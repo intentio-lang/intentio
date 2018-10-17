@@ -17,7 +17,7 @@ import           Language.Intentio.SourcePos    ( HasSourcePos(..) )
 
 data ModuleSource = ModuleSource {
     _moduleSourceName     :: Text
-  ,  _moduleSourceExport  ::  Maybe ExportDecl
+  ,  _moduleSourceExport  :: Maybe ExportDecl
   ,  _moduleSourceImports :: [ImportDecl]
   ,  _moduleSourceItems   :: [ItemDecl]
   }
@@ -31,8 +31,8 @@ instance FromJSON ModuleSource
 
 instance Module ModuleSource where
   type ItemTy ModuleSource = ItemDecl
-  _moduleName   = ModuleName . _moduleSourceName
-  _moduleItems  = _moduleSourceItems  
+  _moduleName  = ModuleName . _moduleSourceName
+  _moduleItems = _moduleSourceItems  
 
 newtype ExportDecl = ExportDecl ExportItems
   deriving (Show, Eq, Generic)
@@ -104,7 +104,7 @@ instance ToJSON Stmt
 instance FromJSON Stmt
 
 data Assign
-  = Assign { _name :: ScopeId, _val :: Expr }
+  = Assign { _assignId :: ScopeId, _assignVal :: Expr }
   deriving (Show, Eq, Generic)
 
 instance ToJSON Assign

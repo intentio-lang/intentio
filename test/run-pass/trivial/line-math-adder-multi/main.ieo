@@ -1,0 +1,7 @@
+import adder
+
+fun main() {
+  a = int(scanln());
+  b = int(scanln());
+  println(adder:add(a + b));
+}

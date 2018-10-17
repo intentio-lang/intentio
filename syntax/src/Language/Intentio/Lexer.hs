@@ -192,7 +192,11 @@ ident = (try . lexeme $ (p >>= nonReserved)) >>= mkt TIdent <?> "identifier"
   p = identStart >:> many identContinue
 
   nonReserved :: Text -> Parser Text
+<<<<<<< HEAD
   nonReserved w | isKeyword w = Intentio.Prelude.fail $ "Illegal identifier: " <> toS w
+=======
+  nonReserved w | isKeyword w = P.fail $ "Illegal identifier: " <> toS w
+>>>>>>> 51fe24b4f4eb360eb5fa25b24559402bd54a2b67
                 | otherwise   = return w
 
   isKeyword :: Text -> Bool
@@ -337,7 +341,7 @@ escseq = try charesc <|> try asciiesc <|> try unicodeesc
 -- Utilities
 
 mkt :: TokenType -> Text -> Parser Token
-mkt _ty _text = return Token {..}
+mkt _ty _text = return Token { .. }
 
 sc :: Parser ()
 sc = L.space space1 lineComment empty

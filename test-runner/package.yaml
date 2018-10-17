@@ -1,0 +1,40 @@
+_common: !include "../package-common.yaml"
+
+name: test-runner
+
+<<: *meta
+
+dependencies:
+  - aeson
+  - async
+  - base
+  - containers
+  - Diff
+  - directory
+  - filepath
+  - intentio-prelude
+  - mtl
+  - optparse-applicative
+  - temporary
+  - text
+  - transformers
+  - typed-process
+  - unordered-containers
+  - yaml
+
+library:
+  source-dirs: src
+
+executable:
+  main: Main.hs
+  source-dirs: app
+  dependencies:
+    - test-runner
+
+tests:
+  test-runner-test:
+    main: Spec.hs
+    source-dirs: test
+    dependencies:
+      - test-runner
+      - hspec

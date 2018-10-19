@@ -40,7 +40,7 @@ instance HasSourcePos DummyModule where
 
 instance Module DummyModule where
   type ItemTy DummyModule = DummyItem
-  _moduleName = _dummyModuleName
+  _moduleName  = _dummyModuleName
   _moduleItems = _dummyModuleItems
 
 -- | A 'DummyModule' named @DummyModule@ with no items.

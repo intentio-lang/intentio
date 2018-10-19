@@ -55,7 +55,7 @@ newtype AssemblyName = AssemblyName { _unAssemblyName :: Text }
   deriving (Show, Eq, Ord, Hashable, Generic)
 
 instance ToJSON AssemblyName where
-  toJSON = toJSON . _unAssemblyName
+  toJSON     = toJSON . _unAssemblyName
   toEncoding = toEncoding . _unAssemblyName
 
 instance FromJSON AssemblyName where
@@ -68,7 +68,7 @@ newtype ModuleName = ModuleName { _unModuleName :: Text }
   deriving (Show, Eq, Ord, Hashable, Generic)
 
 instance ToJSON ModuleName where
-  toJSON = toJSON . _unModuleName
+  toJSON     = toJSON . _unModuleName
   toEncoding = toEncoding . _unModuleName
 
 instance FromJSON ModuleName where
@@ -81,7 +81,7 @@ newtype ItemName = ItemName { _unItemName :: Text }
   deriving (Show, Eq, Ord, Hashable, Generic)
 
 instance ToJSON ItemName where
-  toJSON = toJSON . _unItemName
+  toJSON     = toJSON . _unItemName
   toEncoding = toEncoding . _unItemName
 
 instance FromJSON ItemName where
@@ -228,7 +228,7 @@ moduleItems = to _moduleItems
 
 instance Module Void where
   type ItemTy Void = Void
-  _moduleName = unreachable
+  _moduleName  = unreachable
   _moduleItems = unreachable
 
 --------------------------------------------------------------------------------

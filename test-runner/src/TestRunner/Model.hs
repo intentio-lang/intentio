@@ -75,7 +75,8 @@ instance FromJSON TestCommand where
 deriving instance FromJSON CompileCommandSpec
 
 instance FromJSON Arguments where
-  parseJSON = withArray "Arguments" $ fmap (Arguments . toList) . mapM parseJSON
+  parseJSON =
+    withArray "Arguments" $ fmap (Arguments . toList) . mapM parseJSON
 
 instance FromJSON RunCommandSpec where
   parseJSON = withObject "RunCommandSpec" $ \o ->
@@ -83,5 +84,5 @@ instance FromJSON RunCommandSpec where
 
 instance FromJSON IOSpec where
   parseJSON (String t) = return $ RawIOSpec t
-  parseJSON (Array a)  = fmap (LinesIOSpec . toList) . mapM parseJSON $ a
+  parseJSON (Array  a) = fmap (LinesIOSpec . toList) . mapM parseJSON $ a
   parseJSON invalid    = typeMismatch "IOSpec" invalid

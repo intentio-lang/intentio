@@ -43,8 +43,8 @@ import           Intentio.Diagnostics           ( Diagnostic
                                                 , cnote
                                                 )
 
-import           Language.Intentio.AST          ( ModuleSource )
-import           Language.Intentio.Parser       ( ParserError
+import qualified Language.Intentio.AST         as AST
+import           Language.Intentio.Parser       ( ParserErrorBundle
                                                 , parseModule
                                                 )
 
@@ -77,7 +77,7 @@ instance Module SourceText where
   _moduleName  = _sourceTextModuleName
   _moduleItems = const []
 
-parseSourceFiles :: Assembly SourceFile -> Compile (Assembly ModuleSource)
+parseSourceFiles :: Assembly SourceFile -> Compile (Assembly (AST.Module ()))
 parseSourceFiles srcAsm = do
   let srcMl = srcAsm ^. assemblyModules & toList
   dstRs <- liftIOE $ mapM parseSourceFile_ srcMl
@@ -85,7 +85,8 @@ parseSourceFiles srcAsm = do
   let dstMm = mkModuleMap $ NE.fromList dstMl
   return $ srcAsm & assemblyModules .~ dstMm
 
-parseSourceTexts :: Assembly SourceText -> CompilePure (Assembly ModuleSource)
+parseSourceTexts
+  :: Assembly SourceText -> CompilePure (Assembly (AST.Module ()))
 parseSourceTexts srcAsm = do
   let srcMl = srcAsm ^. assemblyModules & toList
   let dstRs = fmap parseSourceText_ srcMl
@@ -96,10 +97,10 @@ parseSourceTexts srcAsm = do
 readSourceFile :: SourceFile -> Compile SourceText
 readSourceFile = liftIO . readSourceFile_
 
-parseSourceFile :: SourceFile -> Compile ModuleSource
+parseSourceFile :: SourceFile -> Compile (AST.Module ())
 parseSourceFile = readSourceFile >=> impurify . parseSourceText
 
-parseSourceText :: SourceText -> CompilePure ModuleSource
+parseSourceText :: SourceText -> CompilePure (AST.Module ())
 parseSourceText = toCompile . parseSourceText_
  where
   toCompile (Right moduleSource) = return moduleSource
@@ -114,10 +115,10 @@ readSourceFile_ f = do
   _sourceTextContent <- readFile _sourceTextFilePath
   return $ SourceText { .. }
 
-parseSourceFile_ :: SourceFile -> IO (Either ParserError ModuleSource)
+parseSourceFile_ :: SourceFile -> IO (Either ParserErrorBundle (AST.Module ()))
 parseSourceFile_ = fmap parseSourceText_ . readSourceFile_
 
-parseSourceText_ :: SourceText -> Either ParserError ModuleSource
+parseSourceText_ :: SourceText -> Either ParserErrorBundle (AST.Module ())
 parseSourceText_ f = parseModule (f ^. moduleName)
                                  (f ^. sourceTextFilePath)
                                  (f ^. sourceTextContent)
@@ -125,16 +126,16 @@ parseSourceText_ f = parseModule (f ^. moduleName)
 filePathToModName :: FilePath -> ModuleName
 filePathToModName = ModuleName . toS . takeBaseName
 
-toDiag :: ParserError -> Seq Diagnostic
-toDiag parserError = headDiag <| S.fromList stackDiags
+toDiag :: ParserErrorBundle -> Seq Diagnostic
+toDiag bundle = S.fromList . toList . fmap conv . fst $ errsWP
  where
-  hsp :| stp = MPE.errorPos parserError
-  stackDiags = fmap stackDiag stp
-  headDiag   = cerror (hsp ^. sourcePos) headMsg
-  headMsg    = T.strip . toS . MPE.parseErrorTextPretty $ parserError
-  stackDiag p = cnote (p ^. sourcePos) "included from here"
+  errs   = MPE.bundleErrors bundle
+  errsWP = MPE.attachSourcePos MPE.errorOffset errs (MPE.bundlePosState bundle)
+  conv (e, s) = cerror (s ^. sourcePos) $ diagMsg e
+  diagMsg = T.strip . toS . MPE.parseErrorTextPretty
 
-parseResultsToCompile :: Monad m => [Either ParserError a] -> CompileT m [a]
+parseResultsToCompile
+  :: Monad m => [Either ParserErrorBundle a] -> CompileT m [a]
 parseResultsToCompile = unFold . foldr' bucket (Right [])
  where
   bucket (Right m) (Right ms) = Right (m : ms)

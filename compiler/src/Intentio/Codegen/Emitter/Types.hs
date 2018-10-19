@@ -55,7 +55,7 @@ instance HasSourcePos (CModuleDef t) where
 
 instance Module (CModuleDef t) where
   type ItemTy (CModuleDef t) = Void
-  _moduleName = ModuleName . toS . _cModuleDefFileName
+  _moduleName  = ModuleName . toS . _cModuleDefFileName
   _moduleItems = const []
 
 cModuleEraseType :: CModuleDef a -> CModuleDef b
@@ -74,5 +74,5 @@ instance HasSourcePos CFile where
 
 instance Module CFile where
   type ItemTy CFile = Void
-  _moduleName = ModuleName . toS . _cFilePath
+  _moduleName  = ModuleName . toS . _cFilePath
   _moduleItems = const []

@@ -38,5 +38,5 @@ spec = parallel $ do
       compilePureFresh (parseSourceTexts asm) `shouldBe` Left
         [ cerror
             (SourcePos "bad.ieo" 0 5)
-            "unexpected end of input\nexpecting '(' or the rest of identifier"
+            "unexpected end of input\nexpecting ''', '(', '_', or alphanumeric character"
         ]

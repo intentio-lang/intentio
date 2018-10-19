@@ -56,11 +56,11 @@ data DiagnosticSeverity
   deriving (Show, Read, Eq, Ord, Enum, Bounded)
 
 instance DiagnosticPrintable DiagnosticSeverity where
-  diagnosticPrint _ DiagnosticNote = "note"
-  diagnosticPrint _ DiagnosticHint = "hint"
+  diagnosticPrint _ DiagnosticNote    = "note"
+  diagnosticPrint _ DiagnosticHint    = "hint"
   diagnosticPrint _ DiagnosticWarning = "warning"
-  diagnosticPrint _ DiagnosticError = "error"
-  diagnosticPrint _ DiagnosticICE = "internal compiler error"
+  diagnosticPrint _ DiagnosticError   = "error"
+  diagnosticPrint _ DiagnosticICE     = "internal compiler error"
 
 data Diagnostic = Diagnostic
   { _diagnosticSeverity :: DiagnosticSeverity
@@ -70,11 +70,15 @@ data Diagnostic = Diagnostic
 
 instance DiagnosticPrintable Diagnostic where
   diagnosticPrint o (Diagnostic sev pos msg) =
-    diagnosticPrint o pos <> ": " <> diagnosticPrint o sev <> ":\n"
-    <> fmtMsg <> "\n"
-    where
-      indent = "   "
-      fmtMsg = indent <> T.replace "\n" ("\n" <> indent) msg
+    diagnosticPrint o pos
+      <> ": "
+      <> diagnosticPrint o sev
+      <> ":\n"
+      <> fmtMsg
+      <> "\n"
+   where
+    indent = "   "
+    fmtMsg = indent <> T.replace "\n" ("\n" <> indent) msg
 
 instance DiagnosticPrintable [Diagnostic] where
   diagnosticPrint o = T.intercalate "\n" . fmap (diagnosticPrint o)
@@ -84,9 +88,8 @@ instance DiagnosticPrintable (Seq Diagnostic) where
 
 instance DiagnosticPrintable SourcePos where
   diagnosticPrint _ (SourcePos "" 0 0) = "?"
-  diagnosticPrint _ (SourcePos f l c)
-    | null f    = showLC
-    | otherwise = toS f <> ":" <> showLC
+  diagnosticPrint _ (SourcePos f l c) | null f    = showLC
+                                      | otherwise = toS f <> ":" <> showLC
     where showLC = show (l + 1) <> ":" <> show (c + 1)
 
 diagnosticFor :: HasSourcePos a => DiagnosticSeverity -> a -> Text -> Diagnostic

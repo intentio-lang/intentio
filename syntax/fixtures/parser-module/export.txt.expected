@@ -1,0 +1,38 @@
+{
+  "_moduleAnn": [],
+  "_moduleExport": {
+    "_exportDeclAnn": [],
+    "_exportDeclItems": [
+      {
+        "_scopeIdAnn": [],
+        "_scopeIdSourcePos": [
+          "test.ieo",
+          0,
+          0
+        ],
+        "_unScopeId": "sinus"
+      },
+      {
+        "_scopeIdAnn": [],
+        "_scopeIdSourcePos": [
+          "test.ieo",
+          0,
+          0
+        ],
+        "_unScopeId": "cosinus"
+      }
+    ],
+    "_exportDeclSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
+  },
+  "_moduleItems": [],
+  "_moduleName": "test",
+  "_moduleSourcePos": [
+    "test.ieo",
+    0,
+    0
+  ]
+}

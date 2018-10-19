@@ -1,118 +1,313 @@
-module Language.Intentio.AST where
+module Language.Intentio.AST
+  ( module Language.Intentio.AST
+  , ModuleName(..)
+  , ItemName(..)
+  , getAnn
+  , setAnn
+  , ann
+  )
+where
 
 import           Intentio.Prelude
 
 import           Data.Convertible               ( convError )
 
-import           Language.Intentio.Assembly     ( Module(..)
-                                                , ModuleName(..)
-                                                , Item(..)
+import           Intentio.Annotated             ( Annotated(..) )
+
+import qualified Language.Intentio.Assembly    as A
+import           Language.Intentio.Assembly     ( ModuleName(..)
                                                 , ItemName(..)
                                                 )
 import           Language.Intentio.Token
-import           Language.Intentio.SourcePos    ( HasSourcePos(..) )
+import           Language.Intentio.SourcePos    ( HasSourcePos(..)
+                                                , SourcePos(..)
+                                                )
 
 --------------------------------------------------------------------------------
 -- AST data structures
 
-data ModuleSource = ModuleSource {
-    _moduleSourceName :: Text,
-    _moduleSourceItems :: [ItemDecl]
+data ModId a = ModId
+  { _modIdAnn       :: a
+  , _modIdSourcePos :: SourcePos
+  , _unModId        :: Text
   }
   deriving (Show, Eq, Generic)
 
-instance HasSourcePos ModuleSource where
-  _sourcePos _ = undefined -- TODO:
+instance HasSourcePos (ModId a) where
+  _sourcePos = _modIdSourcePos
 
-instance ToJSON ModuleSource
-instance FromJSON ModuleSource
+instance ToJSON a => ToJSON (ModId a)
+instance FromJSON a => FromJSON (ModId a)
 
-instance Module ModuleSource where
-  type ItemTy ModuleSource = ItemDecl
-  _moduleName = ModuleName . _moduleSourceName
-  _moduleItems = _moduleSourceItems
-
-data ItemDecl
-  = FunDecl {
-    _itemDeclName :: ScopeId,
-    _funDeclParams :: FunParams,
-    _funDeclBody :: FunBody
+data ScopeId a = ScopeId
+  { _scopeIdAnn       :: a
+  , _scopeIdSourcePos :: SourcePos
+  , _unScopeId        :: Text
   }
   deriving (Show, Eq, Generic)
 
-instance HasSourcePos ItemDecl where
-  _sourcePos _ = undefined -- TODO:
+instance HasSourcePos (ScopeId a) where
+  _sourcePos = _scopeIdSourcePos
 
-instance ToJSON ItemDecl
-instance FromJSON ItemDecl
+instance ToJSON a => ToJSON (ScopeId a)
+instance FromJSON a => FromJSON (ScopeId a)
 
-instance Item ItemDecl where
-  _itemName = Just . ItemName . (\(ScopeId n) -> n) . _itemDeclName
-
-newtype ModId = ModId Text
-  deriving (Show, Eq, Generic, ToJSON, FromJSON)
-
-newtype ScopeId = ScopeId Text
-  deriving (Show, Eq, Generic, ToJSON, FromJSON)
-
-data AnyId
-  = Qid ModId ScopeId
-  | Id ScopeId
+data Qid a = Qid
+  { _qidAnn       :: a
+  , _qidSourcePos :: SourcePos
+  , _qidMod       :: Text
+  , _qidScope     :: Text
+  }
   deriving (Show, Eq, Generic)
 
-instance ToJSON AnyId
-instance FromJSON AnyId
+instance HasSourcePos (Qid a) where
+  _sourcePos = _qidSourcePos
 
-newtype FunParams = FunParams [FunParam]
-  deriving (Show, Eq, Generic, ToJSON, FromJSON)
+instance ToJSON a => ToJSON (Qid a)
+instance FromJSON a => FromJSON (Qid a)
 
-newtype FunParam = FunParam ScopeId
-  deriving (Show, Eq, Generic, ToJSON, FromJSON)
-
-newtype FunBody = FunBody Block
-  deriving (Show, Eq, Generic, ToJSON, FromJSON)
-
-data Expr
-  = BinExpr BinOp Expr Expr
-  | BlockExpr Block
-  | FunCallExpr Expr FunArgs
-  | IdExpr AnyId
-  | IfExpr { _ifCondition :: Expr, _ifBody :: Block }
-  | IfElseExpr { _ifCondition :: Expr, _ifBody :: Block, _elseBody :: Block }
-  | LetDeclExpr { _letDeclName :: ScopeId, _letDeclVal :: Expr }
-  | LitExpr Literal
-  | WhileExpr { _whileCondition :: Expr, _whileBody :: Block }
-  | UnaryExpr UnaryOp Expr
-  | ParenExpr Expr
-  | ReturnExpr (Maybe Expr)
+data AnyId a
+  = Qid' (Qid a)
+  | ScopeId' (ScopeId a)
   deriving (Show, Eq, Generic)
 
-instance ToJSON Expr
-instance FromJSON Expr
+instance ToJSON a => ToJSON (AnyId a)
+instance FromJSON a => FromJSON (AnyId a)
 
-newtype FunArgs = FunArgs [Expr]
-  deriving (Show, Eq, Generic, ToJSON, FromJSON)
-
-newtype Block = Block [Expr]
-  deriving (Show, Eq, Generic, ToJSON, FromJSON)
-
-data Literal
-  = Integer Text
-  | Float Text
-  | String Text
-  | CharString Text
-  | RawString Text
-  | RegexString Text
+data Module a = Module
+  { _moduleAnn       :: a
+  , _moduleSourcePos :: SourcePos
+  , _moduleName      :: ModuleName
+  , _moduleExport    :: Maybe (ExportDecl a)
+  , _moduleItems     :: [ItemDecl a]
+  }
   deriving (Show, Eq, Generic)
 
-instance ToJSON Literal
-instance FromJSON Literal
+instance HasSourcePos (Module a) where
+  _sourcePos = _moduleSourcePos
 
-data BinOp
+instance ToJSON a => ToJSON (Module a)
+instance FromJSON a => FromJSON (Module a)
+
+instance (Eq a, Show a) => A.Module (Module a) where
+  type ItemTy (Module a) = ItemDecl a
+  _moduleName  = Language.Intentio.AST._moduleName
+  _moduleItems = Language.Intentio.AST._moduleItems
+
+data ItemDecl a = ItemDecl
+  { _itemDeclAnn       :: a
+  , _itemDeclSourcePos :: SourcePos
+  , _itemDeclKind      :: ItemDeclKind a
+  }
+  deriving (Show, Eq, Generic)
+
+instance HasSourcePos (ItemDecl a) where
+  _sourcePos = _itemDeclSourcePos
+
+instance ToJSON a => ToJSON (ItemDecl a)
+instance FromJSON a => FromJSON (ItemDecl a)
+
+instance (Eq a, Show a) => A.Item (ItemDecl a) where
+  _itemName ItemDecl { _itemDeclKind = ImportItemDecl _ } = Nothing
+  _itemName ItemDecl { _itemDeclKind = FunItemDecl f } =
+    let FunDecl { _funDeclName = ScopeId { _unScopeId } } = f
+    in  Just $ ItemName _unScopeId
+
+data ItemDeclKind a
+  = ImportItemDecl (ImportDecl a)
+  | FunItemDecl (FunDecl a)
+  deriving (Show, Eq, Generic)
+
+instance ToJSON a => ToJSON (ItemDeclKind a)
+instance FromJSON a => FromJSON (ItemDeclKind a)
+
+data ExportDecl a = ExportDecl
+  { _exportDeclAnn       :: a
+  , _exportDeclSourcePos :: SourcePos
+  , _exportDeclItems     :: [ScopeId a]
+  }
+  deriving (Show, Eq, Generic)
+
+instance HasSourcePos (ExportDecl a) where
+  _sourcePos = _exportDeclSourcePos
+
+instance ToJSON a => ToJSON (ExportDecl a)
+instance FromJSON a => FromJSON (ExportDecl a)
+
+data ImportDecl a = ImportDecl
+  { _importDeclAnn       :: a
+  , _importDeclSourcePos :: SourcePos
+  , _importDeclKind      :: ImportDeclKind a
+  }
+  deriving (Show, Eq, Generic)
+
+instance HasSourcePos (ImportDecl a) where
+  _sourcePos = _importDeclSourcePos
+
+instance ToJSON a => ToJSON (ImportDecl a)
+instance FromJSON a => FromJSON (ImportDecl a)
+
+data ImportDeclKind a
+  = ImportQid (Qid a)
+  | ImportQidAs (Qid a) (ScopeId a)
+  | ImportId (ModId a)
+  | ImportIdAs (ModId a) (ModId a)
+  | ImportAll (ModId a)
+  deriving (Show, Eq, Generic)
+
+instance ToJSON a => ToJSON (ImportDeclKind a)
+instance FromJSON a => FromJSON (ImportDeclKind a)
+
+data FunDecl a = FunDecl
+  { _funDeclAnn       :: a
+  , _funDeclSourcePos :: SourcePos
+  , _funDeclName      :: ScopeId a
+  , _funDeclParams    :: [FunParam a]
+  , _funDeclBody      :: FunBody a
+  }
+  deriving (Show, Eq, Generic)
+
+instance HasSourcePos (FunDecl a) where
+  _sourcePos = _funDeclSourcePos
+
+instance ToJSON a => ToJSON (FunDecl a)
+instance FromJSON a => FromJSON (FunDecl a)
+
+newtype FunParam a = FunParam { _funParamId :: ScopeId a }
+  deriving (Show, Eq, Generic, HasSourcePos, ToJSON, FromJSON)
+
+newtype FunBody a = FunBody { _funBodyBlock :: Block a }
+  deriving (Show, Eq, Generic, HasSourcePos, ToJSON, FromJSON)
+
+data Stmt a = Stmt
+  { _stmtAnn       :: a
+  , _stmtSourcePos :: SourcePos
+  , _stmtKind      :: StmtKind a
+  }
+  deriving (Show, Eq, Generic)
+
+instance HasSourcePos (Stmt a) where
+  _sourcePos = _stmtSourcePos
+
+instance ToJSON a => ToJSON (Stmt a)
+instance FromJSON a => FromJSON (Stmt a)
+
+data StmtKind a
+  = AssignStmt (ScopeId a) (Expr a)
+  | ExprStmt (Expr a)
+  deriving (Show, Eq, Generic)
+
+instance ToJSON a => ToJSON (StmtKind a)
+instance FromJSON a => FromJSON (StmtKind a)
+
+data Expr a = Expr
+  { _exprAnn       :: a
+  , _exprSourcePos :: SourcePos
+  , _exprKind      :: ExprKind a
+  }
+  deriving (Show, Eq, Generic)
+
+instance HasSourcePos (Expr a) where
+  _sourcePos = _exprSourcePos
+
+instance ToJSON a => ToJSON (Expr a)
+instance FromJSON a => FromJSON (Expr a)
+
+data ExprKind a
+  = IdExpr (AnyId a)
+  | LitExpr (Lit a)
+  | BlockExpr (Block a)
+  | SuccExpr (Expr a)
+  | FailExpr (Expr a)
+  | UnExpr (UnOp a) (Expr a)
+  | BinExpr (BinOp a) (Expr a) (Expr a)
+  | CallExpr (Expr a) [Expr a]
+  | WhileExpr (Expr a) (Block a)
+  | IfExpr (Expr a) (Block a) (Maybe (Block a))
+  | ParenExpr (Expr a)
+  | ReturnExpr (Maybe (Expr a))
+  deriving (Show, Eq, Generic)
+
+instance ToJSON a => ToJSON (ExprKind a)
+instance FromJSON a => FromJSON (ExprKind a)
+
+data Block a = Block
+  { _blockAnn       :: a
+  , _blockSourcePos :: SourcePos
+  , _blockStmts     :: [Stmt a]
+  }
+  deriving (Show, Eq, Generic)
+
+instance HasSourcePos (Block a) where
+  _sourcePos = _blockSourcePos
+
+instance ToJSON a => ToJSON (Block a)
+instance FromJSON a => FromJSON (Block a)
+
+data Lit a = Lit
+  { _litAnn       :: a
+  , _litSourcePos :: SourcePos
+  , _litKind      :: LitKind
+  }
+  deriving (Show, Eq, Generic)
+
+instance ToJSON a => ToJSON (Lit a)
+instance FromJSON a => FromJSON (Lit a)
+
+instance HasSourcePos (Lit a) where
+  _sourcePos = _litSourcePos
+
+data LitKind
+  = IntegerLit Text
+  | FloatLit Text
+  | StringLit Text
+  | RawStringLit Text
+  | RegexLit Text
+  | NoneLit
+  deriving (Show, Eq, Generic)
+
+instance ToJSON LitKind
+instance FromJSON LitKind
+
+data UnOp a = UnOp
+  { _unOpAnn       :: a
+  , _unOpSourcePos :: SourcePos
+  , _unOpKind      :: UnOpKind
+  }
+  deriving (Show, Eq, Generic)
+
+instance ToJSON a => ToJSON (UnOp a)
+instance FromJSON a => FromJSON (UnOp a)
+
+instance HasSourcePos (UnOp a) where
+  _sourcePos = _unOpSourcePos
+
+data UnOpKind
+  = UnNeg
+  | UnNot
+  deriving (Show, Eq, Generic)
+
+instance ToJSON UnOpKind
+instance FromJSON UnOpKind
+
+data BinOp a = BinOp
+  { _binOpAnn       :: a
+  , _binOpSourcePos :: SourcePos
+  , _binOpKind      :: BinOpKind
+  }
+  deriving (Show, Eq, Generic)
+
+instance ToJSON a => ToJSON (BinOp a)
+instance FromJSON a => FromJSON (BinOp a)
+
+instance HasSourcePos (BinOp a) where
+  _sourcePos = _binOpSourcePos
+
+data BinOpKind
   = BinAdd
   | BinAnd
   | BinDiv
-  | BinEqEq
+  | BinEq
   | BinGt
   | BinGtEq
   | BinLt
@@ -120,71 +315,122 @@ data BinOp
   | BinMul
   | BinNeq
   | BinOr
+  | BinSEq
+  | BinSNeq
   | BinSub
+  | BinXor
   deriving (Show, Eq, Generic)
 
-instance ToJSON BinOp
-instance FromJSON BinOp
-
-data UnaryOp
-  = UnaryAdd
-  | UnaryNot
-  | UnarySub
-  deriving (Show, Eq, Generic)
-
-instance ToJSON UnaryOp
-instance FromJSON UnaryOp
+instance ToJSON BinOpKind
+instance FromJSON BinOpKind
 
 --------------------------------------------------------------------------------
 -- Lenses
 
-makeLenses ''AnyId
-makeLenses ''Block
-makeLenses ''Expr
-makeLenses ''FunArgs
-makeLenses ''FunBody
-makeLenses ''FunParam
-makeLenses ''FunParams
-makeLenses ''ItemDecl
 makeLenses ''ModId
-makeLenses ''ModuleSource
 makeLenses ''ScopeId
+makeLenses ''Qid
+makePrisms ''AnyId
+makeLenses ''Module
+makeLenses ''ItemDecl
+makePrisms ''ItemDeclKind
+makeLenses ''ExportDecl
+makeLenses ''ImportDecl
+makePrisms ''ImportDeclKind
+makeLenses ''FunDecl
+makeLenses ''FunParam
+makeLenses ''FunBody
+makeLenses ''Stmt
+makePrisms ''StmtKind
+makeLenses ''Expr
+makePrisms ''ExprKind
+makeLenses ''Block
+makeLenses ''Lit
+makePrisms ''LitKind
+makeLenses ''UnOp
+makePrisms ''UnOpKind
+makeLenses ''BinOp
+makePrisms ''BinOpKind
+
+instance Annotated ModId where
+  ann = modIdAnn
+
+instance Annotated ScopeId where
+  ann = scopeIdAnn
+
+instance Annotated Qid where
+  ann = qidAnn
+
+instance Annotated Module where
+  ann = moduleAnn
+
+instance Annotated ExportDecl where
+  ann = exportDeclAnn
+
+instance Annotated ImportDecl where
+  ann = importDeclAnn
+
+instance Annotated ItemDecl where
+  ann = itemDeclAnn
+
+instance Annotated FunDecl where
+  ann = funDeclAnn
+
+instance Annotated Stmt where
+  ann = stmtAnn
+
+instance Annotated Expr where
+  ann = exprAnn
+
+instance Annotated Block where
+  ann = blockAnn
+
+instance Annotated Lit where
+  ann = litAnn
+
+instance Annotated UnOp where
+  ann = unOpAnn
+
+instance Annotated BinOp where
+  ann = binOpAnn
 
 --------------------------------------------------------------------------------
 -- Token/TokenType -> AST tag conversions
 
-instance Convertible TokenType BinOp where
+instance Convertible TokenType BinOpKind where
   safeConvert TKwAnd  = Right BinAnd
   safeConvert TKwOr   = Right BinOr
+  safeConvert TKwXor  = Right BinXor
   safeConvert TOpAdd  = Right BinAdd
-  safeConvert TOpSub  = Right BinSub
-  safeConvert TOpMul  = Right BinMul
   safeConvert TOpDiv  = Right BinDiv
-  safeConvert TOpEqEq = Right BinEqEq
-  safeConvert TOpNeq  = Right BinNeq
-  safeConvert TOpLt   = Right BinLt
-  safeConvert TOpLtEq = Right BinLtEq
+  safeConvert TOpEqEq = Right BinEq
   safeConvert TOpGt   = Right BinGt
   safeConvert TOpGtEq = Right BinGtEq
-  safeConvert x = convError "Not a binary operator" x
+  safeConvert TOpLt   = Right BinLt
+  safeConvert TOpLtEq = Right BinLtEq
+  safeConvert TOpMul  = Right BinMul
+  safeConvert TOpNeq  = Right BinNeq
+  safeConvert TOpSEq  = Right BinSEq
+  safeConvert TOpSNeq = Right BinSNeq
+  safeConvert TOpSub  = Right BinSub
+  safeConvert x       = convError "Not a binary operator" x
 
-instance Convertible Token BinOp where
-  safeConvert Token{_ty} = safeConvert _ty
+instance Convertible Token BinOpKind where
+  safeConvert Token { _ty } = safeConvert _ty
 
-instance Convertible TokenType UnaryOp where
-  safeConvert TKwNot = Right UnaryNot
-  safeConvert TOpAdd = Right UnaryAdd
-  safeConvert TOpSub = Right UnarySub
-  safeConvert x = convError "Not an unary operator" x
+instance Convertible TokenType UnOpKind where
+  safeConvert TKwNot = Right UnNot
+  safeConvert TOpSub = Right UnNeg
+  safeConvert x      = convError "Not an unary operator" x
 
-instance Convertible Token UnaryOp where
-  safeConvert Token{_ty} = safeConvert _ty
+instance Convertible Token UnOpKind where
+  safeConvert Token { _ty } = safeConvert _ty
 
-instance Convertible Token Literal where
-  safeConvert Token{_ty=TInteger, _text}     = Right $ Integer _text
-  safeConvert Token{_ty=TFloat, _text}       = Right $ Float _text
-  safeConvert Token{_ty=TString, _text}      = Right $ String _text
-  safeConvert Token{_ty=TCharString, _text}  = Right $ CharString _text
-  safeConvert Token{_ty=TRawString, _text}   = Right $ RawString _text
-  safeConvert Token{_ty=TRegexString, _text} = Right $ RegexString _text
-  safeConvert x = convError "Not a literal" x
+instance Convertible Token LitKind where
+  safeConvert (Token TInteger     txt) = Right $ IntegerLit txt
+  safeConvert (Token TFloat       txt) = Right $ FloatLit txt
+  safeConvert (Token TString      txt) = Right $ StringLit txt
+  safeConvert (Token TRawString   txt) = Right $ RawStringLit txt
+  safeConvert (Token TRegexString txt) = Right $ RegexLit txt
+  safeConvert (Token TKwNone      _  ) = Right NoneLit
+  safeConvert x                        = convError "Not a literal" x

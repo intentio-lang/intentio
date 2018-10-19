@@ -1,0 +1,181 @@
+[
+  {
+    "_itemDeclAnn": [],
+    "_itemDeclKind": {
+      "contents": {
+        "_importDeclAnn": [],
+        "_importDeclKind": {
+          "contents": [
+            {
+              "_qidAnn": [],
+              "_qidMod": "math",
+              "_qidScope": "sin",
+              "_qidSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ]
+            },
+            {
+              "_scopeIdAnn": [],
+              "_scopeIdSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ],
+              "_unScopeId": "sinus"
+            }
+          ],
+          "tag": "ImportQidAs"
+        },
+        "_importDeclSourcePos": [
+          "test.ieo",
+          0,
+          0
+        ]
+      },
+      "tag": "ImportItemDecl"
+    },
+    "_itemDeclSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
+  },
+  {
+    "_itemDeclAnn": [],
+    "_itemDeclKind": {
+      "contents": {
+        "_importDeclAnn": [],
+        "_importDeclKind": {
+          "contents": {
+            "_qidAnn": [],
+            "_qidMod": "math",
+            "_qidScope": "cos",
+            "_qidSourcePos": [
+              "test.ieo",
+              0,
+              0
+            ]
+          },
+          "tag": "ImportQid"
+        },
+        "_importDeclSourcePos": [
+          "test.ieo",
+          0,
+          0
+        ]
+      },
+      "tag": "ImportItemDecl"
+    },
+    "_itemDeclSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
+  },
+  {
+    "_itemDeclAnn": [],
+    "_itemDeclKind": {
+      "contents": {
+        "_importDeclAnn": [],
+        "_importDeclKind": {
+          "contents": [
+            {
+              "_modIdAnn": [],
+              "_modIdSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ],
+              "_unModId": "tg"
+            },
+            {
+              "_modIdAnn": [],
+              "_modIdSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ],
+              "_unModId": "tangens"
+            }
+          ],
+          "tag": "ImportIdAs"
+        },
+        "_importDeclSourcePos": [
+          "test.ieo",
+          0,
+          0
+        ]
+      },
+      "tag": "ImportItemDecl"
+    },
+    "_itemDeclSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
+  },
+  {
+    "_itemDeclAnn": [],
+    "_itemDeclKind": {
+      "contents": {
+        "_importDeclAnn": [],
+        "_importDeclKind": {
+          "contents": {
+            "_modIdAnn": [],
+            "_modIdSourcePos": [
+              "test.ieo",
+              0,
+              0
+            ],
+            "_unModId": "ctg"
+          },
+          "tag": "ImportId"
+        },
+        "_importDeclSourcePos": [
+          "test.ieo",
+          0,
+          0
+        ]
+      },
+      "tag": "ImportItemDecl"
+    },
+    "_itemDeclSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
+  },
+  {
+    "_itemDeclAnn": [],
+    "_itemDeclKind": {
+      "contents": {
+        "_importDeclAnn": [],
+        "_importDeclKind": {
+          "contents": {
+            "_modIdAnn": [],
+            "_modIdSourcePos": [
+              "test.ieo",
+              0,
+              0
+            ],
+            "_unModId": "io"
+          },
+          "tag": "ImportAll"
+        },
+        "_importDeclSourcePos": [
+          "test.ieo",
+          0,
+          0
+        ]
+      },
+      "tag": "ImportItemDecl"
+    },
+    "_itemDeclSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
+  }
+]

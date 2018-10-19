@@ -1,7 +1,0 @@
-{
-    foo(1, 2, 3);
-    foo();
-    foo(a, b,);
-    mod:fn(foo());
-    (boo)();
-}

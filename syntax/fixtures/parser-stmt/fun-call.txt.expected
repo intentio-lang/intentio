@@ -1,0 +1,409 @@
+[
+  {
+    "_stmtAnn": [],
+    "_stmtKind": {
+      "contents": {
+        "_exprAnn": [],
+        "_exprKind": {
+          "contents": [
+            {
+              "_exprAnn": [],
+              "_exprKind": {
+                "contents": {
+                  "contents": {
+                    "_scopeIdAnn": [],
+                    "_scopeIdSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ],
+                    "_unScopeId": "foo"
+                  },
+                  "tag": "ScopeId'"
+                },
+                "tag": "IdExpr"
+              },
+              "_exprSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ]
+            },
+            [
+              {
+                "_exprAnn": [],
+                "_exprKind": {
+                  "contents": {
+                    "_litAnn": [],
+                    "_litKind": {
+                      "contents": "1",
+                      "tag": "IntegerLit"
+                    },
+                    "_litSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  },
+                  "tag": "LitExpr"
+                },
+                "_exprSourcePos": [
+                  "test.ieo",
+                  0,
+                  0
+                ]
+              },
+              {
+                "_exprAnn": [],
+                "_exprKind": {
+                  "contents": {
+                    "_litAnn": [],
+                    "_litKind": {
+                      "contents": "2",
+                      "tag": "IntegerLit"
+                    },
+                    "_litSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  },
+                  "tag": "LitExpr"
+                },
+                "_exprSourcePos": [
+                  "test.ieo",
+                  0,
+                  0
+                ]
+              },
+              {
+                "_exprAnn": [],
+                "_exprKind": {
+                  "contents": {
+                    "_litAnn": [],
+                    "_litKind": {
+                      "contents": "3",
+                      "tag": "IntegerLit"
+                    },
+                    "_litSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  },
+                  "tag": "LitExpr"
+                },
+                "_exprSourcePos": [
+                  "test.ieo",
+                  0,
+                  0
+                ]
+              }
+            ]
+          ],
+          "tag": "CallExpr"
+        },
+        "_exprSourcePos": [
+          "test.ieo",
+          0,
+          0
+        ]
+      },
+      "tag": "ExprStmt"
+    },
+    "_stmtSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
+  },
+  {
+    "_stmtAnn": [],
+    "_stmtKind": {
+      "contents": {
+        "_exprAnn": [],
+        "_exprKind": {
+          "contents": [
+            {
+              "_exprAnn": [],
+              "_exprKind": {
+                "contents": {
+                  "contents": {
+                    "_scopeIdAnn": [],
+                    "_scopeIdSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ],
+                    "_unScopeId": "foo"
+                  },
+                  "tag": "ScopeId'"
+                },
+                "tag": "IdExpr"
+              },
+              "_exprSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ]
+            },
+            []
+          ],
+          "tag": "CallExpr"
+        },
+        "_exprSourcePos": [
+          "test.ieo",
+          0,
+          0
+        ]
+      },
+      "tag": "ExprStmt"
+    },
+    "_stmtSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
+  },
+  {
+    "_stmtAnn": [],
+    "_stmtKind": {
+      "contents": {
+        "_exprAnn": [],
+        "_exprKind": {
+          "contents": [
+            {
+              "_exprAnn": [],
+              "_exprKind": {
+                "contents": {
+                  "contents": {
+                    "_scopeIdAnn": [],
+                    "_scopeIdSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ],
+                    "_unScopeId": "foo"
+                  },
+                  "tag": "ScopeId'"
+                },
+                "tag": "IdExpr"
+              },
+              "_exprSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ]
+            },
+            [
+              {
+                "_exprAnn": [],
+                "_exprKind": {
+                  "contents": {
+                    "contents": {
+                      "_scopeIdAnn": [],
+                      "_scopeIdSourcePos": [
+                        "test.ieo",
+                        0,
+                        0
+                      ],
+                      "_unScopeId": "a"
+                    },
+                    "tag": "ScopeId'"
+                  },
+                  "tag": "IdExpr"
+                },
+                "_exprSourcePos": [
+                  "test.ieo",
+                  0,
+                  0
+                ]
+              },
+              {
+                "_exprAnn": [],
+                "_exprKind": {
+                  "contents": {
+                    "contents": {
+                      "_scopeIdAnn": [],
+                      "_scopeIdSourcePos": [
+                        "test.ieo",
+                        0,
+                        0
+                      ],
+                      "_unScopeId": "b"
+                    },
+                    "tag": "ScopeId'"
+                  },
+                  "tag": "IdExpr"
+                },
+                "_exprSourcePos": [
+                  "test.ieo",
+                  0,
+                  0
+                ]
+              }
+            ]
+          ],
+          "tag": "CallExpr"
+        },
+        "_exprSourcePos": [
+          "test.ieo",
+          0,
+          0
+        ]
+      },
+      "tag": "ExprStmt"
+    },
+    "_stmtSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
+  },
+  {
+    "_stmtAnn": [],
+    "_stmtKind": {
+      "contents": {
+        "_exprAnn": [],
+        "_exprKind": {
+          "contents": [
+            {
+              "_exprAnn": [],
+              "_exprKind": {
+                "contents": {
+                  "contents": {
+                    "_qidAnn": [],
+                    "_qidMod": "mod",
+                    "_qidScope": "fn",
+                    "_qidSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  },
+                  "tag": "Qid'"
+                },
+                "tag": "IdExpr"
+              },
+              "_exprSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ]
+            },
+            [
+              {
+                "_exprAnn": [],
+                "_exprKind": {
+                  "contents": [
+                    {
+                      "_exprAnn": [],
+                      "_exprKind": {
+                        "contents": {
+                          "contents": {
+                            "_scopeIdAnn": [],
+                            "_scopeIdSourcePos": [
+                              "test.ieo",
+                              0,
+                              0
+                            ],
+                            "_unScopeId": "foo"
+                          },
+                          "tag": "ScopeId'"
+                        },
+                        "tag": "IdExpr"
+                      },
+                      "_exprSourcePos": [
+                        "test.ieo",
+                        0,
+                        0
+                      ]
+                    },
+                    []
+                  ],
+                  "tag": "CallExpr"
+                },
+                "_exprSourcePos": [
+                  "test.ieo",
+                  0,
+                  0
+                ]
+              }
+            ]
+          ],
+          "tag": "CallExpr"
+        },
+        "_exprSourcePos": [
+          "test.ieo",
+          0,
+          0
+        ]
+      },
+      "tag": "ExprStmt"
+    },
+    "_stmtSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
+  },
+  {
+    "_stmtAnn": [],
+    "_stmtKind": {
+      "contents": {
+        "_exprAnn": [],
+        "_exprKind": {
+          "contents": [
+            {
+              "_exprAnn": [],
+              "_exprKind": {
+                "contents": {
+                  "_exprAnn": [],
+                  "_exprKind": {
+                    "contents": {
+                      "contents": {
+                        "_scopeIdAnn": [],
+                        "_scopeIdSourcePos": [
+                          "test.ieo",
+                          0,
+                          0
+                        ],
+                        "_unScopeId": "boo"
+                      },
+                      "tag": "ScopeId'"
+                    },
+                    "tag": "IdExpr"
+                  },
+                  "_exprSourcePos": [
+                    "test.ieo",
+                    0,
+                    0
+                  ]
+                },
+                "tag": "ParenExpr"
+              },
+              "_exprSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ]
+            },
+            []
+          ],
+          "tag": "CallExpr"
+        },
+        "_exprSourcePos": [
+          "test.ieo",
+          0,
+          0
+        ]
+      },
+      "tag": "ExprStmt"
+    },
+    "_stmtSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
+  }
+]

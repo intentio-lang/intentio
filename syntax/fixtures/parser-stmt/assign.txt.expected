@@ -1,0 +1,137 @@
+[
+  {
+    "_stmtAnn": [],
+    "_stmtKind": {
+      "contents": [
+        {
+          "_scopeIdAnn": [],
+          "_scopeIdSourcePos": [
+            "test.ieo",
+            0,
+            0
+          ],
+          "_unScopeId": "e"
+        },
+        {
+          "_exprAnn": [],
+          "_exprKind": {
+            "contents": {
+              "_litAnn": [],
+              "_litKind": {
+                "contents": "r#\"my sweet \"string\"\"#",
+                "tag": "RawStringLit"
+              },
+              "_litSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ]
+            },
+            "tag": "LitExpr"
+          },
+          "_exprSourcePos": [
+            "test.ieo",
+            0,
+            0
+          ]
+        }
+      ],
+      "tag": "AssignStmt"
+    },
+    "_stmtSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
+  },
+  {
+    "_stmtAnn": [],
+    "_stmtKind": {
+      "contents": [
+        {
+          "_scopeIdAnn": [],
+          "_scopeIdSourcePos": [
+            "test.ieo",
+            0,
+            0
+          ],
+          "_unScopeId": "e"
+        },
+        {
+          "_exprAnn": [],
+          "_exprKind": {
+            "contents": [
+              {
+                "_binOpAnn": [],
+                "_binOpKind": "BinAdd",
+                "_binOpSourcePos": [
+                  "test.ieo",
+                  0,
+                  0
+                ]
+              },
+              {
+                "_exprAnn": [],
+                "_exprKind": {
+                  "contents": {
+                    "contents": {
+                      "_scopeIdAnn": [],
+                      "_scopeIdSourcePos": [
+                        "test.ieo",
+                        0,
+                        0
+                      ],
+                      "_unScopeId": "e"
+                    },
+                    "tag": "ScopeId'"
+                  },
+                  "tag": "IdExpr"
+                },
+                "_exprSourcePos": [
+                  "test.ieo",
+                  0,
+                  0
+                ]
+              },
+              {
+                "_exprAnn": [],
+                "_exprKind": {
+                  "contents": {
+                    "_litAnn": [],
+                    "_litKind": {
+                      "contents": "\"2\"",
+                      "tag": "StringLit"
+                    },
+                    "_litSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  },
+                  "tag": "LitExpr"
+                },
+                "_exprSourcePos": [
+                  "test.ieo",
+                  0,
+                  0
+                ]
+              }
+            ],
+            "tag": "BinExpr"
+          },
+          "_exprSourcePos": [
+            "",
+            0,
+            0
+          ]
+        }
+      ],
+      "tag": "AssignStmt"
+    },
+    "_stmtSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
+  }
+]

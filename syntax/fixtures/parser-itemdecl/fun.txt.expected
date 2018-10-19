@@ -1,46 +1,250 @@
 [
   {
-    "_funDeclBody": [
-      {
-        "contents": {
-          "contents": "a",
-          "tag": "Id"
+    "_itemDeclAnn": [],
+    "_itemDeclKind": {
+      "contents": {
+        "_funDeclAnn": [],
+        "_funDeclBody": {
+          "_blockAnn": [],
+          "_blockSourcePos": [
+            "test.ieo",
+            0,
+            0
+          ],
+          "_blockStmts": [
+            {
+              "_stmtAnn": [],
+              "_stmtKind": {
+                "contents": {
+                  "_exprAnn": [],
+                  "_exprKind": {
+                    "contents": {
+                      "contents": {
+                        "_scopeIdAnn": [],
+                        "_scopeIdSourcePos": [
+                          "test.ieo",
+                          0,
+                          0
+                        ],
+                        "_unScopeId": "a"
+                      },
+                      "tag": "ScopeId'"
+                    },
+                    "tag": "IdExpr"
+                  },
+                  "_exprSourcePos": [
+                    "test.ieo",
+                    0,
+                    0
+                  ]
+                },
+                "tag": "ExprStmt"
+              },
+              "_stmtSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ]
+            }
+          ]
         },
-        "tag": "IdExpr"
-      }
-    ],
-    "_funDeclParams": [
-      "a",
-      "b"
-    ],
-    "_itemDeclName": "foo"
+        "_funDeclName": {
+          "_scopeIdAnn": [],
+          "_scopeIdSourcePos": [
+            "test.ieo",
+            0,
+            0
+          ],
+          "_unScopeId": "foo"
+        },
+        "_funDeclParams": [
+          {
+            "_scopeIdAnn": [],
+            "_scopeIdSourcePos": [
+              "test.ieo",
+              0,
+              0
+            ],
+            "_unScopeId": "a"
+          },
+          {
+            "_scopeIdAnn": [],
+            "_scopeIdSourcePos": [
+              "test.ieo",
+              0,
+              0
+            ],
+            "_unScopeId": "b"
+          }
+        ],
+        "_funDeclSourcePos": [
+          "test.ieo",
+          0,
+          0
+        ]
+      },
+      "tag": "FunItemDecl"
+    },
+    "_itemDeclSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
   },
   {
-    "_funDeclBody": [
-      {
-        "contents": {
-          "contents": "x",
-          "tag": "Id"
+    "_itemDeclAnn": [],
+    "_itemDeclKind": {
+      "contents": {
+        "_funDeclAnn": [],
+        "_funDeclBody": {
+          "_blockAnn": [],
+          "_blockSourcePos": [
+            "test.ieo",
+            0,
+            0
+          ],
+          "_blockStmts": [
+            {
+              "_stmtAnn": [],
+              "_stmtKind": {
+                "contents": {
+                  "_exprAnn": [],
+                  "_exprKind": {
+                    "contents": {
+                      "contents": {
+                        "_scopeIdAnn": [],
+                        "_scopeIdSourcePos": [
+                          "test.ieo",
+                          0,
+                          0
+                        ],
+                        "_unScopeId": "x"
+                      },
+                      "tag": "ScopeId'"
+                    },
+                    "tag": "IdExpr"
+                  },
+                  "_exprSourcePos": [
+                    "test.ieo",
+                    0,
+                    0
+                  ]
+                },
+                "tag": "ExprStmt"
+              },
+              "_stmtSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ]
+            }
+          ]
         },
-        "tag": "IdExpr"
-      }
-    ],
-    "_funDeclParams": [
-      "x"
-    ],
-    "_itemDeclName": "id"
+        "_funDeclName": {
+          "_scopeIdAnn": [],
+          "_scopeIdSourcePos": [
+            "test.ieo",
+            0,
+            0
+          ],
+          "_unScopeId": "id"
+        },
+        "_funDeclParams": [
+          {
+            "_scopeIdAnn": [],
+            "_scopeIdSourcePos": [
+              "test.ieo",
+              0,
+              0
+            ],
+            "_unScopeId": "x"
+          }
+        ],
+        "_funDeclSourcePos": [
+          "test.ieo",
+          0,
+          0
+        ]
+      },
+      "tag": "FunItemDecl"
+    },
+    "_itemDeclSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
   },
   {
-    "_funDeclBody": [
-      {
-        "contents": {
-          "contents": "92",
-          "tag": "Integer"
+    "_itemDeclAnn": [],
+    "_itemDeclKind": {
+      "contents": {
+        "_funDeclAnn": [],
+        "_funDeclBody": {
+          "_blockAnn": [],
+          "_blockSourcePos": [
+            "test.ieo",
+            0,
+            0
+          ],
+          "_blockStmts": [
+            {
+              "_stmtAnn": [],
+              "_stmtKind": {
+                "contents": {
+                  "_exprAnn": [],
+                  "_exprKind": {
+                    "contents": {
+                      "_litAnn": [],
+                      "_litKind": {
+                        "contents": "92",
+                        "tag": "IntegerLit"
+                      },
+                      "_litSourcePos": [
+                        "test.ieo",
+                        0,
+                        0
+                      ]
+                    },
+                    "tag": "LitExpr"
+                  },
+                  "_exprSourcePos": [
+                    "test.ieo",
+                    0,
+                    0
+                  ]
+                },
+                "tag": "ExprStmt"
+              },
+              "_stmtSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ]
+            }
+          ]
         },
-        "tag": "LitExpr"
-      }
-    ],
-    "_funDeclParams": [],
-    "_itemDeclName": "constant"
+        "_funDeclName": {
+          "_scopeIdAnn": [],
+          "_scopeIdSourcePos": [
+            "test.ieo",
+            0,
+            0
+          ],
+          "_unScopeId": "constant"
+        },
+        "_funDeclParams": [],
+        "_funDeclSourcePos": [
+          "test.ieo",
+          0,
+          0
+        ]
+      },
+      "tag": "FunItemDecl"
+    },
+    "_itemDeclSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
   }
 ]

@@ -3,5 +3,5 @@ fun foo(a, b) {
 }
 
 fun bar() {
-    let x = 4;
+    x = 4;
 }

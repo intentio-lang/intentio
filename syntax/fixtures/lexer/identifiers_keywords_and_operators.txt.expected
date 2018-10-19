@@ -114,5 +114,21 @@
   {
     "_text": "a",
     "_ty": "TIdent"
+  },
+  {
+    "_text": "a",
+    "_ty": "TIdent"
+  },
+  {
+    "_text": "!=",
+    "_ty": "TOpNeq"
+  },
+  {
+    "_text": "a",
+    "_ty": "TIdent"
+  },
+  {
+    "_text": "none",
+    "_ty": "TKwNone"
   }
 ]

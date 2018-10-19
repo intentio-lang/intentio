@@ -19,8 +19,9 @@ import           Intentio.Compiler              ( Assembly
                                                 , runCompileFresh
                                                 )
 import           Intentio.Diagnostics           ( diagnosticShow )
-import           Intentio.Hir.Compiler          ( readHirDumpFiles )
-import           Language.Intentio.Compiler     ( SourceFile )
+import           Language.Intentio.Compiler     ( SourceFile
+                                                , parseSourceFiles
+                                                )
 
 import           Intentioc.Opts                 ( buildInputAssembly )
 
@@ -28,9 +29,9 @@ import           Intentioc.Opts                 ( buildInputAssembly )
 -- Compiler pipeline
 
 compilerPipeline :: Assembly SourceFile -> Compile ()
--- compilerPipeline = parseSourceFiles >=> traceStep_
 compilerPipeline =
-  readHirDumpFiles
+  parseSourceFiles
+    >=> const (fail "Not implemented: HIR Lowering")
     >=> (impurify . emitCAssembly)
     >=> printCAssemblyToWorkDir
     >=> runGCC

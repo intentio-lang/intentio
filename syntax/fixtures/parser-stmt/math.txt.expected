@@ -1,0 +1,1752 @@
+[
+  {
+    "_stmtAnn": [],
+    "_stmtKind": {
+      "contents": {
+        "_exprAnn": [],
+        "_exprKind": {
+          "contents": [
+            {
+              "_binOpAnn": [],
+              "_binOpKind": "BinSub",
+              "_binOpSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ]
+            },
+            {
+              "_exprAnn": [],
+              "_exprKind": {
+                "contents": [
+                  {
+                    "_binOpAnn": [],
+                    "_binOpKind": "BinAdd",
+                    "_binOpSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  },
+                  {
+                    "_exprAnn": [],
+                    "_exprKind": {
+                      "contents": {
+                        "_litAnn": [],
+                        "_litKind": {
+                          "contents": "3",
+                          "tag": "IntegerLit"
+                        },
+                        "_litSourcePos": [
+                          "test.ieo",
+                          0,
+                          0
+                        ]
+                      },
+                      "tag": "LitExpr"
+                    },
+                    "_exprSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  },
+                  {
+                    "_exprAnn": [],
+                    "_exprKind": {
+                      "contents": [
+                        {
+                          "_binOpAnn": [],
+                          "_binOpKind": "BinMul",
+                          "_binOpSourcePos": [
+                            "test.ieo",
+                            0,
+                            0
+                          ]
+                        },
+                        {
+                          "_exprAnn": [],
+                          "_exprKind": {
+                            "contents": {
+                              "_litAnn": [],
+                              "_litKind": {
+                                "contents": "4",
+                                "tag": "IntegerLit"
+                              },
+                              "_litSourcePos": [
+                                "test.ieo",
+                                0,
+                                0
+                              ]
+                            },
+                            "tag": "LitExpr"
+                          },
+                          "_exprSourcePos": [
+                            "test.ieo",
+                            0,
+                            0
+                          ]
+                        },
+                        {
+                          "_exprAnn": [],
+                          "_exprKind": {
+                            "contents": {
+                              "_litAnn": [],
+                              "_litKind": {
+                                "contents": "5",
+                                "tag": "IntegerLit"
+                              },
+                              "_litSourcePos": [
+                                "test.ieo",
+                                0,
+                                0
+                              ]
+                            },
+                            "tag": "LitExpr"
+                          },
+                          "_exprSourcePos": [
+                            "test.ieo",
+                            0,
+                            0
+                          ]
+                        }
+                      ],
+                      "tag": "BinExpr"
+                    },
+                    "_exprSourcePos": [
+                      "",
+                      0,
+                      0
+                    ]
+                  }
+                ],
+                "tag": "BinExpr"
+              },
+              "_exprSourcePos": [
+                "",
+                0,
+                0
+              ]
+            },
+            {
+              "_exprAnn": [],
+              "_exprKind": {
+                "contents": [
+                  {
+                    "_binOpAnn": [],
+                    "_binOpKind": "BinDiv",
+                    "_binOpSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  },
+                  {
+                    "_exprAnn": [],
+                    "_exprKind": {
+                      "contents": {
+                        "_exprAnn": [],
+                        "_exprKind": {
+                          "contents": [
+                            {
+                              "_binOpAnn": [],
+                              "_binOpKind": "BinAdd",
+                              "_binOpSourcePos": [
+                                "test.ieo",
+                                0,
+                                0
+                              ]
+                            },
+                            {
+                              "_exprAnn": [],
+                              "_exprKind": {
+                                "contents": {
+                                  "_litAnn": [],
+                                  "_litKind": {
+                                    "contents": "8",
+                                    "tag": "IntegerLit"
+                                  },
+                                  "_litSourcePos": [
+                                    "test.ieo",
+                                    0,
+                                    0
+                                  ]
+                                },
+                                "tag": "LitExpr"
+                              },
+                              "_exprSourcePos": [
+                                "test.ieo",
+                                0,
+                                0
+                              ]
+                            },
+                            {
+                              "_exprAnn": [],
+                              "_exprKind": {
+                                "contents": {
+                                  "_litAnn": [],
+                                  "_litKind": {
+                                    "contents": "1",
+                                    "tag": "IntegerLit"
+                                  },
+                                  "_litSourcePos": [
+                                    "test.ieo",
+                                    0,
+                                    0
+                                  ]
+                                },
+                                "tag": "LitExpr"
+                              },
+                              "_exprSourcePos": [
+                                "test.ieo",
+                                0,
+                                0
+                              ]
+                            }
+                          ],
+                          "tag": "BinExpr"
+                        },
+                        "_exprSourcePos": [
+                          "",
+                          0,
+                          0
+                        ]
+                      },
+                      "tag": "ParenExpr"
+                    },
+                    "_exprSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  },
+                  {
+                    "_exprAnn": [],
+                    "_exprKind": {
+                      "contents": {
+                        "_litAnn": [],
+                        "_litKind": {
+                          "contents": "3",
+                          "tag": "IntegerLit"
+                        },
+                        "_litSourcePos": [
+                          "test.ieo",
+                          0,
+                          0
+                        ]
+                      },
+                      "tag": "LitExpr"
+                    },
+                    "_exprSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  }
+                ],
+                "tag": "BinExpr"
+              },
+              "_exprSourcePos": [
+                "",
+                0,
+                0
+              ]
+            }
+          ],
+          "tag": "BinExpr"
+        },
+        "_exprSourcePos": [
+          "",
+          0,
+          0
+        ]
+      },
+      "tag": "ExprStmt"
+    },
+    "_stmtSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
+  },
+  {
+    "_stmtAnn": [],
+    "_stmtKind": {
+      "contents": {
+        "_exprAnn": [],
+        "_exprKind": {
+          "contents": [
+            {
+              "_unOpAnn": [],
+              "_unOpKind": "UnNeg",
+              "_unOpSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ]
+            },
+            {
+              "_exprAnn": [],
+              "_exprKind": {
+                "contents": {
+                  "_litAnn": [],
+                  "_litKind": {
+                    "contents": "3",
+                    "tag": "IntegerLit"
+                  },
+                  "_litSourcePos": [
+                    "test.ieo",
+                    0,
+                    0
+                  ]
+                },
+                "tag": "LitExpr"
+              },
+              "_exprSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ]
+            }
+          ],
+          "tag": "UnExpr"
+        },
+        "_exprSourcePos": [
+          "",
+          0,
+          0
+        ]
+      },
+      "tag": "ExprStmt"
+    },
+    "_stmtSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
+  },
+  {
+    "_stmtAnn": [],
+    "_stmtKind": {
+      "contents": {
+        "_exprAnn": [],
+        "_exprKind": {
+          "contents": [
+            {
+              "_unOpAnn": [],
+              "_unOpKind": "UnNeg",
+              "_unOpSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ]
+            },
+            {
+              "_exprAnn": [],
+              "_exprKind": {
+                "contents": {
+                  "_exprAnn": [],
+                  "_exprKind": {
+                    "contents": [
+                      {
+                        "_binOpAnn": [],
+                        "_binOpKind": "BinAdd",
+                        "_binOpSourcePos": [
+                          "test.ieo",
+                          0,
+                          0
+                        ]
+                      },
+                      {
+                        "_exprAnn": [],
+                        "_exprKind": {
+                          "contents": {
+                            "_litAnn": [],
+                            "_litKind": {
+                              "contents": "2",
+                              "tag": "IntegerLit"
+                            },
+                            "_litSourcePos": [
+                              "test.ieo",
+                              0,
+                              0
+                            ]
+                          },
+                          "tag": "LitExpr"
+                        },
+                        "_exprSourcePos": [
+                          "test.ieo",
+                          0,
+                          0
+                        ]
+                      },
+                      {
+                        "_exprAnn": [],
+                        "_exprKind": {
+                          "contents": {
+                            "_litAnn": [],
+                            "_litKind": {
+                              "contents": "2",
+                              "tag": "IntegerLit"
+                            },
+                            "_litSourcePos": [
+                              "test.ieo",
+                              0,
+                              0
+                            ]
+                          },
+                          "tag": "LitExpr"
+                        },
+                        "_exprSourcePos": [
+                          "test.ieo",
+                          0,
+                          0
+                        ]
+                      }
+                    ],
+                    "tag": "BinExpr"
+                  },
+                  "_exprSourcePos": [
+                    "",
+                    0,
+                    0
+                  ]
+                },
+                "tag": "ParenExpr"
+              },
+              "_exprSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ]
+            }
+          ],
+          "tag": "UnExpr"
+        },
+        "_exprSourcePos": [
+          "",
+          0,
+          0
+        ]
+      },
+      "tag": "ExprStmt"
+    },
+    "_stmtSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
+  },
+  {
+    "_stmtAnn": [],
+    "_stmtKind": {
+      "contents": {
+        "_exprAnn": [],
+        "_exprKind": {
+          "contents": [
+            {
+              "_unOpAnn": [],
+              "_unOpKind": "UnNeg",
+              "_unOpSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ]
+            },
+            {
+              "_exprAnn": [],
+              "_exprKind": {
+                "contents": [
+                  {
+                    "_exprAnn": [],
+                    "_exprKind": {
+                      "contents": {
+                        "contents": {
+                          "_scopeIdAnn": [],
+                          "_scopeIdSourcePos": [
+                            "test.ieo",
+                            0,
+                            0
+                          ],
+                          "_unScopeId": "foo"
+                        },
+                        "tag": "ScopeId'"
+                      },
+                      "tag": "IdExpr"
+                    },
+                    "_exprSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  },
+                  []
+                ],
+                "tag": "CallExpr"
+              },
+              "_exprSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ]
+            }
+          ],
+          "tag": "UnExpr"
+        },
+        "_exprSourcePos": [
+          "",
+          0,
+          0
+        ]
+      },
+      "tag": "ExprStmt"
+    },
+    "_stmtSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
+  },
+  {
+    "_stmtAnn": [],
+    "_stmtKind": {
+      "contents": {
+        "_exprAnn": [],
+        "_exprKind": {
+          "contents": [
+            {
+              "_binOpAnn": [],
+              "_binOpKind": "BinAnd",
+              "_binOpSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ]
+            },
+            {
+              "_exprAnn": [],
+              "_exprKind": {
+                "contents": [
+                  {
+                    "_unOpAnn": [],
+                    "_unOpKind": "UnNeg",
+                    "_unOpSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  },
+                  {
+                    "_exprAnn": [],
+                    "_exprKind": {
+                      "contents": {
+                        "_litAnn": [],
+                        "_litKind": {
+                          "contents": "2",
+                          "tag": "IntegerLit"
+                        },
+                        "_litSourcePos": [
+                          "test.ieo",
+                          0,
+                          0
+                        ]
+                      },
+                      "tag": "LitExpr"
+                    },
+                    "_exprSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  }
+                ],
+                "tag": "UnExpr"
+              },
+              "_exprSourcePos": [
+                "",
+                0,
+                0
+              ]
+            },
+            {
+              "_exprAnn": [],
+              "_exprKind": {
+                "contents": [
+                  {
+                    "_exprAnn": [],
+                    "_exprKind": {
+                      "contents": {
+                        "contents": {
+                          "_scopeIdAnn": [],
+                          "_scopeIdSourcePos": [
+                            "test.ieo",
+                            0,
+                            0
+                          ],
+                          "_unScopeId": "bar"
+                        },
+                        "tag": "ScopeId'"
+                      },
+                      "tag": "IdExpr"
+                    },
+                    "_exprSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  },
+                  []
+                ],
+                "tag": "CallExpr"
+              },
+              "_exprSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ]
+            }
+          ],
+          "tag": "BinExpr"
+        },
+        "_exprSourcePos": [
+          "",
+          0,
+          0
+        ]
+      },
+      "tag": "ExprStmt"
+    },
+    "_stmtSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
+  },
+  {
+    "_stmtAnn": [],
+    "_stmtKind": {
+      "contents": {
+        "_exprAnn": [],
+        "_exprKind": {
+          "contents": [
+            {
+              "_binOpAnn": [],
+              "_binOpKind": "BinOr",
+              "_binOpSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ]
+            },
+            {
+              "_exprAnn": [],
+              "_exprKind": {
+                "contents": [
+                  {
+                    "_binOpAnn": [],
+                    "_binOpKind": "BinAnd",
+                    "_binOpSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  },
+                  {
+                    "_exprAnn": [],
+                    "_exprKind": {
+                      "contents": [
+                        {
+                          "_unOpAnn": [],
+                          "_unOpKind": "UnNot",
+                          "_unOpSourcePos": [
+                            "test.ieo",
+                            0,
+                            0
+                          ]
+                        },
+                        {
+                          "_exprAnn": [],
+                          "_exprKind": {
+                            "contents": {
+                              "contents": {
+                                "_scopeIdAnn": [],
+                                "_scopeIdSourcePos": [
+                                  "test.ieo",
+                                  0,
+                                  0
+                                ],
+                                "_unScopeId": "x"
+                              },
+                              "tag": "ScopeId'"
+                            },
+                            "tag": "IdExpr"
+                          },
+                          "_exprSourcePos": [
+                            "test.ieo",
+                            0,
+                            0
+                          ]
+                        }
+                      ],
+                      "tag": "UnExpr"
+                    },
+                    "_exprSourcePos": [
+                      "",
+                      0,
+                      0
+                    ]
+                  },
+                  {
+                    "_exprAnn": [],
+                    "_exprKind": {
+                      "contents": {
+                        "contents": {
+                          "_scopeIdAnn": [],
+                          "_scopeIdSourcePos": [
+                            "test.ieo",
+                            0,
+                            0
+                          ],
+                          "_unScopeId": "b"
+                        },
+                        "tag": "ScopeId'"
+                      },
+                      "tag": "IdExpr"
+                    },
+                    "_exprSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  }
+                ],
+                "tag": "BinExpr"
+              },
+              "_exprSourcePos": [
+                "",
+                0,
+                0
+              ]
+            },
+            {
+              "_exprAnn": [],
+              "_exprKind": {
+                "contents": [
+                  {
+                    "_unOpAnn": [],
+                    "_unOpKind": "UnNot",
+                    "_unOpSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  },
+                  {
+                    "_exprAnn": [],
+                    "_exprKind": {
+                      "contents": {
+                        "contents": {
+                          "_scopeIdAnn": [],
+                          "_scopeIdSourcePos": [
+                            "test.ieo",
+                            0,
+                            0
+                          ],
+                          "_unScopeId": "c"
+                        },
+                        "tag": "ScopeId'"
+                      },
+                      "tag": "IdExpr"
+                    },
+                    "_exprSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  }
+                ],
+                "tag": "UnExpr"
+              },
+              "_exprSourcePos": [
+                "",
+                0,
+                0
+              ]
+            }
+          ],
+          "tag": "BinExpr"
+        },
+        "_exprSourcePos": [
+          "",
+          0,
+          0
+        ]
+      },
+      "tag": "ExprStmt"
+    },
+    "_stmtSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
+  },
+  {
+    "_stmtAnn": [],
+    "_stmtKind": {
+      "contents": {
+        "_exprAnn": [],
+        "_exprKind": {
+          "contents": [
+            {
+              "_binOpAnn": [],
+              "_binOpKind": "BinEq",
+              "_binOpSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ]
+            },
+            {
+              "_exprAnn": [],
+              "_exprKind": {
+                "contents": {
+                  "_litAnn": [],
+                  "_litKind": {
+                    "contents": "2",
+                    "tag": "IntegerLit"
+                  },
+                  "_litSourcePos": [
+                    "test.ieo",
+                    0,
+                    0
+                  ]
+                },
+                "tag": "LitExpr"
+              },
+              "_exprSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ]
+            },
+            {
+              "_exprAnn": [],
+              "_exprKind": {
+                "contents": [
+                  {
+                    "_binOpAnn": [],
+                    "_binOpKind": "BinAdd",
+                    "_binOpSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  },
+                  {
+                    "_exprAnn": [],
+                    "_exprKind": {
+                      "contents": {
+                        "_litAnn": [],
+                        "_litKind": {
+                          "contents": "1",
+                          "tag": "IntegerLit"
+                        },
+                        "_litSourcePos": [
+                          "test.ieo",
+                          0,
+                          0
+                        ]
+                      },
+                      "tag": "LitExpr"
+                    },
+                    "_exprSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  },
+                  {
+                    "_exprAnn": [],
+                    "_exprKind": {
+                      "contents": {
+                        "_litAnn": [],
+                        "_litKind": {
+                          "contents": "1",
+                          "tag": "IntegerLit"
+                        },
+                        "_litSourcePos": [
+                          "test.ieo",
+                          0,
+                          0
+                        ]
+                      },
+                      "tag": "LitExpr"
+                    },
+                    "_exprSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  }
+                ],
+                "tag": "BinExpr"
+              },
+              "_exprSourcePos": [
+                "",
+                0,
+                0
+              ]
+            }
+          ],
+          "tag": "BinExpr"
+        },
+        "_exprSourcePos": [
+          "",
+          0,
+          0
+        ]
+      },
+      "tag": "ExprStmt"
+    },
+    "_stmtSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
+  },
+  {
+    "_stmtAnn": [],
+    "_stmtKind": {
+      "contents": {
+        "_exprAnn": [],
+        "_exprKind": {
+          "contents": [
+            {
+              "_binOpAnn": [],
+              "_binOpKind": "BinAnd",
+              "_binOpSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ]
+            },
+            {
+              "_exprAnn": [],
+              "_exprKind": {
+                "contents": [
+                  {
+                    "_binOpAnn": [],
+                    "_binOpKind": "BinNeq",
+                    "_binOpSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  },
+                  {
+                    "_exprAnn": [],
+                    "_exprKind": {
+                      "contents": {
+                        "_litAnn": [],
+                        "_litKind": {
+                          "contents": "3",
+                          "tag": "IntegerLit"
+                        },
+                        "_litSourcePos": [
+                          "test.ieo",
+                          0,
+                          0
+                        ]
+                      },
+                      "tag": "LitExpr"
+                    },
+                    "_exprSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  },
+                  {
+                    "_exprAnn": [],
+                    "_exprKind": {
+                      "contents": [
+                        {
+                          "_binOpAnn": [],
+                          "_binOpKind": "BinAdd",
+                          "_binOpSourcePos": [
+                            "test.ieo",
+                            0,
+                            0
+                          ]
+                        },
+                        {
+                          "_exprAnn": [],
+                          "_exprKind": {
+                            "contents": {
+                              "_litAnn": [],
+                              "_litKind": {
+                                "contents": "1",
+                                "tag": "IntegerLit"
+                              },
+                              "_litSourcePos": [
+                                "test.ieo",
+                                0,
+                                0
+                              ]
+                            },
+                            "tag": "LitExpr"
+                          },
+                          "_exprSourcePos": [
+                            "test.ieo",
+                            0,
+                            0
+                          ]
+                        },
+                        {
+                          "_exprAnn": [],
+                          "_exprKind": {
+                            "contents": {
+                              "_litAnn": [],
+                              "_litKind": {
+                                "contents": "1",
+                                "tag": "IntegerLit"
+                              },
+                              "_litSourcePos": [
+                                "test.ieo",
+                                0,
+                                0
+                              ]
+                            },
+                            "tag": "LitExpr"
+                          },
+                          "_exprSourcePos": [
+                            "test.ieo",
+                            0,
+                            0
+                          ]
+                        }
+                      ],
+                      "tag": "BinExpr"
+                    },
+                    "_exprSourcePos": [
+                      "",
+                      0,
+                      0
+                    ]
+                  }
+                ],
+                "tag": "BinExpr"
+              },
+              "_exprSourcePos": [
+                "",
+                0,
+                0
+              ]
+            },
+            {
+              "_exprAnn": [],
+              "_exprKind": {
+                "contents": [
+                  {
+                    "_binOpAnn": [],
+                    "_binOpKind": "BinLt",
+                    "_binOpSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  },
+                  {
+                    "_exprAnn": [],
+                    "_exprKind": {
+                      "contents": {
+                        "_litAnn": [],
+                        "_litKind": {
+                          "contents": "4",
+                          "tag": "IntegerLit"
+                        },
+                        "_litSourcePos": [
+                          "test.ieo",
+                          0,
+                          0
+                        ]
+                      },
+                      "tag": "LitExpr"
+                    },
+                    "_exprSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  },
+                  {
+                    "_exprAnn": [],
+                    "_exprKind": {
+                      "contents": {
+                        "_litAnn": [],
+                        "_litKind": {
+                          "contents": "9",
+                          "tag": "IntegerLit"
+                        },
+                        "_litSourcePos": [
+                          "test.ieo",
+                          0,
+                          0
+                        ]
+                      },
+                      "tag": "LitExpr"
+                    },
+                    "_exprSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  }
+                ],
+                "tag": "BinExpr"
+              },
+              "_exprSourcePos": [
+                "",
+                0,
+                0
+              ]
+            }
+          ],
+          "tag": "BinExpr"
+        },
+        "_exprSourcePos": [
+          "",
+          0,
+          0
+        ]
+      },
+      "tag": "ExprStmt"
+    },
+    "_stmtSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
+  },
+  {
+    "_stmtAnn": [],
+    "_stmtKind": {
+      "contents": {
+        "_exprAnn": [],
+        "_exprKind": {
+          "contents": [
+            {
+              "_binOpAnn": [],
+              "_binOpKind": "BinAnd",
+              "_binOpSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ]
+            },
+            {
+              "_exprAnn": [],
+              "_exprKind": {
+                "contents": [
+                  {
+                    "_binOpAnn": [],
+                    "_binOpKind": "BinGtEq",
+                    "_binOpSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  },
+                  {
+                    "_exprAnn": [],
+                    "_exprKind": {
+                      "contents": [
+                        {
+                          "_binOpAnn": [],
+                          "_binOpKind": "BinMul",
+                          "_binOpSourcePos": [
+                            "test.ieo",
+                            0,
+                            0
+                          ]
+                        },
+                        {
+                          "_exprAnn": [],
+                          "_exprKind": {
+                            "contents": {
+                              "_litAnn": [],
+                              "_litKind": {
+                                "contents": "6",
+                                "tag": "IntegerLit"
+                              },
+                              "_litSourcePos": [
+                                "test.ieo",
+                                0,
+                                0
+                              ]
+                            },
+                            "tag": "LitExpr"
+                          },
+                          "_exprSourcePos": [
+                            "test.ieo",
+                            0,
+                            0
+                          ]
+                        },
+                        {
+                          "_exprAnn": [],
+                          "_exprKind": {
+                            "contents": {
+                              "_litAnn": [],
+                              "_litKind": {
+                                "contents": "5",
+                                "tag": "IntegerLit"
+                              },
+                              "_litSourcePos": [
+                                "test.ieo",
+                                0,
+                                0
+                              ]
+                            },
+                            "tag": "LitExpr"
+                          },
+                          "_exprSourcePos": [
+                            "test.ieo",
+                            0,
+                            0
+                          ]
+                        }
+                      ],
+                      "tag": "BinExpr"
+                    },
+                    "_exprSourcePos": [
+                      "",
+                      0,
+                      0
+                    ]
+                  },
+                  {
+                    "_exprAnn": [],
+                    "_exprKind": {
+                      "contents": {
+                        "_litAnn": [],
+                        "_litKind": {
+                          "contents": "0",
+                          "tag": "IntegerLit"
+                        },
+                        "_litSourcePos": [
+                          "test.ieo",
+                          0,
+                          0
+                        ]
+                      },
+                      "tag": "LitExpr"
+                    },
+                    "_exprSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  }
+                ],
+                "tag": "BinExpr"
+              },
+              "_exprSourcePos": [
+                "",
+                0,
+                0
+              ]
+            },
+            {
+              "_exprAnn": [],
+              "_exprKind": {
+                "contents": [
+                  {
+                    "_binOpAnn": [],
+                    "_binOpKind": "BinLtEq",
+                    "_binOpSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  },
+                  {
+                    "_exprAnn": [],
+                    "_exprKind": {
+                      "contents": [
+                        {
+                          "_unOpAnn": [],
+                          "_unOpKind": "UnNot",
+                          "_unOpSourcePos": [
+                            "test.ieo",
+                            0,
+                            0
+                          ]
+                        },
+                        {
+                          "_exprAnn": [],
+                          "_exprKind": {
+                            "contents": {
+                              "_litAnn": [],
+                              "_litKind": {
+                                "contents": "2",
+                                "tag": "IntegerLit"
+                              },
+                              "_litSourcePos": [
+                                "test.ieo",
+                                0,
+                                0
+                              ]
+                            },
+                            "tag": "LitExpr"
+                          },
+                          "_exprSourcePos": [
+                            "test.ieo",
+                            0,
+                            0
+                          ]
+                        }
+                      ],
+                      "tag": "UnExpr"
+                    },
+                    "_exprSourcePos": [
+                      "",
+                      0,
+                      0
+                    ]
+                  },
+                  {
+                    "_exprAnn": [],
+                    "_exprKind": {
+                      "contents": {
+                        "_litAnn": [],
+                        "_litKind": {
+                          "contents": "9",
+                          "tag": "IntegerLit"
+                        },
+                        "_litSourcePos": [
+                          "test.ieo",
+                          0,
+                          0
+                        ]
+                      },
+                      "tag": "LitExpr"
+                    },
+                    "_exprSourcePos": [
+                      "test.ieo",
+                      0,
+                      0
+                    ]
+                  }
+                ],
+                "tag": "BinExpr"
+              },
+              "_exprSourcePos": [
+                "",
+                0,
+                0
+              ]
+            }
+          ],
+          "tag": "BinExpr"
+        },
+        "_exprSourcePos": [
+          "",
+          0,
+          0
+        ]
+      },
+      "tag": "ExprStmt"
+    },
+    "_stmtSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
+  },
+  {
+    "_stmtAnn": [],
+    "_stmtKind": {
+      "contents": {
+        "_exprAnn": [],
+        "_exprKind": {
+          "contents": {
+            "_exprAnn": [],
+            "_exprKind": {
+              "contents": [
+                {
+                  "_binOpAnn": [],
+                  "_binOpKind": "BinXor",
+                  "_binOpSourcePos": [
+                    "test.ieo",
+                    0,
+                    0
+                  ]
+                },
+                {
+                  "_exprAnn": [],
+                  "_exprKind": {
+                    "contents": {
+                      "_litAnn": [],
+                      "_litKind": {
+                        "contents": "2",
+                        "tag": "IntegerLit"
+                      },
+                      "_litSourcePos": [
+                        "test.ieo",
+                        0,
+                        0
+                      ]
+                    },
+                    "tag": "LitExpr"
+                  },
+                  "_exprSourcePos": [
+                    "test.ieo",
+                    0,
+                    0
+                  ]
+                },
+                {
+                  "_exprAnn": [],
+                  "_exprKind": {
+                    "contents": {
+                      "_exprAnn": [],
+                      "_exprKind": {
+                        "contents": [
+                          {
+                            "_binOpAnn": [],
+                            "_binOpKind": "BinAnd",
+                            "_binOpSourcePos": [
+                              "test.ieo",
+                              0,
+                              0
+                            ]
+                          },
+                          {
+                            "_exprAnn": [],
+                            "_exprKind": {
+                              "contents": {
+                                "_litAnn": [],
+                                "_litKind": {
+                                  "tag": "NoneLit"
+                                },
+                                "_litSourcePos": [
+                                  "test.ieo",
+                                  0,
+                                  0
+                                ]
+                              },
+                              "tag": "LitExpr"
+                            },
+                            "_exprSourcePos": [
+                              "test.ieo",
+                              0,
+                              0
+                            ]
+                          },
+                          {
+                            "_exprAnn": [],
+                            "_exprKind": {
+                              "contents": {
+                                "_exprAnn": [],
+                                "_exprKind": {
+                                  "contents": [
+                                    {
+                                      "_binOpAnn": [],
+                                      "_binOpKind": "BinOr",
+                                      "_binOpSourcePos": [
+                                        "test.ieo",
+                                        0,
+                                        0
+                                      ]
+                                    },
+                                    {
+                                      "_exprAnn": [],
+                                      "_exprKind": {
+                                        "contents": [
+                                          {
+                                            "_exprAnn": [],
+                                            "_exprKind": {
+                                              "contents": {
+                                                "contents": {
+                                                  "_scopeIdAnn": [],
+                                                  "_scopeIdSourcePos": [
+                                                    "test.ieo",
+                                                    0,
+                                                    0
+                                                  ],
+                                                  "_unScopeId": "f"
+                                                },
+                                                "tag": "ScopeId'"
+                                              },
+                                              "tag": "IdExpr"
+                                            },
+                                            "_exprSourcePos": [
+                                              "test.ieo",
+                                              0,
+                                              0
+                                            ]
+                                          },
+                                          [
+                                            {
+                                              "_exprAnn": [],
+                                              "_exprKind": {
+                                                "contents": {
+                                                  "_litAnn": [],
+                                                  "_litKind": {
+                                                    "contents": "3",
+                                                    "tag": "IntegerLit"
+                                                  },
+                                                  "_litSourcePos": [
+                                                    "test.ieo",
+                                                    0,
+                                                    0
+                                                  ]
+                                                },
+                                                "tag": "LitExpr"
+                                              },
+                                              "_exprSourcePos": [
+                                                "test.ieo",
+                                                0,
+                                                0
+                                              ]
+                                            }
+                                          ]
+                                        ],
+                                        "tag": "CallExpr"
+                                      },
+                                      "_exprSourcePos": [
+                                        "test.ieo",
+                                        0,
+                                        0
+                                      ]
+                                    },
+                                    {
+                                      "_exprAnn": [],
+                                      "_exprKind": {
+                                        "contents": {
+                                          "_exprAnn": [],
+                                          "_exprKind": {
+                                            "contents": {
+                                              "_exprAnn": [],
+                                              "_exprKind": {
+                                                "contents": [
+                                                  {
+                                                    "_binOpAnn": [],
+                                                    "_binOpKind": "BinAdd",
+                                                    "_binOpSourcePos": [
+                                                      "test.ieo",
+                                                      0,
+                                                      0
+                                                    ]
+                                                  },
+                                                  {
+                                                    "_exprAnn": [],
+                                                    "_exprKind": {
+                                                      "contents": {
+                                                        "_litAnn": [],
+                                                        "_litKind": {
+                                                          "contents": "2",
+                                                          "tag": "IntegerLit"
+                                                        },
+                                                        "_litSourcePos": [
+                                                          "test.ieo",
+                                                          0,
+                                                          0
+                                                        ]
+                                                      },
+                                                      "tag": "LitExpr"
+                                                    },
+                                                    "_exprSourcePos": [
+                                                      "test.ieo",
+                                                      0,
+                                                      0
+                                                    ]
+                                                  },
+                                                  {
+                                                    "_exprAnn": [],
+                                                    "_exprKind": {
+                                                      "contents": {
+                                                        "_litAnn": [],
+                                                        "_litKind": {
+                                                          "contents": "2",
+                                                          "tag": "IntegerLit"
+                                                        },
+                                                        "_litSourcePos": [
+                                                          "test.ieo",
+                                                          0,
+                                                          0
+                                                        ]
+                                                      },
+                                                      "tag": "LitExpr"
+                                                    },
+                                                    "_exprSourcePos": [
+                                                      "test.ieo",
+                                                      0,
+                                                      0
+                                                    ]
+                                                  }
+                                                ],
+                                                "tag": "BinExpr"
+                                              },
+                                              "_exprSourcePos": [
+                                                "",
+                                                0,
+                                                0
+                                              ]
+                                            },
+                                            "tag": "ParenExpr"
+                                          },
+                                          "_exprSourcePos": [
+                                            "test.ieo",
+                                            0,
+                                            0
+                                          ]
+                                        },
+                                        "tag": "SuccExpr"
+                                      },
+                                      "_exprSourcePos": [
+                                        "test.ieo",
+                                        0,
+                                        0
+                                      ]
+                                    }
+                                  ],
+                                  "tag": "BinExpr"
+                                },
+                                "_exprSourcePos": [
+                                  "",
+                                  0,
+                                  0
+                                ]
+                              },
+                              "tag": "FailExpr"
+                            },
+                            "_exprSourcePos": [
+                              "test.ieo",
+                              0,
+                              0
+                            ]
+                          }
+                        ],
+                        "tag": "BinExpr"
+                      },
+                      "_exprSourcePos": [
+                        "",
+                        0,
+                        0
+                      ]
+                    },
+                    "tag": "FailExpr"
+                  },
+                  "_exprSourcePos": [
+                    "test.ieo",
+                    0,
+                    0
+                  ]
+                }
+              ],
+              "tag": "BinExpr"
+            },
+            "_exprSourcePos": [
+              "",
+              0,
+              0
+            ]
+          },
+          "tag": "SuccExpr"
+        },
+        "_exprSourcePos": [
+          "test.ieo",
+          0,
+          0
+        ]
+      },
+      "tag": "ExprStmt"
+    },
+    "_stmtSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
+  },
+  {
+    "_stmtAnn": [],
+    "_stmtKind": {
+      "contents": {
+        "_exprAnn": [],
+        "_exprKind": {
+          "contents": [
+            {
+              "_binOpAnn": [],
+              "_binOpKind": "BinSEq",
+              "_binOpSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ]
+            },
+            {
+              "_exprAnn": [],
+              "_exprKind": {
+                "contents": {
+                  "_litAnn": [],
+                  "_litKind": {
+                    "contents": "0",
+                    "tag": "IntegerLit"
+                  },
+                  "_litSourcePos": [
+                    "test.ieo",
+                    0,
+                    0
+                  ]
+                },
+                "tag": "LitExpr"
+              },
+              "_exprSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ]
+            },
+            {
+              "_exprAnn": [],
+              "_exprKind": {
+                "contents": {
+                  "_litAnn": [],
+                  "_litKind": {
+                    "contents": "0.0",
+                    "tag": "FloatLit"
+                  },
+                  "_litSourcePos": [
+                    "test.ieo",
+                    0,
+                    0
+                  ]
+                },
+                "tag": "LitExpr"
+              },
+              "_exprSourcePos": [
+                "test.ieo",
+                0,
+                0
+              ]
+            }
+          ],
+          "tag": "BinExpr"
+        },
+        "_exprSourcePos": [
+          "",
+          0,
+          0
+        ]
+      },
+      "tag": "ExprStmt"
+    },
+    "_stmtSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
+  }
+]

@@ -1,47 +1,100 @@
 module Language.Intentio.Parser
   ( Parser
   , ParserError
+  , ParserErrorBundle
+  , lex
+  , lexTest
   , parseModule
   , parseItemDecl
-  , parseExpr
-  , mod
-  , itemDecl
-  , expr
+  , parseStmt
+  , parseItemDecls
+  , parseStmts
   )
 where
 
 import           Intentio.Prelude        hiding ( Prefix
+                                                , exponent
+                                                , fail
                                                 , many
                                                 , mod
+                                                , none
+                                                , option
+                                                , some
+                                                , succ
                                                 , try
+                                                , un
                                                 )
+import qualified Intentio.Prelude
 
-import           Text.Megaparsec                ( (<?>)
+import           Control.Monad.Combinators.Expr ( Operator(InfixL, Prefix)
+                                                , makeExprParser
+                                                )
+import           Data.Char                      ( isLower )
+import qualified Data.Bimap                    as BM
+import qualified Data.Text                     as T
+import           Text.Megaparsec                ( Parsec
+                                                , ParseError
+                                                , ParseErrorBundle
+                                                , (<?>)
+                                                , anySingleBut
                                                 , between
+                                                , count
                                                 , eof
+                                                , getParserState
                                                 , many
+                                                , notFollowedBy
+                                                , oneOf
+                                                , option
                                                 , optional
+                                                , parse
+                                                , parseTest
+                                                , satisfy
                                                 , sepEndBy
+                                                , some
                                                 , try
                                                 )
 import qualified Text.Megaparsec               as M
-import           Text.Megaparsec.Expr           ( Operator
-                                                  ( InfixL
-                                                  , InfixR
-                                                  , Prefix
-                                                  )
-                                                , makeExprParser
+import           Text.Megaparsec.Char           ( alphaNumChar
+                                                , char
+                                                , digitChar
+                                                , hexDigitChar
+                                                , letterChar
+                                                , octDigitChar
+                                                , space1
+                                                , string
                                                 )
+import qualified Text.Megaparsec.Char.Lexer    as L
 
 import           Language.Intentio.Assembly     ( ModuleName(..) )
 import           Language.Intentio.AST
-import           Language.Intentio.Lexer        ( Parser
-                                                , ParserError
-                                                , ident
-                                                , literal
-                                                , tok
+import           Language.Intentio.SourcePos    ( SourcePos(..)
+                                                , HasSourcePos(..)
                                                 )
 import           Language.Intentio.Token
+
+--------------------------------------------------------------------------------
+-- Parser monad
+
+type Parser = Parsec Void Text
+type ParserError = ParseError Text Void
+type ParserErrorBundle = ParseErrorBundle Text Void
+
+--------------------------------------------------------------------------------
+-- Lexer-only parsing entry points
+
+-- | Run lexer over input text. Returns either lexer error or list of tokens.
+lex
+  :: String -- Parser Name of source file.
+  -> Text   -- ^ Input for lexer.
+  -> Either ParserErrorBundle [Token]
+lex = parse programLex
+
+-- | Run lexer over input text and print the results to standard output.
+-- Useful for testing.
+lexTest
+  :: Text -- ^ Input for lexer.
+  -> IO ()
+lexTest = parseTest programLex
 
 --------------------------------------------------------------------------------
 -- Parser entry-points
@@ -50,170 +103,601 @@ parseModule
   :: ModuleName -- ^ Name of module.
   -> FilePath   -- ^ Name of source file.
   -> Text       -- ^ Input for parser.
-  -> Either ParserError ModuleSource
-parseModule (ModuleName modName) = M.parse (mod modName)
+  -> Either ParserErrorBundle (Module ())
+parseModule = M.parse . mod
 
 parseItemDecl
   :: FilePath -- ^ Name of source file.
   -> Text     -- ^ Input for parser.
-  -> Either ParserError ItemDecl
+  -> Either ParserErrorBundle (ItemDecl ())
 parseItemDecl = M.parse itemDecl
 
-parseExpr
+parseStmt
   :: FilePath -- ^ Name of source file.
   -> Text     -- ^ Input for parser.
-  -> Either ParserError Expr
-parseExpr = M.parse expr
+  -> Either ParserErrorBundle (Stmt ())
+parseStmt = M.parse stmt
+
+parseItemDecls
+  :: FilePath -- ^ Name of source file.
+  -> Text     -- ^ Input for parser.
+  -> Either ParserErrorBundle [ItemDecl ()]
+parseItemDecls = M.parse (some itemDecl <* eof)
+
+parseStmts
+  :: FilePath -- ^ Name of source file.
+  -> Text     -- ^ Input for parser.
+  -> Either ParserErrorBundle [Stmt ()]
+parseStmts = M.parse (stmts <* eof)
+
+--------------------------------------------------------------------------------
+-- Lexer productions
+
+-- | Parse whole program as a list of tokens.
+programLex :: Parser [Token]
+programLex = between sc eof $ many anyTok
+
+-- | Parse any valid token.
+anyTok :: Parser Token
+anyTok = literal <|> ident <|> anyKeyword <|> anyOperator
+
+-- | Parse token of given type.
+tok :: TokenType -> Parser Token
+tok TFloat        = float
+tok TIdent        = ident
+tok TInteger      = integer
+tok TKwAbstract   = tokKw TKwAbstract
+tok TKwAnd        = tokKw TKwAnd
+tok TKwAs         = tokKw TKwAs
+tok TKwBreak      = tokKw TKwBreak
+tok TKwCase       = tokKw TKwCase
+tok TKwConst      = tokKw TKwConst
+tok TKwContinue   = tokKw TKwContinue
+tok TKwDo         = tokKw TKwDo
+tok TKwElse       = tokKw TKwElse
+tok TKwEnum       = tokKw TKwEnum
+tok TKwEval       = tokKw TKwEval
+tok TKwExport     = tokKw TKwExport
+tok TKwFail       = tokKw TKwFail
+tok TKwFun        = tokKw TKwFun
+tok TKwIf         = tokKw TKwIf
+tok TKwImpl       = tokKw TKwImpl
+tok TKwImport     = tokKw TKwImport
+tok TKwIn         = tokKw TKwIn
+tok TKwIs         = tokKw TKwIs
+tok TKwLoop       = tokKw TKwLoop
+tok TKwModule     = tokKw TKwModule
+tok TKwNone       = tokKw TKwNone
+tok TKwNot        = tokKw TKwNot
+tok TKwOr         = tokKw TKwOr
+tok TKwReturn     = tokKw TKwReturn
+tok TKwStruct     = tokKw TKwStruct
+tok TKwSucc       = tokKw TKwSucc
+tok TKwTrait      = tokKw TKwTrait
+tok TKwType       = tokKw TKwType
+tok TKwUnderscore = tokKw TKwUnderscore
+tok TKwWhere      = tokKw TKwWhere
+tok TKwWhile      = tokKw TKwWhile
+tok TKwXor        = tokKw TKwXor
+tok TKwYield      = tokKw TKwYield
+tok TOpAdd        = tokOp TOpAdd
+tok TOpColon      = tokOp TOpColon
+tok TOpColonEq    = tokOp TOpColonEq
+tok TOpComma      = tokOp TOpComma
+tok TOpDiv        = tokOp TOpDiv
+tok TOpDollar     = tokOp TOpDollar
+tok TOpEq         = tokOp TOpEq
+tok TOpEqEq       = tokOp TOpEqEq
+tok TOpGt         = tokOp TOpGt
+tok TOpGtEq       = tokOp TOpGtEq
+tok TOpLBrace     = tokOp TOpLBrace
+tok TOpLBracket   = tokOp TOpLBracket
+tok TOpLParen     = tokOp TOpLParen
+tok TOpLt         = tokOp TOpLt
+tok TOpLtEq       = tokOp TOpLtEq
+tok TOpLtSub      = tokOp TOpLtSub
+tok TOpMul        = tokOp TOpMul
+tok TOpNeq        = tokOp TOpNeq
+tok TOpPercent    = tokOp TOpPercent
+tok TOpRBrace     = tokOp TOpRBrace
+tok TOpRBracket   = tokOp TOpRBracket
+tok TOpRParen     = tokOp TOpRParen
+tok TOpSemicolon  = tokOp TOpSemicolon
+tok TOpSEq        = tokOp TOpSEq
+tok TOpSNeq       = tokOp TOpSNeq
+tok TOpSub        = tokOp TOpSub
+tok TRawString    = rawstring
+tok TRegexString  = regexstring
+tok TString       = string'
+
+--------------------------------------------------------------------------------
+-- Token productions
+
+-- | Parse an identifier.
+ident :: Parser Token
+ident = identT >>= mkt TIdent <?> "identifier"
+
+-- | Parse an identifier.
+identT :: Parser Text
+identT = (lexeme . try) (p >>= nonReserved) <?> "identifier"
+ where
+  p :: Parser Text
+  p = identStart >:> many identContinue
+
+  nonReserved :: Text -> Parser Text
+  nonReserved w
+    | isKeyword w = Intentio.Prelude.fail $ "Illegal identifier: " <> toS w
+    | otherwise   = return w
+
+  isKeyword :: Text -> Bool
+  isKeyword = flip BM.member keywords
+
+-- | Parse any valid keyword.
+anyKeyword :: Parser Token
+anyKeyword = anyReserved keywords <?> "keyword"
+
+-- | Parse any valid operator.
+anyOperator :: Parser Token
+anyOperator = anyReserved operators <?> "operator"
+
+-- | Parse any valid literal.
+literal :: Parser Token
+literal = float <|> integer <|> anyString <|> none
+
+-- | Parse none literal
+none :: Parser Token
+none = tok TKwNone <?> "none literal"
+
+-- | Parse any valid integer literal.
+integer :: Parser Token
+integer = (lexeme . try) p >>= mkt TInteger <?> "integer literal"
+ where
+  p           = try binary <|> try octal <|> try hexadecimal <|> decimalNum
+
+  binary      = char '0' >:> oneOf ['b', 'B'] >:> binaryNum
+  octal       = char '0' >:> oneOf ['o', 'O'] >:> octalNum
+  hexadecimal = char '0' >:> oneOf ['x', 'X'] >:> hexadecimalNum
+
+-- | Parse any valid floating-point literal.
+float :: Parser Token
+float = (lexeme . try) p >>= mkt TFloat <?> "floating-point literal"
+ where
+  p =
+    decimalNum
+      <~> ((string "." <~> decimalNum <~> option "" exponent) <|> exponent)
+
+decimalNum :: Parser Text
+decimalNum = toS <$> p <?> "decimal digits"
+  where p = digitChar >:> many (digitChar <|> char '_')
+
+binaryNum :: Parser Text
+binaryNum = toS <$> p <?> "binary digits"
+ where
+  p            = binDigitChar >:> many (binDigitChar <|> char '_')
+  binDigitChar = oneOf ['0', '1'] <?> "binary digit"
+
+octalNum :: Parser Text
+octalNum = toS <$> p <?> "octal digits"
+  where p = octDigitChar >:> many (octDigitChar <|> char '_')
+
+hexadecimalNum :: Parser Text
+hexadecimalNum = toS <$> p <?> "hexadecimal digits"
+  where p = hexDigitChar >:> many (hexDigitChar <|> char '_')
+
+exponent :: Parser Text
+exponent = do
+  e           <- T.singleton <$> oneOf ['e', 'E']
+  sign        <- option "" $ T.singleton <$> oneOf ['+', '-']
+  underscores <- toS <$> many (char '_')
+  val         <- decimalNum
+  return $ e <> sign <> underscores <> val
+
+-- | Parse any valid string literal.
+anyString :: Parser Token
+anyString = string' <|> regexstring <|> rawstring
+
+-- | Parse valid regular string literal.
+string' :: Parser Token
+string' = (lexeme . try) (stringprefix <~> istring') >>= mkt TString
+
+-- | Parse valid regex literal.
+regexstring :: Parser Token
+regexstring =
+  (lexeme . try) (stringprefix <~> iregexstring) >>= mkt TRegexString
+
+-- | Parse valid raw string literal.
+rawstring :: Parser Token
+rawstring = (lexeme . try) (stringprefix <~> irawstring) >>= mkt TRawString
+
+istring' :: Parser Text
+istring' =
+  string "\""
+    <~> (T.concat <$> many strchr)
+    <~> string "\""
+    <?> "regular string"
+
+iregexstring :: Parser Text
+iregexstring =
+  string "x" <~> (try istring' <|> try irawstring) <?> "regex string"
+
+irawstring :: Parser Text
+irawstring = char 'r' >:> rawstring' 0 <?> "raw string"
+ where
+  rawstring' :: Int -> Parser Text
+  rawstring' n =
+    (string "\"" <~> rawstring'' n <~> string "\"")
+      <|> (string "#" <~> rawstring' (n + 1) <~> string "#")
+
+  rawstring'' :: Int -> Parser Text
+  rawstring'' n = toS <$> many rwsany
+   where
+    rwsany = try (anySingleBut '"') <|> try (char '"' <* notFollowedBy hashes)
+    hashes = count n $ char '#'
+
+stringprefix :: Parser Text
+stringprefix = option "" stringmod
+
+stringmod :: Parser Text
+stringmod = toS <$> some (satisfy isStringModChar) <?> "string modifier"
+  where isStringModChar c = c /= 'r' && c /= 'x' && isLower c
+
+strchr :: Parser Text
+strchr =
+  try escseq
+    <|> (T.singleton <$> satisfy (\c -> c /= '"' && c /= '\\'))
+    <?> "string character or escape sequence"
+
+escseq :: Parser Text
+escseq = try charesc <|> try asciiesc <|> try unicodeesc
+ where
+  charesc = do
+    slash <- char '\\'
+    code  <- oneOf ['\'', '"', 'n', 'r', 't', '\\', '0']
+    return $ toS [slash, code]
+
+  asciiesc   = string "\\x" <:< hexDigitChar <:< hexDigitChar
+
+  unicodeesc = do
+    prefix <- string "\\u{"
+    val    <- many (hexDigitChar <|> char '_')
+    suffix <- string "}"
+    return $ prefix <> toS val <> suffix
 
 --------------------------------------------------------------------------------
 -- Core parser productions
 
-mod :: Text -> Parser ModuleSource
-mod _moduleSourceName = do
-  _moduleSourceItems <- many itemDecl
-  _                  <- eof
-  return ModuleSource { .. }
-
-itemDecl :: Parser ItemDecl
-itemDecl = funDecl
-
-expr :: Parser Expr
-expr = opexpr
+mod :: ModuleName -> Parser (Module ())
+mod _moduleName = do
+  let _moduleAnn = ()
+  _moduleSourcePos <- srcPos
+  between sc eof $ do
+    _moduleExport <- optional exportDecl
+    _moduleItems  <- many itemDecl
+    return Module { .. }
 
 --------------------------------------------------------------------------------
 -- Identifiers
 
-modId :: Parser ModId
-modId = ModId . (^. text) <$> ident
+genId :: (() -> SourcePos -> Text -> i) -> Parser i
+genId f = f <$> pure () <*> srcPos <*> identT
 
-scopeId :: Parser ScopeId
-scopeId = ScopeId . (^. text) <$> ident
+modId :: Parser (ModId ())
+modId = genId ModId <?> "module name"
 
-anyId :: Parser AnyId
-anyId = try qid <|> try id
- where
-  id  = Id <$> scopeId
-  qid = do
-    m <- modId
-    _ <- tok TOpColon
-    s <- scopeId
-    return $ Qid m s
+scopeId :: Parser (ScopeId ())
+scopeId = genId ScopeId <?> "identifier"
+
+qid :: Parser (Qid ())
+qid =
+  (Qid <$> pure () <*> srcPos <*> (identT <* tok TOpColon) <*> identT)
+    <?> "qualified identifier"
+
+anyId :: Parser (AnyId ())
+anyId = try (Qid' <$> qid) <|> (ScopeId' <$> scopeId)
+
+exportDecl :: Parser (ExportDecl ())
+exportDecl =
+  ExportDecl
+    <$> pure ()
+    <*> srcPos
+    <*> (tok TKwExport *> exportItems)
+    <?> "export declaration"
+  where exportItems = parens $ sepEndBy scopeId comma
 
 --------------------------------------------------------------------------------
 -- Item declarations
 
-funDecl :: Parser ItemDecl
-funDecl = do
-  _              <- tok TKwFun
-  _itemDeclName  <- scopeId
-  _funDeclParams <- params
-  _funDeclBody   <- body
-  return FunDecl { .. }
+itemDecl :: Parser (ItemDecl ())
+itemDecl = importItem <|> funItem
+
+importItem :: Parser (ItemDecl ())
+importItem = item' (ImportItemDecl <$> importDecl) <?> "import declaration"
+
+modGlob :: Parser (ModId ())
+modGlob = modId <* (tok TOpColon *> tok TOpMul)
+
+data ImportFirstId a = ImportFirstQid (Qid a) | ImportFirstMod (ModId a) | ImportFirstGlob (ModId a)
+
+importDecl :: Parser (ImportDecl ())
+importDecl = do
+  pos <- srcPos
+  void $ tok TKwImport
+  k <- pFirstId >>= \case
+    ImportFirstGlob i -> return $ ImportAll i
+    ImportFirstQid  i -> pRename scopeId >>= \case
+      Just r  -> return $ ImportQidAs i r
+      Nothing -> return $ ImportQid i
+    ImportFirstMod i -> pRename modId >>= \case
+      Just r  -> return $ ImportIdAs i r
+      Nothing -> return $ ImportId i
+  return $ ImportDecl () pos k
  where
-  params    = FunParams <$> parens paramList
-  paramList = sepEndBy param comma
-  param     = FunParam <$> scopeId
-  body      = FunBody <$> block
+  pFirstId =
+    try (ImportFirstGlob <$> modGlob)
+      <|> try (ImportFirstQid <$> qid)
+      <|> (ImportFirstMod <$> modId)
+
+  pRename p = optional (tok TKwAs *> p)
+
+funItem :: Parser (ItemDecl ())
+funItem = item' (FunItemDecl <$> funDecl) <?> "function item"
+
+funDecl :: Parser (FunDecl ())
+funDecl = p <?> "function declaration"
+ where
+  p = do
+    let _funDeclAnn = ()
+    _funDeclSourcePos <- srcPos
+    tok TKwFun
+    _funDeclName   <- scopeId
+    _funDeclParams <- params
+    _funDeclBody   <- FunBody <$> block
+    return FunDecl { .. }
+  params = parens $ sepEndBy param comma
+  param  = FunParam <$> scopeId
+
+--------------------------------------------------------------------------------
+-- Statements
+
+stmt :: Parser (Stmt ())
+stmt = try assignStmt <|> exprStmt
+
+stmts :: Parser [Stmt ()]
+stmts = sepEndBy stmt semi <?> "statements"
+
+assignStmt :: Parser (Stmt ())
+assignStmt =
+  stmt' (AssignStmt <$> (scopeId <* tok TOpEq) <*> expr)
+    <?> "assignment statement"
+
+exprStmt :: Parser (Stmt ())
+exprStmt = stmt' (ExprStmt <$> expr) <?> "expression statement"
 
 --------------------------------------------------------------------------------
 -- Expressions
 
-opexpr :: Parser Expr
-opexpr = makeExprParser term table
+expr :: Parser (Expr ())
+expr = opExpr
+
+opExpr :: Parser (Expr ())
+opExpr = makeExprParser termWithCall table <?> "expression"
  where
   table =
-    [ [prefix TKwNot, prefix TOpSub, prefix TOpAdd]
+    [ [prefix TKwNot, prefix TOpSub]
     , [infixL TOpMul, infixL TOpDiv]
     , [infixL TOpAdd, infixL TOpSub]
-    , [ infixL TOpEqEq
+    , [ infixL TOpSEq
+      , infixL TOpSNeq
+      , infixL TOpEqEq
       , infixL TOpNeq
       , infixL TOpLtEq
       , infixL TOpGtEq
       , infixL TOpLt
       , infixL TOpGt
       ]
+    , [infixL TKwXor]
     , [infixL TKwAnd]
     , [infixL TKwOr]
     ]
 
-  prefix tokTy = Prefix $ UnaryExpr <$> (convert <$> tok tokTy)
-  infixL tokTy = InfixL $ BinExpr <$> (convert <$> tok tokTy)
-  infixR tokTy = InfixR $ BinExpr <$> (convert <$> tok tokTy)
+  prefix tokTy = Prefix $ un (_sourcePos ()) tokTy
+  infixL tokTy = InfixL $ bin (_sourcePos ()) tokTy
+  -- infixR tokTy = InfixR $ bin (_sourcePos ()) tokTy
 
-term :: Parser Expr
+  un :: SourcePos -> TokenType -> Parser (Expr () -> Expr ())
+  un pos tokTy = do
+    o <- UnOp <$> pure () <*> srcPos <*> (convert <$> tok tokTy)
+    return $ \e -> Expr () pos (UnExpr o e)
+
+  bin :: SourcePos -> TokenType -> Parser (Expr () -> Expr () -> Expr ())
+  bin pos tokTy = do
+    o <- BinOp <$> pure () <*> srcPos <*> (convert <$> tok tokTy)
+    return $ \l r -> Expr () pos (BinExpr o l r)
+
+termWithCall :: Parser (Expr ())
+termWithCall = try callExpr <|> term
+
+term :: Parser (Expr ())
 term =
-  try letdeclexpr
-    <|> try whileexpr
-    <|> try ifelseexpr
-    <|> try ifexpr
-    <|> try returnexpr
-    <|> try blockexpr
-    <|> try funcallexpr
-    <|> try parenexpr
-    <|> try litexpr
-    <|> try idexpr
+  litExpr
+    <|> idExpr
+    <|> blockExpr
+    <|> succExpr
+    <|> failExpr
+    <|> whileExpr
+    <|> ifExpr
+    <|> parenExpr
+    <|> returnExpr
 
-letdeclexpr :: Parser Expr
-letdeclexpr = do
-  _            <- tok TKwLet
-  _letDeclName <- scopeId
-  _            <- tok TOpEq
-  _letDeclVal  <- expr
-  return LetDeclExpr { .. }
+idExpr :: Parser (Expr ())
+idExpr = expr' (IdExpr <$> anyId)
 
-whileexpr :: Parser Expr
-whileexpr = do
-  _               <- tok TKwWhile
-  _whileCondition <- expr
-  _whileBody      <- block
-  return WhileExpr { .. }
+litExpr :: Parser (Expr ())
+litExpr = expr' (LitExpr <$> p)
+  where p = lit' (fmap convert literal) <?> "literal"
 
-ifelseexpr :: Parser Expr
-ifelseexpr = do
-  _ <- tok TKwIf
-  i <- expr
-  t <- block
-  _ <- tok TKwElse
-  e <- block
-  return $ IfElseExpr i t e
+blockExpr :: Parser (Expr ())
+blockExpr = expr' (BlockExpr <$> block) <?> "block"
 
-ifexpr :: Parser Expr
-ifexpr = do
-  _ <- tok TKwIf
-  e <- expr
-  b <- block
-  return $ IfExpr e b
+succExpr :: Parser (Expr ())
+succExpr = expr' (SuccExpr <$> (tok TKwSucc *> expr) <?> "succ expression")
 
-returnexpr :: Parser Expr
-returnexpr = do
-  _ <- tok TKwReturn
-  e <- optional expr
-  return $ ReturnExpr e
+failExpr :: Parser (Expr ())
+failExpr = expr' (FailExpr <$> (tok TKwFail *> expr) <?> "fail expression")
 
-blockexpr :: Parser Expr
-blockexpr = BlockExpr <$> block
+callExpr :: Parser (Expr ())
+callExpr = expr' (CallExpr <$> term <*> args) <?> "function call"
+  where args = parens (sepEndBy expr comma)
 
-parenexpr :: Parser Expr
-parenexpr = ParenExpr <$> parens expr
+whileExpr :: Parser (Expr ())
+whileExpr = expr' p <?> "while expression"
+  where p = WhileExpr <$> (tok TKwWhile *> expr) <*> block
 
-funcallexpr :: Parser Expr
-funcallexpr = do
-  c <- try idexpr <|> try parenexpr
-  p <- parens argList
-  return $ FunCallExpr c p
-  where argList = FunArgs <$> sepEndBy expr comma
+ifExpr :: Parser (Expr ())
+ifExpr = expr' p <?> "if expression"
+ where
+  p = IfExpr <$> (tok TKwIf *> expr) <*> block <*> optional e
+  e = tok TKwElse *> block
 
-idexpr :: Parser Expr
-idexpr = IdExpr <$> anyId
+parenExpr :: Parser (Expr ())
+parenExpr = expr' (ParenExpr <$> parens expr) <?> "parenthesized expression"
 
-litexpr :: Parser Expr
-litexpr = LitExpr . convert <$> literal <?> "literal"
+returnExpr :: Parser (Expr ())
+returnExpr =
+  expr' (ReturnExpr <$> (tok TKwReturn *> optional expr))
+    <?> "return expression"
 
 --------------------------------------------------------------------------------
 -- Utilities
 
-block :: Parser Block
-block = Block <$> braced exprList where exprList = sepEndBy expr semi
+mkt :: TokenType -> Text -> Parser Token
+mkt _ty _text = return Token { .. }
+
+sc :: Parser ()
+sc = L.space space1 lineComment empty
+  where lineComment = L.skipLineComment "#"
+
+lexeme :: Parser a -> Parser a
+lexeme = L.lexeme sc
+
+symbol :: Text -> Parser Text
+symbol = L.symbol sc
+
+identStart :: Parser Char
+identStart = letterChar <|> char '_'
+
+identContinue :: Parser Char
+identContinue = alphaNumChar <|> char '_' <|> char '\''
+
+anyReserved :: BM.Bimap Text TokenType -> Parser Token
+anyReserved = try . BM.fold (\s t p -> (symbol s >>= mkt t) <|> p) empty
+
+tokKw :: TokenType -> Parser Token
+tokKw = tokReserved keywords
+
+tokOp :: TokenType -> Parser Token
+tokOp = tokReserved operators
+
+tokReserved :: BM.Bimap Text TokenType -> TokenType -> Parser Token
+tokReserved m t = (try . symbol) s >>= mkt t where s = m BM.!> t
+
+keywords :: BM.Bimap Text TokenType
+keywords = BM.fromList
+  [ ("abstract", TKwAbstract)
+  , ("and"     , TKwAnd)
+  , ("as"      , TKwAs)
+  , ("break"   , TKwBreak)
+  , ("case"    , TKwCase)
+  , ("const"   , TKwConst)
+  , ("continue", TKwContinue)
+  , ("do"      , TKwDo)
+  , ("else"    , TKwElse)
+  , ("enum"    , TKwEnum)
+  , ("eval"    , TKwEval)
+  , ("export"  , TKwExport)
+  , ("fail"    , TKwFail)
+  , ("fun"     , TKwFun)
+  , ("if"      , TKwIf)
+  , ("impl"    , TKwImpl)
+  , ("import"  , TKwImport)
+  , ("in"      , TKwIn)
+  , ("is"      , TKwIs)
+  , ("loop"    , TKwLoop)
+  , ("module"  , TKwModule)
+  , ("none"    , TKwNone)
+  , ("not"     , TKwNot)
+  , ("or"      , TKwOr)
+  , ("return"  , TKwReturn)
+  , ("struct"  , TKwStruct)
+  , ("succ"    , TKwSucc)
+  , ("trait"   , TKwTrait)
+  , ("type"    , TKwType)
+  , ("where"   , TKwWhere)
+  , ("while"   , TKwWhile)
+  , ("xor"     , TKwXor)
+  , ("yield"   , TKwYield)
+  , ("_"       , TKwUnderscore)
+  ]
+
+operators :: BM.Bimap Text TokenType
+operators = BM.fromList
+  [ ("+"  , TOpAdd)
+  , ("-"  , TOpSub)
+  , ("*"  , TOpMul)
+  , ("/"  , TOpDiv)
+  , ("("  , TOpLParen)
+  , (")"  , TOpRParen)
+  , ("["  , TOpLBracket)
+  , ("]"  , TOpRBracket)
+  , ("{"  , TOpLBrace)
+  , ("}"  , TOpRBrace)
+  , (","  , TOpComma)
+  , (":"  , TOpColon)
+  , (";"  , TOpSemicolon)
+  , ("="  , TOpEq)
+  , ("==" , TOpEqEq)
+  , ("===", TOpSEq)
+  , ("<"  , TOpLt)
+  , ("<=" , TOpLtEq)
+  , (">"  , TOpGt)
+  , (">=" , TOpGtEq)
+  , ("!=" , TOpNeq)
+  , ("!==", TOpSNeq)
+  , (":=" , TOpColonEq)
+  , ("<-" , TOpLtSub)
+  , ("$"  , TOpDollar)
+  , ("%"  , TOpPercent)
+  ]
+
+infixl 6 <:<
+(<:<) :: StringConv t Text => Parser t -> Parser Char -> Parser Text
+(<:<) l r = snoc <$> (toS <$> l) <*> r
+
+infixr 6 >:>
+(>:>) :: StringConv t Text => Parser Char -> Parser t -> Parser Text
+(>:>) l r = cons <$> l <*> (toS <$> r)
+
+infixr 6 <~>
+(<~>) :: Monoid a => Parser a -> Parser a -> Parser a
+(<~>) l r = (<>) <$> l <*> r
+
+srcPos :: Parser SourcePos
+srcPos = _sourcePos <$> getParserState
+
+item' :: Parser (ItemDeclKind ()) -> Parser (ItemDecl ())
+item' p = ItemDecl <$> pure () <*> srcPos <*> p
+
+stmt' :: Parser (StmtKind ()) -> Parser (Stmt ())
+stmt' p = Stmt <$> pure () <*> srcPos <*> p
+
+expr' :: Parser (ExprKind ()) -> Parser (Expr ())
+expr' p = Expr <$> pure () <*> srcPos <*> p
+
+lit' :: Parser LitKind -> Parser (Lit ())
+lit' p = Lit <$> pure () <*> srcPos <*> p
+
+block :: Parser (Block ())
+block = Block <$> pure () <*> srcPos <*> p where p = braced stmts <?> "block"
 
 braced :: Parser a -> Parser a
 braced = between (tok TOpLBrace) (tok TOpRBrace)

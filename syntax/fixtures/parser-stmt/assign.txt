@@ -1,0 +1,2 @@
+e = r#"my sweet "string""#;
+e = e + "2"

@@ -14,10 +14,10 @@ import qualified Data.Aeson.Encode.Pretty      as AEP
 import           System.Directory
 import           System.FilePath
 import           Test.Hspec
-import           Text.Megaparsec.Error          ( ParseError
+import           Text.Megaparsec                ( Stream )
+import           Text.Megaparsec.Error          ( ParseErrorBundle
                                                 , ShowErrorComponent
-                                                , ShowToken
-                                                , parseErrorPretty
+                                                , errorBundlePretty
                                                 )
 
 --------------------------------------------------------------------------------
@@ -32,15 +32,16 @@ class Fixture f where
 class FixtureMaterializable a where
   fixtureMaterialize :: a -> Text
 
-instance (ShowErrorComponent e, Ord t, ShowToken t, ToJSON r) =>
-  FixtureMaterializable (Either (ParseError t e) r)
+instance (ShowErrorComponent e, Ord t, Stream t, ToJSON r) =>
+  FixtureMaterializable (Either (ParseErrorBundle t e) r)
  where
-  fixtureMaterialize (Left l) = "[ERROR]\n" <> toS (parseErrorPretty l)
+  fixtureMaterialize (Left  l) = "[ERROR]\n" <> toS (errorBundlePretty l)
   fixtureMaterialize (Right r) = toS . encodePretty' conf $ r
-    where conf = AEP.defConfig { AEP.confIndent = AEP.Spaces 2
-                               , AEP.confCompare = AEP.compare
-                               , AEP.confTrailingNewline = True
-                               }
+   where
+    conf = AEP.defConfig { AEP.confIndent          = AEP.Spaces 2
+                         , AEP.confCompare         = AEP.compare
+                         , AEP.confTrailingNewline = True
+                         }
 
 --------------------------------------------------------------------------------
 -- Fixture-based test framework.
@@ -81,15 +82,13 @@ data FileFixture = FileFixture {
     deriving (Eq, Show)
 
 instance Fixture FileFixture where
-  fixtureName = name
+  fixtureName     = name
 
   getFixtureInput = readFile . inputPath
 
   getFixtureExpected f = do
     exists <- doesFileExist $ expectedPath f
-    if exists
-    then Just <$> readFile (expectedPath f)
-    else return Nothing
+    if exists then Just <$> readFile (expectedPath f) else return Nothing
 
   writeFixtureExpected = writeFile . expectedPath
 

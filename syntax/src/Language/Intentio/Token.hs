@@ -1,4 +1,10 @@
-module Language.Intentio.Token where
+module Language.Intentio.Token
+  ( TokenType(..)
+  , Token(..)
+  , ty
+  , text
+  )
+where
 
 import           Intentio.Prelude
 
@@ -6,8 +12,9 @@ import           Intentio.Prelude
 -- Token data structures
 
 data TokenType
-  = TIdent
-
+  = TFloat
+  | TIdent
+  | TInteger
   | TKwAbstract
   | TKwAnd
   | TKwAs
@@ -20,14 +27,13 @@ data TokenType
   | TKwEnum
   | TKwEval
   | TKwExport
-  | TKwFail
   | TKwFun
+  | TKwFail
   | TKwIf
   | TKwImpl
   | TKwImport
   | TKwIn
   | TKwIs
-  | TKwLet
   | TKwLoop
   | TKwModule
   | TKwNone
@@ -43,56 +49,43 @@ data TokenType
   | TKwWhile
   | TKwXor
   | TKwYield
-
   | TOpAdd
-  | TOpSub
-  | TOpMul
-  | TOpDiv
-
-  | TOpLParen
-  | TOpRParen
-  | TOpLBracket
-  | TOpRBracket
-  | TOpLBrace
-  | TOpRBrace
-  | TOpComma
   | TOpColon
-  | TOpSemicolon
-
+  | TOpColonEq
+  | TOpComma
+  | TOpDiv
+  | TOpDollar
   | TOpEq
   | TOpEqEq
-  | TOpEqEqEq
   | TOpGt
   | TOpGtEq
+  | TOpLBrace
+  | TOpLBracket
+  | TOpLParen
   | TOpLt
   | TOpLtEq
-  | TOpNeq
-  | TOpNeqEq
-
-  | TOpColonEq
   | TOpLtSub
-  | TOpDollar
+  | TOpMul
+  | TOpNeq
   | TOpPercent
-
-  | TInteger
-  | TFloat
-  | TNone
-  | TSucc
-  | TFail
-
-  | TString
-  | TCharString
+  | TOpRBrace
+  | TOpRBracket
+  | TOpRParen
+  | TOpSemicolon
+  | TOpSEq
+  | TOpSNeq
+  | TOpSub
   | TRawString
   | TRegexString
-
+  | TString
   deriving (Eq, Ord, Show, Generic)
 
 instance ToJSON TokenType
 instance FromJSON TokenType
 
-data Token = Token {
-    _ty :: TokenType,
-    _text :: Text
+data Token = Token
+  { _ty   :: TokenType
+  , _text :: Text
   }
   deriving (Eq, Ord, Show, Generic)
 

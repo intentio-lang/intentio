@@ -1,0 +1,70 @@
+[
+  {
+    "_stmtAnn": [],
+    "_stmtKind": {
+      "contents": {
+        "_exprAnn": [],
+        "_exprKind": {
+          "contents": null,
+          "tag": "ReturnExpr"
+        },
+        "_exprSourcePos": [
+          "test.ieo",
+          0,
+          0
+        ]
+      },
+      "tag": "ExprStmt"
+    },
+    "_stmtSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
+  },
+  {
+    "_stmtAnn": [],
+    "_stmtKind": {
+      "contents": {
+        "_exprAnn": [],
+        "_exprKind": {
+          "contents": {
+            "_exprAnn": [],
+            "_exprKind": {
+              "contents": {
+                "contents": {
+                  "_scopeIdAnn": [],
+                  "_scopeIdSourcePos": [
+                    "test.ieo",
+                    0,
+                    0
+                  ],
+                  "_unScopeId": "a"
+                },
+                "tag": "ScopeId'"
+              },
+              "tag": "IdExpr"
+            },
+            "_exprSourcePos": [
+              "test.ieo",
+              0,
+              0
+            ]
+          },
+          "tag": "ReturnExpr"
+        },
+        "_exprSourcePos": [
+          "test.ieo",
+          0,
+          0
+        ]
+      },
+      "tag": "ExprStmt"
+    },
+    "_stmtSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
+  }
+]

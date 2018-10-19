@@ -21,7 +21,6 @@ import qualified Data.Text                     as T
 import           Data.Text.IO                   ( readFile )
 import           System.FilePath                ( takeBaseName )
 import qualified Text.Megaparsec.Error         as MPE
-import qualified Text.Megaparsec.Pos           as MPP
 
 import           Intentio.Compiler              ( Assembly
                                                 , assemblyModules
@@ -39,6 +38,7 @@ import           Intentio.Compiler              ( Assembly
 import           Intentio.Diagnostics           ( Diagnostic
                                                 , SourcePos(..)
                                                 , HasSourcePos(..)
+                                                , sourcePos
                                                 , cerror
                                                 , cnote
                                                 )
@@ -66,7 +66,7 @@ instance HasSourcePos SourceFile where
 
 instance Module SourceFile where
   type ItemTy SourceFile = Void
-  _moduleName = filePathToModName . _sourceFilePath
+  _moduleName  = filePathToModName . _sourceFilePath
   _moduleItems = const []
 
 instance HasSourcePos SourceText where
@@ -74,7 +74,7 @@ instance HasSourcePos SourceText where
 
 instance Module SourceText where
   type ItemTy SourceText = Void
-  _moduleName = _sourceTextModuleName
+  _moduleName  = _sourceTextModuleName
   _moduleItems = const []
 
 parseSourceFiles :: Assembly SourceFile -> Compile (Assembly ModuleSource)
@@ -128,20 +128,11 @@ filePathToModName = ModuleName . toS . takeBaseName
 toDiag :: ParserError -> Seq Diagnostic
 toDiag parserError = headDiag <| S.fromList stackDiags
  where
-  headPos :| stackPos = MPE.errorPos parserError
-
-  stackDiags          = fmap stackDiag stackPos
-
-  headDiag            = cerror (mpSourcePos headPos) headMsg
-
-  headMsg             = T.strip . toS . MPE.parseErrorTextPretty $ parserError
-
-  stackDiag pos = cnote (mpSourcePos pos) "included from here"
-
-  mpSourcePos MPP.SourcePos { sourceName, sourceLine, sourceColumn } =
-    SourcePos sourceName (unPos sourceLine) (unPos sourceColumn)
-
-  unPos p = fromIntegral $ MPP.unPos p - 1
+  hsp :| stp = MPE.errorPos parserError
+  stackDiags = fmap stackDiag stp
+  headDiag   = cerror (hsp ^. sourcePos) headMsg
+  headMsg    = T.strip . toS . MPE.parseErrorTextPretty $ parserError
+  stackDiag p = cnote (p ^. sourcePos) "included from here"
 
 parseResultsToCompile :: Monad m => [Either ParserError a] -> CompileT m [a]
 parseResultsToCompile = unFold . foldr' bucket (Right [])

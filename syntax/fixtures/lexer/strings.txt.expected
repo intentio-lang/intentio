@@ -34,5 +34,9 @@
   {
     "_text": "\"\\\"\"",
     "_ty": "TString"
+  },
+  {
+    "_text": "r#\"my sweet \"string\"\"#",
+    "_ty": "TRawString"
   }
 ]

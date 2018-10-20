@@ -40,7 +40,7 @@ import           Text.Megaparsec                ( Parsec
                                                 , between
                                                 , count
                                                 , eof
-                                                , getParserState
+                                                , getSourcePos
                                                 , many
                                                 , notFollowedBy
                                                 , oneOf
@@ -682,7 +682,7 @@ infixr 6 <~>
 (<~>) l r = (<>) <$> l <*> r
 
 srcPos :: Parser SourcePos
-srcPos = _sourcePos <$> getParserState
+srcPos = _sourcePos <$> getSourcePos
 
 item' :: Parser (ItemDeclKind ()) -> Parser (ItemDecl ())
 item' p = ItemDecl <$> pure () <*> srcPos <*> p

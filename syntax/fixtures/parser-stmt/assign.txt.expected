@@ -24,7 +24,7 @@
               "_litSourcePos": [
                 "test.ieo",
                 0,
-                0
+                4
               ]
             },
             "tag": "LitExpr"
@@ -32,7 +32,7 @@
           "_exprSourcePos": [
             "test.ieo",
             0,
-            0
+            4
           ]
         }
       ],
@@ -52,7 +52,7 @@
           "_scopeIdAnn": [],
           "_scopeIdSourcePos": [
             "test.ieo",
-            0,
+            1,
             0
           ],
           "_unScopeId": "e"
@@ -66,8 +66,8 @@
                 "_binOpKind": "BinAdd",
                 "_binOpSourcePos": [
                   "test.ieo",
-                  0,
-                  0
+                  1,
+                  6
                 ]
               },
               {
@@ -78,8 +78,8 @@
                       "_scopeIdAnn": [],
                       "_scopeIdSourcePos": [
                         "test.ieo",
-                        0,
-                        0
+                        1,
+                        4
                       ],
                       "_unScopeId": "e"
                     },
@@ -89,8 +89,8 @@
                 },
                 "_exprSourcePos": [
                   "test.ieo",
-                  0,
-                  0
+                  1,
+                  4
                 ]
               },
               {
@@ -104,16 +104,16 @@
                     },
                     "_litSourcePos": [
                       "test.ieo",
-                      0,
-                      0
+                      1,
+                      8
                     ]
                   },
                   "tag": "LitExpr"
                 },
                 "_exprSourcePos": [
                   "test.ieo",
-                  0,
-                  0
+                  1,
+                  8
                 ]
               }
             ],
@@ -130,7 +130,7 @@
     },
     "_stmtSourcePos": [
       "test.ieo",
-      0,
+      1,
       0
     ]
   }

@@ -12,7 +12,7 @@
             "_blockSourcePos": [
               "test.ieo",
               0,
-              0
+              14
             ],
             "_blockStmts": [
               {
@@ -26,8 +26,8 @@
                           "_scopeIdAnn": [],
                           "_scopeIdSourcePos": [
                             "test.ieo",
-                            0,
-                            0
+                            1,
+                            4
                           ],
                           "_unScopeId": "a"
                         },
@@ -37,16 +37,16 @@
                     },
                     "_exprSourcePos": [
                       "test.ieo",
-                      0,
-                      0
+                      1,
+                      4
                     ]
                   },
                   "tag": "ExprStmt"
                 },
                 "_stmtSourcePos": [
                   "test.ieo",
-                  0,
-                  0
+                  1,
+                  4
                 ]
               }
             ]
@@ -56,7 +56,7 @@
             "_scopeIdSourcePos": [
               "test.ieo",
               0,
-              0
+              4
             ],
             "_unScopeId": "foo"
           },
@@ -66,7 +66,7 @@
               "_scopeIdSourcePos": [
                 "test.ieo",
                 0,
-                0
+                8
               ],
               "_unScopeId": "a"
             },
@@ -75,7 +75,7 @@
               "_scopeIdSourcePos": [
                 "test.ieo",
                 0,
-                0
+                11
               ],
               "_unScopeId": "b"
             }
@@ -103,8 +103,8 @@
             "_blockAnn": [],
             "_blockSourcePos": [
               "test.ieo",
-              0,
-              0
+              4,
+              10
             ],
             "_blockStmts": [
               {
@@ -115,8 +115,8 @@
                       "_scopeIdAnn": [],
                       "_scopeIdSourcePos": [
                         "test.ieo",
-                        0,
-                        0
+                        5,
+                        4
                       ],
                       "_unScopeId": "x"
                     },
@@ -131,16 +131,16 @@
                           },
                           "_litSourcePos": [
                             "test.ieo",
-                            0,
-                            0
+                            5,
+                            8
                           ]
                         },
                         "tag": "LitExpr"
                       },
                       "_exprSourcePos": [
                         "test.ieo",
-                        0,
-                        0
+                        5,
+                        8
                       ]
                     }
                   ],
@@ -148,8 +148,8 @@
                 },
                 "_stmtSourcePos": [
                   "test.ieo",
-                  0,
-                  0
+                  5,
+                  4
                 ]
               }
             ]
@@ -158,15 +158,15 @@
             "_scopeIdAnn": [],
             "_scopeIdSourcePos": [
               "test.ieo",
-              0,
-              0
+              4,
+              4
             ],
             "_unScopeId": "bar"
           },
           "_funDeclParams": [],
           "_funDeclSourcePos": [
             "test.ieo",
-            0,
+            4,
             0
           ]
         },
@@ -174,7 +174,7 @@
       },
       "_itemDeclSourcePos": [
         "test.ieo",
-        0,
+        4,
         0
       ]
     }

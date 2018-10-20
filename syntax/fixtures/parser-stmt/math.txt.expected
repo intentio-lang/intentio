@@ -12,7 +12,7 @@
               "_binOpSourcePos": [
                 "test.ieo",
                 0,
-                0
+                10
               ]
             },
             {
@@ -25,7 +25,7 @@
                     "_binOpSourcePos": [
                       "test.ieo",
                       0,
-                      0
+                      2
                     ]
                   },
                   {
@@ -61,7 +61,7 @@
                           "_binOpSourcePos": [
                             "test.ieo",
                             0,
-                            0
+                            6
                           ]
                         },
                         {
@@ -76,7 +76,7 @@
                               "_litSourcePos": [
                                 "test.ieo",
                                 0,
-                                0
+                                4
                               ]
                             },
                             "tag": "LitExpr"
@@ -84,7 +84,7 @@
                           "_exprSourcePos": [
                             "test.ieo",
                             0,
-                            0
+                            4
                           ]
                         },
                         {
@@ -99,7 +99,7 @@
                               "_litSourcePos": [
                                 "test.ieo",
                                 0,
-                                0
+                                8
                               ]
                             },
                             "tag": "LitExpr"
@@ -107,7 +107,7 @@
                           "_exprSourcePos": [
                             "test.ieo",
                             0,
-                            0
+                            8
                           ]
                         }
                       ],
@@ -138,7 +138,7 @@
                     "_binOpSourcePos": [
                       "test.ieo",
                       0,
-                      0
+                      20
                     ]
                   },
                   {
@@ -154,7 +154,7 @@
                               "_binOpSourcePos": [
                                 "test.ieo",
                                 0,
-                                0
+                                15
                               ]
                             },
                             {
@@ -169,7 +169,7 @@
                                   "_litSourcePos": [
                                     "test.ieo",
                                     0,
-                                    0
+                                    13
                                   ]
                                 },
                                 "tag": "LitExpr"
@@ -177,7 +177,7 @@
                               "_exprSourcePos": [
                                 "test.ieo",
                                 0,
-                                0
+                                13
                               ]
                             },
                             {
@@ -192,7 +192,7 @@
                                   "_litSourcePos": [
                                     "test.ieo",
                                     0,
-                                    0
+                                    17
                                   ]
                                 },
                                 "tag": "LitExpr"
@@ -200,7 +200,7 @@
                               "_exprSourcePos": [
                                 "test.ieo",
                                 0,
-                                0
+                                17
                               ]
                             }
                           ],
@@ -217,7 +217,7 @@
                     "_exprSourcePos": [
                       "test.ieo",
                       0,
-                      0
+                      12
                     ]
                   },
                   {
@@ -232,7 +232,7 @@
                         "_litSourcePos": [
                           "test.ieo",
                           0,
-                          0
+                          22
                         ]
                       },
                       "tag": "LitExpr"
@@ -240,7 +240,7 @@
                     "_exprSourcePos": [
                       "test.ieo",
                       0,
-                      0
+                      22
                     ]
                   }
                 ],
@@ -281,7 +281,7 @@
               "_unOpKind": "UnNeg",
               "_unOpSourcePos": [
                 "test.ieo",
-                0,
+                1,
                 0
               ]
             },
@@ -296,16 +296,16 @@
                   },
                   "_litSourcePos": [
                     "test.ieo",
-                    0,
-                    0
+                    1,
+                    1
                   ]
                 },
                 "tag": "LitExpr"
               },
               "_exprSourcePos": [
                 "test.ieo",
-                0,
-                0
+                1,
+                1
               ]
             }
           ],
@@ -321,7 +321,7 @@
     },
     "_stmtSourcePos": [
       "test.ieo",
-      0,
+      1,
       0
     ]
   },
@@ -337,7 +337,7 @@
               "_unOpKind": "UnNeg",
               "_unOpSourcePos": [
                 "test.ieo",
-                0,
+                2,
                 0
               ]
             },
@@ -353,8 +353,8 @@
                         "_binOpKind": "BinAdd",
                         "_binOpSourcePos": [
                           "test.ieo",
-                          0,
-                          0
+                          2,
+                          3
                         ]
                       },
                       {
@@ -368,16 +368,16 @@
                             },
                             "_litSourcePos": [
                               "test.ieo",
-                              0,
-                              0
+                              2,
+                              2
                             ]
                           },
                           "tag": "LitExpr"
                         },
                         "_exprSourcePos": [
                           "test.ieo",
-                          0,
-                          0
+                          2,
+                          2
                         ]
                       },
                       {
@@ -391,16 +391,16 @@
                             },
                             "_litSourcePos": [
                               "test.ieo",
-                              0,
-                              0
+                              2,
+                              4
                             ]
                           },
                           "tag": "LitExpr"
                         },
                         "_exprSourcePos": [
                           "test.ieo",
-                          0,
-                          0
+                          2,
+                          4
                         ]
                       }
                     ],
@@ -416,8 +416,8 @@
               },
               "_exprSourcePos": [
                 "test.ieo",
-                0,
-                0
+                2,
+                1
               ]
             }
           ],
@@ -433,7 +433,7 @@
     },
     "_stmtSourcePos": [
       "test.ieo",
-      0,
+      2,
       0
     ]
   },
@@ -449,7 +449,7 @@
               "_unOpKind": "UnNeg",
               "_unOpSourcePos": [
                 "test.ieo",
-                0,
+                3,
                 0
               ]
             },
@@ -465,8 +465,8 @@
                           "_scopeIdAnn": [],
                           "_scopeIdSourcePos": [
                             "test.ieo",
-                            0,
-                            0
+                            3,
+                            1
                           ],
                           "_unScopeId": "foo"
                         },
@@ -476,8 +476,8 @@
                     },
                     "_exprSourcePos": [
                       "test.ieo",
-                      0,
-                      0
+                      3,
+                      1
                     ]
                   },
                   []
@@ -486,8 +486,8 @@
               },
               "_exprSourcePos": [
                 "test.ieo",
-                0,
-                0
+                3,
+                1
               ]
             }
           ],
@@ -503,7 +503,7 @@
     },
     "_stmtSourcePos": [
       "test.ieo",
-      0,
+      3,
       0
     ]
   },
@@ -519,8 +519,8 @@
               "_binOpKind": "BinAnd",
               "_binOpSourcePos": [
                 "test.ieo",
-                0,
-                0
+                4,
+                3
               ]
             },
             {
@@ -532,7 +532,7 @@
                     "_unOpKind": "UnNeg",
                     "_unOpSourcePos": [
                       "test.ieo",
-                      0,
+                      4,
                       0
                     ]
                   },
@@ -547,16 +547,16 @@
                         },
                         "_litSourcePos": [
                           "test.ieo",
-                          0,
-                          0
+                          4,
+                          1
                         ]
                       },
                       "tag": "LitExpr"
                     },
                     "_exprSourcePos": [
                       "test.ieo",
-                      0,
-                      0
+                      4,
+                      1
                     ]
                   }
                 ],
@@ -580,8 +580,8 @@
                           "_scopeIdAnn": [],
                           "_scopeIdSourcePos": [
                             "test.ieo",
-                            0,
-                            0
+                            4,
+                            7
                           ],
                           "_unScopeId": "bar"
                         },
@@ -591,8 +591,8 @@
                     },
                     "_exprSourcePos": [
                       "test.ieo",
-                      0,
-                      0
+                      4,
+                      7
                     ]
                   },
                   []
@@ -601,8 +601,8 @@
               },
               "_exprSourcePos": [
                 "test.ieo",
-                0,
-                0
+                4,
+                7
               ]
             }
           ],
@@ -618,7 +618,7 @@
     },
     "_stmtSourcePos": [
       "test.ieo",
-      0,
+      4,
       0
     ]
   },
@@ -634,8 +634,8 @@
               "_binOpKind": "BinOr",
               "_binOpSourcePos": [
                 "test.ieo",
-                0,
-                0
+                5,
+                12
               ]
             },
             {
@@ -647,8 +647,8 @@
                     "_binOpKind": "BinAnd",
                     "_binOpSourcePos": [
                       "test.ieo",
-                      0,
-                      0
+                      5,
+                      6
                     ]
                   },
                   {
@@ -660,7 +660,7 @@
                           "_unOpKind": "UnNot",
                           "_unOpSourcePos": [
                             "test.ieo",
-                            0,
+                            5,
                             0
                           ]
                         },
@@ -672,8 +672,8 @@
                                 "_scopeIdAnn": [],
                                 "_scopeIdSourcePos": [
                                   "test.ieo",
-                                  0,
-                                  0
+                                  5,
+                                  4
                                 ],
                                 "_unScopeId": "x"
                               },
@@ -683,8 +683,8 @@
                           },
                           "_exprSourcePos": [
                             "test.ieo",
-                            0,
-                            0
+                            5,
+                            4
                           ]
                         }
                       ],
@@ -704,8 +704,8 @@
                           "_scopeIdAnn": [],
                           "_scopeIdSourcePos": [
                             "test.ieo",
-                            0,
-                            0
+                            5,
+                            10
                           ],
                           "_unScopeId": "b"
                         },
@@ -715,8 +715,8 @@
                     },
                     "_exprSourcePos": [
                       "test.ieo",
-                      0,
-                      0
+                      5,
+                      10
                     ]
                   }
                 ],
@@ -737,8 +737,8 @@
                     "_unOpKind": "UnNot",
                     "_unOpSourcePos": [
                       "test.ieo",
-                      0,
-                      0
+                      5,
+                      15
                     ]
                   },
                   {
@@ -749,8 +749,8 @@
                           "_scopeIdAnn": [],
                           "_scopeIdSourcePos": [
                             "test.ieo",
-                            0,
-                            0
+                            5,
+                            19
                           ],
                           "_unScopeId": "c"
                         },
@@ -760,8 +760,8 @@
                     },
                     "_exprSourcePos": [
                       "test.ieo",
-                      0,
-                      0
+                      5,
+                      19
                     ]
                   }
                 ],
@@ -786,7 +786,7 @@
     },
     "_stmtSourcePos": [
       "test.ieo",
-      0,
+      5,
       0
     ]
   },
@@ -802,8 +802,8 @@
               "_binOpKind": "BinEq",
               "_binOpSourcePos": [
                 "test.ieo",
-                0,
-                0
+                6,
+                2
               ]
             },
             {
@@ -817,7 +817,7 @@
                   },
                   "_litSourcePos": [
                     "test.ieo",
-                    0,
+                    6,
                     0
                   ]
                 },
@@ -825,7 +825,7 @@
               },
               "_exprSourcePos": [
                 "test.ieo",
-                0,
+                6,
                 0
               ]
             },
@@ -838,8 +838,8 @@
                     "_binOpKind": "BinAdd",
                     "_binOpSourcePos": [
                       "test.ieo",
-                      0,
-                      0
+                      6,
+                      7
                     ]
                   },
                   {
@@ -853,16 +853,16 @@
                         },
                         "_litSourcePos": [
                           "test.ieo",
-                          0,
-                          0
+                          6,
+                          5
                         ]
                       },
                       "tag": "LitExpr"
                     },
                     "_exprSourcePos": [
                       "test.ieo",
-                      0,
-                      0
+                      6,
+                      5
                     ]
                   },
                   {
@@ -876,16 +876,16 @@
                         },
                         "_litSourcePos": [
                           "test.ieo",
-                          0,
-                          0
+                          6,
+                          9
                         ]
                       },
                       "tag": "LitExpr"
                     },
                     "_exprSourcePos": [
                       "test.ieo",
-                      0,
-                      0
+                      6,
+                      9
                     ]
                   }
                 ],
@@ -910,7 +910,7 @@
     },
     "_stmtSourcePos": [
       "test.ieo",
-      0,
+      6,
       0
     ]
   },
@@ -926,8 +926,8 @@
               "_binOpKind": "BinAnd",
               "_binOpSourcePos": [
                 "test.ieo",
-                0,
-                0
+                7,
+                11
               ]
             },
             {
@@ -939,8 +939,8 @@
                     "_binOpKind": "BinNeq",
                     "_binOpSourcePos": [
                       "test.ieo",
-                      0,
-                      0
+                      7,
+                      2
                     ]
                   },
                   {
@@ -954,7 +954,7 @@
                         },
                         "_litSourcePos": [
                           "test.ieo",
-                          0,
+                          7,
                           0
                         ]
                       },
@@ -962,7 +962,7 @@
                     },
                     "_exprSourcePos": [
                       "test.ieo",
-                      0,
+                      7,
                       0
                     ]
                   },
@@ -975,8 +975,8 @@
                           "_binOpKind": "BinAdd",
                           "_binOpSourcePos": [
                             "test.ieo",
-                            0,
-                            0
+                            7,
+                            7
                           ]
                         },
                         {
@@ -990,16 +990,16 @@
                               },
                               "_litSourcePos": [
                                 "test.ieo",
-                                0,
-                                0
+                                7,
+                                5
                               ]
                             },
                             "tag": "LitExpr"
                           },
                           "_exprSourcePos": [
                             "test.ieo",
-                            0,
-                            0
+                            7,
+                            5
                           ]
                         },
                         {
@@ -1013,16 +1013,16 @@
                               },
                               "_litSourcePos": [
                                 "test.ieo",
-                                0,
-                                0
+                                7,
+                                9
                               ]
                             },
                             "tag": "LitExpr"
                           },
                           "_exprSourcePos": [
                             "test.ieo",
-                            0,
-                            0
+                            7,
+                            9
                           ]
                         }
                       ],
@@ -1052,8 +1052,8 @@
                     "_binOpKind": "BinLt",
                     "_binOpSourcePos": [
                       "test.ieo",
-                      0,
-                      0
+                      7,
+                      17
                     ]
                   },
                   {
@@ -1067,16 +1067,16 @@
                         },
                         "_litSourcePos": [
                           "test.ieo",
-                          0,
-                          0
+                          7,
+                          15
                         ]
                       },
                       "tag": "LitExpr"
                     },
                     "_exprSourcePos": [
                       "test.ieo",
-                      0,
-                      0
+                      7,
+                      15
                     ]
                   },
                   {
@@ -1090,16 +1090,16 @@
                         },
                         "_litSourcePos": [
                           "test.ieo",
-                          0,
-                          0
+                          7,
+                          19
                         ]
                       },
                       "tag": "LitExpr"
                     },
                     "_exprSourcePos": [
                       "test.ieo",
-                      0,
-                      0
+                      7,
+                      19
                     ]
                   }
                 ],
@@ -1124,7 +1124,7 @@
     },
     "_stmtSourcePos": [
       "test.ieo",
-      0,
+      7,
       0
     ]
   },
@@ -1140,8 +1140,8 @@
               "_binOpKind": "BinAnd",
               "_binOpSourcePos": [
                 "test.ieo",
-                0,
-                0
+                8,
+                11
               ]
             },
             {
@@ -1153,8 +1153,8 @@
                     "_binOpKind": "BinGtEq",
                     "_binOpSourcePos": [
                       "test.ieo",
-                      0,
-                      0
+                      8,
+                      6
                     ]
                   },
                   {
@@ -1166,8 +1166,8 @@
                           "_binOpKind": "BinMul",
                           "_binOpSourcePos": [
                             "test.ieo",
-                            0,
-                            0
+                            8,
+                            2
                           ]
                         },
                         {
@@ -1181,7 +1181,7 @@
                               },
                               "_litSourcePos": [
                                 "test.ieo",
-                                0,
+                                8,
                                 0
                               ]
                             },
@@ -1189,7 +1189,7 @@
                           },
                           "_exprSourcePos": [
                             "test.ieo",
-                            0,
+                            8,
                             0
                           ]
                         },
@@ -1204,16 +1204,16 @@
                               },
                               "_litSourcePos": [
                                 "test.ieo",
-                                0,
-                                0
+                                8,
+                                4
                               ]
                             },
                             "tag": "LitExpr"
                           },
                           "_exprSourcePos": [
                             "test.ieo",
-                            0,
-                            0
+                            8,
+                            4
                           ]
                         }
                       ],
@@ -1236,16 +1236,16 @@
                         },
                         "_litSourcePos": [
                           "test.ieo",
-                          0,
-                          0
+                          8,
+                          9
                         ]
                       },
                       "tag": "LitExpr"
                     },
                     "_exprSourcePos": [
                       "test.ieo",
-                      0,
-                      0
+                      8,
+                      9
                     ]
                   }
                 ],
@@ -1266,8 +1266,8 @@
                     "_binOpKind": "BinLtEq",
                     "_binOpSourcePos": [
                       "test.ieo",
-                      0,
-                      0
+                      8,
+                      21
                     ]
                   },
                   {
@@ -1279,8 +1279,8 @@
                           "_unOpKind": "UnNot",
                           "_unOpSourcePos": [
                             "test.ieo",
-                            0,
-                            0
+                            8,
+                            15
                           ]
                         },
                         {
@@ -1294,16 +1294,16 @@
                               },
                               "_litSourcePos": [
                                 "test.ieo",
-                                0,
-                                0
+                                8,
+                                19
                               ]
                             },
                             "tag": "LitExpr"
                           },
                           "_exprSourcePos": [
                             "test.ieo",
-                            0,
-                            0
+                            8,
+                            19
                           ]
                         }
                       ],
@@ -1326,16 +1326,16 @@
                         },
                         "_litSourcePos": [
                           "test.ieo",
-                          0,
-                          0
+                          8,
+                          24
                         ]
                       },
                       "tag": "LitExpr"
                     },
                     "_exprSourcePos": [
                       "test.ieo",
-                      0,
-                      0
+                      8,
+                      24
                     ]
                   }
                 ],
@@ -1360,7 +1360,7 @@
     },
     "_stmtSourcePos": [
       "test.ieo",
-      0,
+      8,
       0
     ]
   },
@@ -1379,8 +1379,8 @@
                   "_binOpKind": "BinXor",
                   "_binOpSourcePos": [
                     "test.ieo",
-                    0,
-                    0
+                    9,
+                    7
                   ]
                 },
                 {
@@ -1394,16 +1394,16 @@
                       },
                       "_litSourcePos": [
                         "test.ieo",
-                        0,
-                        0
+                        9,
+                        5
                       ]
                     },
                     "tag": "LitExpr"
                   },
                   "_exprSourcePos": [
                     "test.ieo",
-                    0,
-                    0
+                    9,
+                    5
                   ]
                 },
                 {
@@ -1418,8 +1418,8 @@
                             "_binOpKind": "BinAnd",
                             "_binOpSourcePos": [
                               "test.ieo",
-                              0,
-                              0
+                              9,
+                              21
                             ]
                           },
                           {
@@ -1432,16 +1432,16 @@
                                 },
                                 "_litSourcePos": [
                                   "test.ieo",
-                                  0,
-                                  0
+                                  9,
+                                  16
                                 ]
                               },
                               "tag": "LitExpr"
                             },
                             "_exprSourcePos": [
                               "test.ieo",
-                              0,
-                              0
+                              9,
+                              16
                             ]
                           },
                           {
@@ -1456,8 +1456,8 @@
                                       "_binOpKind": "BinOr",
                                       "_binOpSourcePos": [
                                         "test.ieo",
-                                        0,
-                                        0
+                                        9,
+                                        35
                                       ]
                                     },
                                     {
@@ -1472,8 +1472,8 @@
                                                   "_scopeIdAnn": [],
                                                   "_scopeIdSourcePos": [
                                                     "test.ieo",
-                                                    0,
-                                                    0
+                                                    9,
+                                                    30
                                                   ],
                                                   "_unScopeId": "f"
                                                 },
@@ -1483,8 +1483,8 @@
                                             },
                                             "_exprSourcePos": [
                                               "test.ieo",
-                                              0,
-                                              0
+                                              9,
+                                              30
                                             ]
                                           },
                                           [
@@ -1499,16 +1499,16 @@
                                                   },
                                                   "_litSourcePos": [
                                                     "test.ieo",
-                                                    0,
-                                                    0
+                                                    9,
+                                                    32
                                                   ]
                                                 },
                                                 "tag": "LitExpr"
                                               },
                                               "_exprSourcePos": [
                                                 "test.ieo",
-                                                0,
-                                                0
+                                                9,
+                                                32
                                               ]
                                             }
                                           ]
@@ -1517,8 +1517,8 @@
                                       },
                                       "_exprSourcePos": [
                                         "test.ieo",
-                                        0,
-                                        0
+                                        9,
+                                        30
                                       ]
                                     },
                                     {
@@ -1536,8 +1536,8 @@
                                                     "_binOpKind": "BinAdd",
                                                     "_binOpSourcePos": [
                                                       "test.ieo",
-                                                      0,
-                                                      0
+                                                      9,
+                                                      46
                                                     ]
                                                   },
                                                   {
@@ -1551,16 +1551,16 @@
                                                         },
                                                         "_litSourcePos": [
                                                           "test.ieo",
-                                                          0,
-                                                          0
+                                                          9,
+                                                          44
                                                         ]
                                                       },
                                                       "tag": "LitExpr"
                                                     },
                                                     "_exprSourcePos": [
                                                       "test.ieo",
-                                                      0,
-                                                      0
+                                                      9,
+                                                      44
                                                     ]
                                                   },
                                                   {
@@ -1574,16 +1574,16 @@
                                                         },
                                                         "_litSourcePos": [
                                                           "test.ieo",
-                                                          0,
-                                                          0
+                                                          9,
+                                                          48
                                                         ]
                                                       },
                                                       "tag": "LitExpr"
                                                     },
                                                     "_exprSourcePos": [
                                                       "test.ieo",
-                                                      0,
-                                                      0
+                                                      9,
+                                                      48
                                                     ]
                                                   }
                                                 ],
@@ -1599,16 +1599,16 @@
                                           },
                                           "_exprSourcePos": [
                                             "test.ieo",
-                                            0,
-                                            0
+                                            9,
+                                            43
                                           ]
                                         },
                                         "tag": "SuccExpr"
                                       },
                                       "_exprSourcePos": [
                                         "test.ieo",
-                                        0,
-                                        0
+                                        9,
+                                        38
                                       ]
                                     }
                                   ],
@@ -1624,8 +1624,8 @@
                             },
                             "_exprSourcePos": [
                               "test.ieo",
-                              0,
-                              0
+                              9,
+                              25
                             ]
                           }
                         ],
@@ -1641,8 +1641,8 @@
                   },
                   "_exprSourcePos": [
                     "test.ieo",
-                    0,
-                    0
+                    9,
+                    11
                   ]
                 }
               ],
@@ -1658,7 +1658,7 @@
         },
         "_exprSourcePos": [
           "test.ieo",
-          0,
+          9,
           0
         ]
       },
@@ -1666,7 +1666,7 @@
     },
     "_stmtSourcePos": [
       "test.ieo",
-      0,
+      9,
       0
     ]
   },
@@ -1682,8 +1682,8 @@
               "_binOpKind": "BinSEq",
               "_binOpSourcePos": [
                 "test.ieo",
-                0,
-                0
+                10,
+                2
               ]
             },
             {
@@ -1697,7 +1697,7 @@
                   },
                   "_litSourcePos": [
                     "test.ieo",
-                    0,
+                    10,
                     0
                   ]
                 },
@@ -1705,7 +1705,7 @@
               },
               "_exprSourcePos": [
                 "test.ieo",
-                0,
+                10,
                 0
               ]
             },
@@ -1720,16 +1720,16 @@
                   },
                   "_litSourcePos": [
                     "test.ieo",
-                    0,
-                    0
+                    10,
+                    6
                   ]
                 },
                 "tag": "LitExpr"
               },
               "_exprSourcePos": [
                 "test.ieo",
-                0,
-                0
+                10,
+                6
               ]
             }
           ],
@@ -1745,7 +1745,7 @@
     },
     "_stmtSourcePos": [
       "test.ieo",
-      0,
+      10,
       0
     ]
   }

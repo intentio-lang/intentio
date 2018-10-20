@@ -7,8 +7,8 @@
         "_scopeIdAnn": [],
         "_scopeIdSourcePos": [
           "test.ieo",
-          0,
-          0
+          1,
+          4
         ],
         "_unScopeId": "sinus"
       },
@@ -16,8 +16,8 @@
         "_scopeIdAnn": [],
         "_scopeIdSourcePos": [
           "test.ieo",
-          0,
-          0
+          2,
+          4
         ],
         "_unScopeId": "cosinus"
       }

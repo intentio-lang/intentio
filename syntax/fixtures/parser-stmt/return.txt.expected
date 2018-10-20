@@ -36,8 +36,8 @@
                   "_scopeIdAnn": [],
                   "_scopeIdSourcePos": [
                     "test.ieo",
-                    0,
-                    0
+                    1,
+                    7
                   ],
                   "_unScopeId": "a"
                 },
@@ -47,15 +47,15 @@
             },
             "_exprSourcePos": [
               "test.ieo",
-              0,
-              0
+              1,
+              7
             ]
           },
           "tag": "ReturnExpr"
         },
         "_exprSourcePos": [
           "test.ieo",
-          0,
+          1,
           0
         ]
       },
@@ -63,7 +63,7 @@
     },
     "_stmtSourcePos": [
       "test.ieo",
-      0,
+      1,
       0
     ]
   }

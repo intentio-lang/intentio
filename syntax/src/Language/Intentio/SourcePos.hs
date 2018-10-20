@@ -18,7 +18,6 @@ import           Intentio.Prelude        hiding ( sourceFile
 import           Data.Aeson                     ( ToJSON(..)
                                                 , FromJSON(..)
                                                 )
-import qualified Text.Megaparsec               as MP
 import qualified Text.Megaparsec.Pos           as MPP
 
 -- This part of code is inspired by Megaparsec's SourcePos structure.
@@ -62,12 +61,6 @@ instance HasSourcePos Void where
 instance HasSourcePos SourcePos where
   _sourcePos = id
   {-# INLINE _sourcePos #-}
-
-instance HasSourcePos (MP.State s) where
-  _sourcePos = _sourcePos . MP.statePosState
-
-instance HasSourcePos (MP.PosState s) where
-  _sourcePos = _sourcePos . MP.pstateSourcePos
 
 instance HasSourcePos MPP.SourcePos where
   _sourcePos (MPP.SourcePos n l c) = SourcePos n (unPos l) (unPos c)

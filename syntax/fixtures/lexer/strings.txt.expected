@@ -9,7 +9,7 @@
   },
   {
     "_text": "xr\"Quick brown fox jumps over the lazy dog\"",
-    "_ty": "TRegexString"
+    "_ty": "TRawString"
   },
   {
     "_text": "\"Quick brown fox\n jumps over\n the lazy dog\"",
@@ -20,12 +20,8 @@
     "_ty": "TRawString"
   },
   {
-    "_text": "tur####\"\nQuick \\u{1f43a} jumps over the lazy \\u{1f436}\n\"####",
-    "_ty": "TRawString"
-  },
-  {
     "_text": "xr###\"\nQuick \\u{1f43a} jumps over the lazy \\u{1f436}\n\"###",
-    "_ty": "TRegexString"
+    "_ty": "TRawString"
   },
   {
     "_text": "\"C:\\\\\"",

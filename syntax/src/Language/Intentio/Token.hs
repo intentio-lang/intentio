@@ -76,7 +76,6 @@ data TokenType
   | TOpSNeq
   | TOpSub
   | TRawString
-  | TRegexString
   | TString
   deriving (Eq, Ord, Show, Generic)
 

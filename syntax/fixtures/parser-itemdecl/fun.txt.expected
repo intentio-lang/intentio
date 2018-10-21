@@ -196,14 +196,15 @@
                     "contents": {
                       "_litAnn": [],
                       "_litKind": {
-                        "contents": "92",
+                        "contents": 92,
                         "tag": "IntegerLit"
                       },
                       "_litSourcePos": [
                         "test.ieo",
                         6,
                         17
-                      ]
+                      ],
+                      "_litText": "92"
                     },
                     "tag": "LitExpr"
                   },

@@ -126,14 +126,15 @@
                         "contents": {
                           "_litAnn": [],
                           "_litKind": {
-                            "contents": "4",
+                            "contents": 4,
                             "tag": "IntegerLit"
                           },
                           "_litSourcePos": [
                             "test.ieo",
                             5,
                             8
-                          ]
+                          ],
+                          "_litText": "4"
                         },
                         "tag": "LitExpr"
                       },

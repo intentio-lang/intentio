@@ -36,14 +36,15 @@
                   "contents": {
                     "_litAnn": [],
                     "_litKind": {
-                      "contents": "1",
+                      "contents": 1,
                       "tag": "IntegerLit"
                     },
                     "_litSourcePos": [
                       "test.ieo",
                       0,
                       4
-                    ]
+                    ],
+                    "_litText": "1"
                   },
                   "tag": "LitExpr"
                 },
@@ -59,14 +60,15 @@
                   "contents": {
                     "_litAnn": [],
                     "_litKind": {
-                      "contents": "2",
+                      "contents": 2,
                       "tag": "IntegerLit"
                     },
                     "_litSourcePos": [
                       "test.ieo",
                       0,
                       7
-                    ]
+                    ],
+                    "_litText": "2"
                   },
                   "tag": "LitExpr"
                 },
@@ -82,14 +84,15 @@
                   "contents": {
                     "_litAnn": [],
                     "_litKind": {
-                      "contents": "3",
+                      "contents": 3,
                       "tag": "IntegerLit"
                     },
                     "_litSourcePos": [
                       "test.ieo",
                       0,
                       10
-                    ]
+                    ],
+                    "_litText": "3"
                   },
                   "tag": "LitExpr"
                 },

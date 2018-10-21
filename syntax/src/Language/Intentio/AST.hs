@@ -247,6 +247,7 @@ instance FromJSON a => FromJSON (Block a)
 data Lit a = Lit
   { _litAnn       :: a
   , _litSourcePos :: SourcePos
+  , _litText      :: Text
   , _litKind      :: LitKind
   }
   deriving (Show, Eq, Generic)
@@ -258,11 +259,10 @@ instance HasSourcePos (Lit a) where
   _sourcePos = _litSourcePos
 
 data LitKind
-  = IntegerLit Text
-  | FloatLit Text
+  = IntegerLit Integer
+  | FloatLit Scientific
   | StringLit Text
   | RawStringLit Text
-  | RegexLit Text
   | NoneLit
   deriving (Show, Eq, Generic)
 
@@ -425,12 +425,3 @@ instance Convertible TokenType UnOpKind where
 
 instance Convertible Token UnOpKind where
   safeConvert Token { _ty } = safeConvert _ty
-
-instance Convertible Token LitKind where
-  safeConvert (Token TInteger     txt) = Right $ IntegerLit txt
-  safeConvert (Token TFloat       txt) = Right $ FloatLit txt
-  safeConvert (Token TString      txt) = Right $ StringLit txt
-  safeConvert (Token TRawString   txt) = Right $ RawStringLit txt
-  safeConvert (Token TRegexString txt) = Right $ RegexLit txt
-  safeConvert (Token TKwNone      _  ) = Right NoneLit
-  safeConvert x                        = convError "Not a literal" x

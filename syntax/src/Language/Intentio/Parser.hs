@@ -29,8 +29,11 @@ import qualified Intentio.Prelude
 import           Control.Monad.Combinators.Expr ( Operator(InfixL, Prefix)
                                                 , makeExprParser
                                                 )
-import           Data.Char                      ( isLower )
+import           Data.Char                      ( isLower
+                                                , digitToInt
+                                                )
 import qualified Data.Bimap                    as BM
+import           Data.Scientific                ( scientific )
 import qualified Data.Text                     as T
 import           Text.Megaparsec                ( Parsec
                                                 , ParseError
@@ -40,7 +43,7 @@ import           Text.Megaparsec                ( Parsec
                                                 , between
                                                 , count
                                                 , eof
-                                                , getParserState
+                                                , getSourcePos
                                                 , many
                                                 , notFollowedBy
                                                 , oneOf
@@ -52,10 +55,12 @@ import           Text.Megaparsec                ( Parsec
                                                 , sepEndBy
                                                 , some
                                                 , try
+                                                , unexpected
                                                 )
 import qualified Text.Megaparsec               as M
 import           Text.Megaparsec.Char           ( alphaNumChar
                                                 , char
+                                                , char'
                                                 , digitChar
                                                 , hexDigitChar
                                                 , letterChar
@@ -139,13 +144,13 @@ programLex = between sc eof $ many anyTok
 
 -- | Parse any valid token.
 anyTok :: Parser Token
-anyTok = literal <|> ident <|> anyKeyword <|> anyOperator
+anyTok = literalLex <|> ident <|> anyKeyword <|> anyOperator
 
 -- | Parse token of given type.
 tok :: TokenType -> Parser Token
-tok TFloat        = float
+tok TFloat        = fst <$> float
 tok TIdent        = ident
-tok TInteger      = integer
+tok TInteger      = fst <$> integer
 tok TKwAbstract   = tokKw TKwAbstract
 tok TKwAnd        = tokKw TKwAnd
 tok TKwAs         = tokKw TKwAs
@@ -206,9 +211,8 @@ tok TOpSemicolon  = tokOp TOpSemicolon
 tok TOpSEq        = tokOp TOpSEq
 tok TOpSNeq       = tokOp TOpSNeq
 tok TOpSub        = tokOp TOpSub
-tok TRawString    = rawstring
-tok TRegexString  = regexstring
-tok TString       = string'
+tok TRawString    = fst <$> rawstring
+tok TString       = fst <$> string'
 
 --------------------------------------------------------------------------------
 -- Token productions
@@ -240,96 +244,169 @@ anyKeyword = anyReserved keywords <?> "keyword"
 anyOperator :: Parser Token
 anyOperator = anyReserved operators <?> "operator"
 
+-- | Tokenize any valid literal.
+literalLex :: Parser Token
+literalLex =
+  (fst <$> float)
+    <|> (fst <$> integer)
+    <|> (fst <$> string')
+    <|> (fst <$> rawstring)
+    <|> none
+
 -- | Parse any valid literal.
-literal :: Parser Token
-literal = float <|> integer <|> anyString <|> none
+literal :: Parser (Lit ())
+literal = par <?> "literal"
+ where
+  par = do
+    sp <- srcPos
+    l1 sp float FloatLit
+      <|> l1 sp integer   IntegerLit
+      <|> l1 sp string'   StringLit
+      <|> l1 sp rawstring RawStringLit
+      <|> l0 sp none NoneLit
+
+  l1 _litSourcePos p k = do
+    let _litAnn = ()
+    (t, v) <- p
+    let _litText = t ^. text
+    let _litKind = k v
+    return Lit { .. }
+
+  l0 _litSourcePos p _litKind = do
+    let _litAnn = ()
+    _litText <- view text <$> p
+    return Lit { .. }
 
 -- | Parse none literal
 none :: Parser Token
 none = tok TKwNone <?> "none literal"
 
 -- | Parse any valid integer literal.
-integer :: Parser Token
-integer = (lexeme . try) p >>= mkt TInteger <?> "integer literal"
+integer :: Parser (Token, Integer)
+integer = (lexeme . try) grammar >>= mktt TInteger <?> "integer literal"
  where
-  p           = try binary <|> try octal <|> try hexadecimal <|> decimalNum
+  grammar     = try binary <|> try octal <|> try hexadecimal <|> decimalNum
+  binary      = gen 'b' binaryNum
+  octal       = gen 'o' octalNum
+  hexadecimal = gen 'x' hexadecimalNum
 
-  binary      = char '0' >:> oneOf ['b', 'B'] >:> binaryNum
-  octal       = char '0' >:> oneOf ['o', 'O'] >:> octalNum
-  hexadecimal = char '0' >:> oneOf ['x', 'X'] >:> hexadecimalNum
+  gen c p = do
+    z      <- char '0'
+    k      <- char' c
+    (t, v) <- p
+    return (z `cons` k `cons` t, v)
 
 -- | Parse any valid floating-point literal.
-float :: Parser Token
-float = (lexeme . try) p >>= mkt TFloat <?> "floating-point literal"
+float :: Parser (Token, Scientific)
+float = (lexeme . try) grammar >>= mktt TFloat <?> "floating-point literal"
  where
-  p =
-    decimalNum
-      <~> ((string "." <~> decimalNum <~> option "" exponent) <|> exponent)
+  grammar = do
+    (ct, cv)         <- decimalNum
+    (dt, et, dv, ev) <- pDotExp <|> pExpOnly
+    let v = scientific (cv * 10 ^ countDigits dv + dv) (ev - countDigits dv)
+    return (ct <> dt <> et, v)
 
-decimalNum :: Parser Text
-decimalNum = toS <$> p <?> "decimal digits"
+  pDotExp = do
+    (dt, dv) <- pDot
+    (et, ev) <- optExp
+    return (dt, et, dv, ev)
+
+  pDot = do
+    d        <- char '.'
+    (vt, vv) <- decimalNum
+    return (d `cons` vt, vv)
+
+  optExp   = option ("", 0) exponent
+
+  pExpOnly = do
+    (et, ev) <- exponent
+    return ("", et, 0, ev)
+
+decimalNum :: Num a => Parser (Text, a)
+decimalNum = parseNum <$> p <?> "decimal digits"
   where p = digitChar >:> many (digitChar <|> char '_')
 
-binaryNum :: Parser Text
-binaryNum = toS <$> p <?> "binary digits"
+binaryNum :: Num a => Parser (Text, a)
+binaryNum = parseNum <$> p <?> "binary digits"
  where
   p            = binDigitChar >:> many (binDigitChar <|> char '_')
   binDigitChar = oneOf ['0', '1'] <?> "binary digit"
 
-octalNum :: Parser Text
-octalNum = toS <$> p <?> "octal digits"
+octalNum :: Num a => Parser (Text, a)
+octalNum = parseNum <$> p <?> "octal digits"
   where p = octDigitChar >:> many (octDigitChar <|> char '_')
 
-hexadecimalNum :: Parser Text
-hexadecimalNum = toS <$> p <?> "hexadecimal digits"
+hexadecimalNum :: Num a => Parser (Text, a)
+hexadecimalNum = parseNum <$> p <?> "hexadecimal digits"
   where p = hexDigitChar >:> many (hexDigitChar <|> char '_')
 
-exponent :: Parser Text
+parseNum :: (StringConv s String, StringConv s Text, Num n) => s -> (Text, n)
+parseNum s = (toS s, fromIntegral r)
+ where
+  r = foldl' step 0 (toS s :: String)
+
+  step a '_' = a
+  step a c   = 10 * a + digitToInt c
+
+exponent :: Num a => Parser (Text, a)
 exponent = do
   e           <- T.singleton <$> oneOf ['e', 'E']
   sign        <- option "" $ T.singleton <$> oneOf ['+', '-']
   underscores <- toS <$> many (char '_')
-  val         <- decimalNum
-  return $ e <> sign <> underscores <> val
-
--- | Parse any valid string literal.
-anyString :: Parser Token
-anyString = string' <|> regexstring <|> rawstring
+  (vt, vv)    <- decimalNum
+  let fsign = if sign == "-" then negate else id
+  return (e <> sign <> underscores <> vt, fsign vv)
 
 -- | Parse valid regular string literal.
-string' :: Parser Token
-string' = (lexeme . try) (stringprefix <~> istring') >>= mkt TString
-
--- | Parse valid regex literal.
-regexstring :: Parser Token
-regexstring =
-  (lexeme . try) (stringprefix <~> iregexstring) >>= mkt TRegexString
+string' :: Parser (Token, Text)
+string' = genString istring' TString "string"
 
 -- | Parse valid raw string literal.
-rawstring :: Parser Token
-rawstring = (lexeme . try) (stringprefix <~> irawstring) >>= mkt TRawString
+rawstring :: Parser (Token, Text)
+rawstring = genString irawstring TRawString "raw string"
 
-istring' :: Parser Text
-istring' =
-  string "\""
-    <~> (T.concat <$> many strchr)
-    <~> string "\""
-    <?> "regular string"
-
-iregexstring :: Parser Text
-iregexstring =
-  string "x" <~> (try istring' <|> try irawstring) <?> "regex string"
-
-irawstring :: Parser Text
-irawstring = char 'r' >:> rawstring' 0 <?> "raw string"
+genString :: Parser (Text, Text) -> TokenType -> String -> Parser (Token, Text)
+genString parser tt lbl = (lexeme . try) grammar >>= mktt tt <?> lbl
  where
-  rawstring' :: Int -> Parser Text
-  rawstring' n =
-    (string "\"" <~> rawstring'' n <~> string "\"")
-      <|> (string "#" <~> rawstring' (n + 1) <~> string "#")
+  grammar = do
+    prefix <- stringprefix
+    (t, v) <- parser
+    let t' = prefix <> t
+    v' <- applyMods (toS prefix) v
+    return (t', v')
 
-  rawstring'' :: Int -> Parser Text
-  rawstring'' n = toS <$> many rwsany
+  applyMods []         v = return v
+  applyMods ('x' : ps) v = applyMods ps v
+  applyMods (p   : _ ) _ = unexpected $ M.Tokens (p :| [])
+
+istring' :: Parser (Text, Text)
+istring' = do
+  l <- string "\""
+  v <- T.concat <$> many strchr
+  r <- string "\""
+  -- FIXME: Process escape sequences
+  return (l <> v <> r, v)
+
+irawstring :: Parser (Text, Text)
+irawstring = do
+  r      <- char 'r'
+  (t, v) <- rawstring' 0
+  return (r `cons` t, v)
+ where
+  rawstring' :: Int -> Parser (Text, Text)
+  rawstring' n = pQuot n <|> pHash n
+
+  pQuot n = delim '"' $ rawstring'' n
+  pHash n = delim '#' $ rawstring' (n + 1)
+
+  delim c p = do
+    l      <- char c
+    (t, v) <- p
+    r      <- char c
+    return ((l `cons` t) `snoc` r, v)
+
+  rawstring'' :: Int -> Parser (Text, Text)
+  rawstring'' n = many rwsany <&> toS <&> \t -> (t, t)
    where
     rwsany = try (anySingleBut '"') <|> try (char '"' <* notFollowedBy hashes)
     hashes = count n $ char '#'
@@ -339,7 +416,7 @@ stringprefix = option "" stringmod
 
 stringmod :: Parser Text
 stringmod = toS <$> some (satisfy isStringModChar) <?> "string modifier"
-  where isStringModChar c = c /= 'r' && c /= 'x' && isLower c
+  where isStringModChar c = c /= 'r' && isLower c
 
 strchr :: Parser Text
 strchr =
@@ -520,7 +597,6 @@ termWithCall = try callExpr <|> term
 term :: Parser (Expr ())
 term =
   litExpr
-    <|> idExpr
     <|> blockExpr
     <|> succExpr
     <|> failExpr
@@ -528,13 +604,13 @@ term =
     <|> ifExpr
     <|> parenExpr
     <|> returnExpr
+    <|> idExpr
 
 idExpr :: Parser (Expr ())
 idExpr = expr' (IdExpr <$> anyId)
 
 litExpr :: Parser (Expr ())
-litExpr = expr' (LitExpr <$> p)
-  where p = lit' (fmap convert literal) <?> "literal"
+litExpr = expr' (LitExpr <$> literal)
 
 blockExpr :: Parser (Expr ())
 blockExpr = expr' (BlockExpr <$> block) <?> "block"
@@ -572,6 +648,9 @@ returnExpr =
 
 mkt :: TokenType -> Text -> Parser Token
 mkt _ty _text = return Token { .. }
+
+mktt :: TokenType -> (Text, a) -> Parser (Token, a)
+mktt _ty (_text, a) = return (Token { .. }, a)
 
 sc :: Parser ()
 sc = L.space space1 lineComment empty
@@ -677,12 +756,8 @@ infixr 6 >:>
 (>:>) :: StringConv t Text => Parser Char -> Parser t -> Parser Text
 (>:>) l r = cons <$> l <*> (toS <$> r)
 
-infixr 6 <~>
-(<~>) :: Monoid a => Parser a -> Parser a -> Parser a
-(<~>) l r = (<>) <$> l <*> r
-
 srcPos :: Parser SourcePos
-srcPos = _sourcePos <$> getParserState
+srcPos = _sourcePos <$> getSourcePos
 
 item' :: Parser (ItemDeclKind ()) -> Parser (ItemDecl ())
 item' p = ItemDecl <$> pure () <*> srcPos <*> p
@@ -692,9 +767,6 @@ stmt' p = Stmt <$> pure () <*> srcPos <*> p
 
 expr' :: Parser (ExprKind ()) -> Parser (Expr ())
 expr' p = Expr <$> pure () <*> srcPos <*> p
-
-lit' :: Parser LitKind -> Parser (Lit ())
-lit' p = Lit <$> pure () <*> srcPos <*> p
 
 block :: Parser (Block ())
 block = Block <$> pure () <*> srcPos <*> p where p = braced stmts <?> "block"
@@ -710,3 +782,9 @@ semi = tok TOpSemicolon
 
 comma :: Parser Token
 comma = tok TOpComma
+
+countDigits :: Integer -> Int
+countDigits = go 1 . abs
+ where
+  go c x | x < 10    = c
+         | otherwise = go (c + 1) (x `div` 10)

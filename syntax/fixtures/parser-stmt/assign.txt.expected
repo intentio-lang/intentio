@@ -18,21 +18,22 @@
             "contents": {
               "_litAnn": [],
               "_litKind": {
-                "contents": "r#\"my sweet \"string\"\"#",
+                "contents": "my sweet \"string\"",
                 "tag": "RawStringLit"
               },
               "_litSourcePos": [
                 "test.ieo",
                 0,
-                0
-              ]
+                4
+              ],
+              "_litText": "r#\"my sweet \"string\"\"#"
             },
             "tag": "LitExpr"
           },
           "_exprSourcePos": [
             "test.ieo",
             0,
-            0
+            4
           ]
         }
       ],
@@ -52,7 +53,7 @@
           "_scopeIdAnn": [],
           "_scopeIdSourcePos": [
             "test.ieo",
-            0,
+            1,
             0
           ],
           "_unScopeId": "e"
@@ -66,8 +67,8 @@
                 "_binOpKind": "BinAdd",
                 "_binOpSourcePos": [
                   "test.ieo",
-                  0,
-                  0
+                  1,
+                  6
                 ]
               },
               {
@@ -78,8 +79,8 @@
                       "_scopeIdAnn": [],
                       "_scopeIdSourcePos": [
                         "test.ieo",
-                        0,
-                        0
+                        1,
+                        4
                       ],
                       "_unScopeId": "e"
                     },
@@ -89,8 +90,8 @@
                 },
                 "_exprSourcePos": [
                   "test.ieo",
-                  0,
-                  0
+                  1,
+                  4
                 ]
               },
               {
@@ -99,21 +100,22 @@
                   "contents": {
                     "_litAnn": [],
                     "_litKind": {
-                      "contents": "\"2\"",
+                      "contents": "2",
                       "tag": "StringLit"
                     },
                     "_litSourcePos": [
                       "test.ieo",
-                      0,
-                      0
-                    ]
+                      1,
+                      8
+                    ],
+                    "_litText": "\"2\""
                   },
                   "tag": "LitExpr"
                 },
                 "_exprSourcePos": [
                   "test.ieo",
-                  0,
-                  0
+                  1,
+                  8
                 ]
               }
             ],
@@ -130,7 +132,7 @@
     },
     "_stmtSourcePos": [
       "test.ieo",
-      0,
+      1,
       0
     ]
   }

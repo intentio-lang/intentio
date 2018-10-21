@@ -72,6 +72,9 @@ import           Data.Convertible              as X
 import           Data.HashSet                  as X
                                                 ( HashSet )
 
+import           Data.Scientific               as X
+                                                ( Scientific )
+
 import           GHC.Exts                      as X
                                                 ( IsList(fromList, fromListN) )
 

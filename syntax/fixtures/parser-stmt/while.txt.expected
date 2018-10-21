@@ -14,7 +14,7 @@
                   "_blockSourcePos": [
                     "test.ieo",
                     0,
-                    0
+                    6
                   ],
                   "_blockStmts": [
                     {
@@ -29,7 +29,7 @@
                                 "_scopeIdSourcePos": [
                                   "test.ieo",
                                   0,
-                                  0
+                                  8
                                 ],
                                 "_unScopeId": "a"
                               },
@@ -40,7 +40,7 @@
                           "_exprSourcePos": [
                             "test.ieo",
                             0,
-                            0
+                            8
                           ]
                         },
                         "tag": "ExprStmt"
@@ -48,7 +48,7 @@
                       "_stmtSourcePos": [
                         "test.ieo",
                         0,
-                        0
+                        8
                       ]
                     },
                     {
@@ -63,7 +63,7 @@
                                 "_scopeIdSourcePos": [
                                   "test.ieo",
                                   0,
-                                  0
+                                  11
                                 ],
                                 "_unScopeId": "b"
                               },
@@ -74,7 +74,7 @@
                           "_exprSourcePos": [
                             "test.ieo",
                             0,
-                            0
+                            11
                           ]
                         },
                         "tag": "ExprStmt"
@@ -82,7 +82,7 @@
                       "_stmtSourcePos": [
                         "test.ieo",
                         0,
-                        0
+                        11
                       ]
                     },
                     {
@@ -97,7 +97,7 @@
                                 "_scopeIdSourcePos": [
                                   "test.ieo",
                                   0,
-                                  0
+                                  14
                                 ],
                                 "_unScopeId": "c"
                               },
@@ -108,7 +108,7 @@
                           "_exprSourcePos": [
                             "test.ieo",
                             0,
-                            0
+                            14
                           ]
                         },
                         "tag": "ExprStmt"
@@ -116,7 +116,7 @@
                       "_stmtSourcePos": [
                         "test.ieo",
                         0,
-                        0
+                        14
                       ]
                     }
                   ]
@@ -126,7 +126,7 @@
               "_exprSourcePos": [
                 "test.ieo",
                 0,
-                0
+                6
               ]
             },
             {
@@ -134,7 +134,7 @@
               "_blockSourcePos": [
                 "test.ieo",
                 0,
-                0
+                19
               ],
               "_blockStmts": [
                 {
@@ -148,8 +148,8 @@
                             "_scopeIdAnn": [],
                             "_scopeIdSourcePos": [
                               "test.ieo",
-                              0,
-                              0
+                              1,
+                              4
                             ],
                             "_unScopeId": "x"
                           },
@@ -159,16 +159,16 @@
                       },
                       "_exprSourcePos": [
                         "test.ieo",
-                        0,
-                        0
+                        1,
+                        4
                       ]
                     },
                     "tag": "ExprStmt"
                   },
                   "_stmtSourcePos": [
                     "test.ieo",
-                    0,
-                    0
+                    1,
+                    4
                   ]
                 }
               ]

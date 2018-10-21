@@ -12,6 +12,7 @@ dependencies:
   - lens
   - mtl
   - protolude
+  - scientific
   - text
   - transformers
   - unordered-containers

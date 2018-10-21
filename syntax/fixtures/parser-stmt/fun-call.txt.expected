@@ -36,21 +36,22 @@
                   "contents": {
                     "_litAnn": [],
                     "_litKind": {
-                      "contents": "1",
+                      "contents": 1,
                       "tag": "IntegerLit"
                     },
                     "_litSourcePos": [
                       "test.ieo",
                       0,
-                      0
-                    ]
+                      4
+                    ],
+                    "_litText": "1"
                   },
                   "tag": "LitExpr"
                 },
                 "_exprSourcePos": [
                   "test.ieo",
                   0,
-                  0
+                  4
                 ]
               },
               {
@@ -59,21 +60,22 @@
                   "contents": {
                     "_litAnn": [],
                     "_litKind": {
-                      "contents": "2",
+                      "contents": 2,
                       "tag": "IntegerLit"
                     },
                     "_litSourcePos": [
                       "test.ieo",
                       0,
-                      0
-                    ]
+                      7
+                    ],
+                    "_litText": "2"
                   },
                   "tag": "LitExpr"
                 },
                 "_exprSourcePos": [
                   "test.ieo",
                   0,
-                  0
+                  7
                 ]
               },
               {
@@ -82,21 +84,22 @@
                   "contents": {
                     "_litAnn": [],
                     "_litKind": {
-                      "contents": "3",
+                      "contents": 3,
                       "tag": "IntegerLit"
                     },
                     "_litSourcePos": [
                       "test.ieo",
                       0,
-                      0
-                    ]
+                      10
+                    ],
+                    "_litText": "3"
                   },
                   "tag": "LitExpr"
                 },
                 "_exprSourcePos": [
                   "test.ieo",
                   0,
-                  0
+                  10
                 ]
               }
             ]
@@ -132,7 +135,7 @@
                     "_scopeIdAnn": [],
                     "_scopeIdSourcePos": [
                       "test.ieo",
-                      0,
+                      1,
                       0
                     ],
                     "_unScopeId": "foo"
@@ -143,7 +146,7 @@
               },
               "_exprSourcePos": [
                 "test.ieo",
-                0,
+                1,
                 0
               ]
             },
@@ -153,7 +156,7 @@
         },
         "_exprSourcePos": [
           "test.ieo",
-          0,
+          1,
           0
         ]
       },
@@ -161,7 +164,7 @@
     },
     "_stmtSourcePos": [
       "test.ieo",
-      0,
+      1,
       0
     ]
   },
@@ -180,7 +183,7 @@
                     "_scopeIdAnn": [],
                     "_scopeIdSourcePos": [
                       "test.ieo",
-                      0,
+                      2,
                       0
                     ],
                     "_unScopeId": "foo"
@@ -191,7 +194,7 @@
               },
               "_exprSourcePos": [
                 "test.ieo",
-                0,
+                2,
                 0
               ]
             },
@@ -204,8 +207,8 @@
                       "_scopeIdAnn": [],
                       "_scopeIdSourcePos": [
                         "test.ieo",
-                        0,
-                        0
+                        2,
+                        4
                       ],
                       "_unScopeId": "a"
                     },
@@ -215,8 +218,8 @@
                 },
                 "_exprSourcePos": [
                   "test.ieo",
-                  0,
-                  0
+                  2,
+                  4
                 ]
               },
               {
@@ -227,8 +230,8 @@
                       "_scopeIdAnn": [],
                       "_scopeIdSourcePos": [
                         "test.ieo",
-                        0,
-                        0
+                        2,
+                        7
                       ],
                       "_unScopeId": "b"
                     },
@@ -238,8 +241,8 @@
                 },
                 "_exprSourcePos": [
                   "test.ieo",
-                  0,
-                  0
+                  2,
+                  7
                 ]
               }
             ]
@@ -248,7 +251,7 @@
         },
         "_exprSourcePos": [
           "test.ieo",
-          0,
+          2,
           0
         ]
       },
@@ -256,7 +259,7 @@
     },
     "_stmtSourcePos": [
       "test.ieo",
-      0,
+      2,
       0
     ]
   },
@@ -277,7 +280,7 @@
                     "_qidScope": "fn",
                     "_qidSourcePos": [
                       "test.ieo",
-                      0,
+                      3,
                       0
                     ]
                   },
@@ -287,7 +290,7 @@
               },
               "_exprSourcePos": [
                 "test.ieo",
-                0,
+                3,
                 0
               ]
             },
@@ -304,8 +307,8 @@
                             "_scopeIdAnn": [],
                             "_scopeIdSourcePos": [
                               "test.ieo",
-                              0,
-                              0
+                              3,
+                              7
                             ],
                             "_unScopeId": "foo"
                           },
@@ -315,8 +318,8 @@
                       },
                       "_exprSourcePos": [
                         "test.ieo",
-                        0,
-                        0
+                        3,
+                        7
                       ]
                     },
                     []
@@ -325,8 +328,8 @@
                 },
                 "_exprSourcePos": [
                   "test.ieo",
-                  0,
-                  0
+                  3,
+                  7
                 ]
               }
             ]
@@ -335,7 +338,7 @@
         },
         "_exprSourcePos": [
           "test.ieo",
-          0,
+          3,
           0
         ]
       },
@@ -343,7 +346,7 @@
     },
     "_stmtSourcePos": [
       "test.ieo",
-      0,
+      3,
       0
     ]
   },
@@ -365,8 +368,8 @@
                         "_scopeIdAnn": [],
                         "_scopeIdSourcePos": [
                           "test.ieo",
-                          0,
-                          0
+                          4,
+                          1
                         ],
                         "_unScopeId": "boo"
                       },
@@ -376,15 +379,15 @@
                   },
                   "_exprSourcePos": [
                     "test.ieo",
-                    0,
-                    0
+                    4,
+                    1
                   ]
                 },
                 "tag": "ParenExpr"
               },
               "_exprSourcePos": [
                 "test.ieo",
-                0,
+                4,
                 0
               ]
             },
@@ -394,7 +397,7 @@
         },
         "_exprSourcePos": [
           "test.ieo",
-          0,
+          4,
           0
         ]
       },
@@ -402,7 +405,7 @@
     },
     "_stmtSourcePos": [
       "test.ieo",
-      0,
+      4,
       0
     ]
   }

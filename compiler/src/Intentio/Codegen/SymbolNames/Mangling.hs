@@ -41,4 +41,4 @@ sanitize = underscoreQualify . T.concatMap f
   underscoreQualify "" = ""
   underscoreQualify s@(T.head -> c) | c == '_'     = s
                                     | isAlphaNum c = s
-                                    | otherwise    = T.cons '_' s
+                                    | otherwise    = '_' <| s

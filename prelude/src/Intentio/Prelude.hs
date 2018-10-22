@@ -23,6 +23,7 @@ import           Protolude                     as X
                                                 , identity
                                                 , moduleName
                                                 )
+import           Unsafe                        as X
 
 import           Control.Arrow                 as X
                                                 ( (>>>)

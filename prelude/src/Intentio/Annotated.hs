@@ -5,7 +5,7 @@ where
 
 import           Intentio.Prelude
 
-class Annotated (a :: * -> *) where
+class (Traversable a) => Annotated (a :: * -> *) where
   getAnn :: a b -> b
   getAnn a = a ^. ann
 

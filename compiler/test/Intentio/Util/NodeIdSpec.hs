@@ -1,4 +1,4 @@
-module Intentio.Hir.ResolverSpec where
+module Intentio.Util.NodeIdSpec where
 
 import           Intentio.Prelude
 
@@ -6,7 +6,7 @@ import           Test.Hspec
 
 import           Intentio.Diagnostics
 import           Intentio.Hir
-import           Intentio.Hir.Resolver
+import qualified Intentio.Util.NodeId          as NodeId
 
 -- | Handwritten module HIR equivalent to following code
 --   (except source positions):
@@ -67,8 +67,8 @@ someHir = Module ()
       )
     ]
 
-someHirWithId :: Module NodeId
-someHirWithId = Module (mkNodeId 0)
+someHirWithId :: Module NodeId.NodeId
+someHirWithId = Module (NodeId.mk 0)
                        (SourcePos "id.ieo" 0 0)
                        (ModuleName "id")
                        [ItemId 1]
@@ -80,14 +80,14 @@ someHirWithId = Module (mkNodeId 0)
  where
   items = fromList
     [ ( 0
-      , Item (mkNodeId 1)
+      , Item (NodeId.mk 1)
              (SourcePos "id.ieo" 5 0)
              (ItemId 0)
              Nothing
              (ImportItem (ModuleName "some") (ItemName "_unused"))
       )
     , ( 1
-      , Item (mkNodeId 2)
+      , Item (NodeId.mk 2)
              (SourcePos "id.ieo" 10 0)
              (ItemId 1)
              (Just $ ItemName "id")
@@ -97,26 +97,27 @@ someHirWithId = Module (mkNodeId 0)
   bodies = fromList
     [ ( 0
       , Body
-        (mkNodeId 3)
+        (NodeId.mk 3)
         [Param (VarId 0)]
         (fromList
           [ ( 0
-            , Var (mkNodeId 4)
+            , Var (NodeId.mk 4)
                   (VarId 0)
-                  (Ident (mkNodeId 5) (SourcePos "id.ieo" 10 10) "x")
+                  (Ident (NodeId.mk 5) (SourcePos "id.ieo" 10 10) "x")
             )
           ]
         )
         [VarId 0]
         (Expr
-          (mkNodeId 6)
+          (NodeId.mk 6)
           (SourcePos "id.ieo" 10 0)
           (ReturnExpr
             (Expr
-              (mkNodeId 7)
+              (NodeId.mk 7)
               (SourcePos "id.ieo" 11 2)
               (PathExpr
-                (Path (mkNodeId 8) (SourcePos "id.ieo" 11 10) (Local (VarId 0)))
+                (Path (NodeId.mk 8) (SourcePos "id.ieo" 11 10) (Local (VarId 0))
+                )
               )
             )
           )
@@ -126,6 +127,6 @@ someHirWithId = Module (mkNodeId 0)
 
 spec :: Spec
 spec = parallel $ do
-  describe "assignNodeIds" $ do
+  describe "assign" $ do
     it "should sequentially assign node ids to Annotated nodes" $ do
-      assignNodeIds someHir `shouldBe` someHirWithId
+      NodeId.assign someHir `shouldBe` someHirWithId

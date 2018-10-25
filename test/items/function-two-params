@@ -1,0 +1,18 @@
+
+# - run:
+#     stdin:
+#       - "2"
+#       - "2"
+#     stdout:
+#       - "4"
+
+fun main() {
+  let a = int(scanln());
+  let b = int(scanln());
+  println(add(a, b);
+}
+
+fun add() {
+  a + b;
+}
+

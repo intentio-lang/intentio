@@ -1,0 +1,9 @@
+
+# - run:
+
+fun main() {
+  assert(r"'" == "\'")
+  assert(r" " == "\t")
+  assert(r"\" == "\\")
+}
+

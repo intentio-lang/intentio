@@ -1,0 +1,11 @@
+
+# - run:
+#     stdout:
+#       - "4"
+
+fun main() {
+  let a = 4;
+  println(a);
+}
+
+

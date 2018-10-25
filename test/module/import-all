@@ -1,0 +1,8 @@
+
+import export-file:*
+
+fun main() {
+  hello();
+  nothing()
+}
+

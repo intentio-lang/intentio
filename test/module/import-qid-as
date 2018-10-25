@@ -1,0 +1,7 @@
+
+import export-file:nothing as something
+
+fun main() {
+  something()
+}
+

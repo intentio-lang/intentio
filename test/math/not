@@ -1,0 +1,9 @@
+
+# - run:
+
+fun main() {
+  let a = succ;
+  assert(not a == fail)
+}
+
+

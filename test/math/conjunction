@@ -1,0 +1,9 @@
+
+# - run:
+
+fun main() {
+  let a = succ;
+  let b = fail;
+  println(not (a and b));
+}
+

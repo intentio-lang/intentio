@@ -1,39 +1,22 @@
 module Intentio.Util.NodeId
   ( NodeId
   , mk
-  , null
   , assign
   )
 where
 
-import           Intentio.Prelude        hiding ( assign
-                                                , null
-                                                )
+import           Intentio.Prelude        hiding ( assign )
 
 import           Intentio.Annotated             ( Annotated(..) )
 
-newtype NodeId = NodeId (Maybe Word)
-  deriving (Eq, Ord, Read, Show)
-
-instance Enum NodeId where
-  toEnum = mk
-  {-# INLINE toEnum #-}
-
-  fromEnum (NodeId Nothing ) = -1
-  fromEnum (NodeId (Just x)) = fromEnum x
-  {-# INLINE fromEnum #-}
+newtype NodeId = NodeId Word
+  deriving (Bounded, Enum, Eq, Ord, Read, Show, ToJSON, FromJSON)
 
 mk :: Int -> NodeId
-mk n | n < 0     = null
-     | otherwise = NodeId . Just . toEnum $ n
+mk = toEnum
 {-# INLINE mk #-}
 
-null :: NodeId
-null = NodeId Nothing
-{-# INLINE null #-}
-
-assign :: forall a . Annotated a => a () -> a NodeId
+assign :: Annotated a => a x -> a NodeId
 assign =
-  flip evalState [mk 0 ..]
-    . mapM (const $ state (unsafeFromJust . uncons))
-    . fmap (const null)
+  flip evalState [mk 0 ..] . mapM (const $ state (unsafeFromJust . uncons))
+{-# INLINABLE assign #-}

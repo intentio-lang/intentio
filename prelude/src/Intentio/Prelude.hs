@@ -70,6 +70,8 @@ import           Data.Convertible              as X
                                                 , safeConvert
                                                 )
 
+import           Data.HashMap.Lazy             as X
+                                                ( HashMap )
 import           Data.HashSet                  as X
                                                 ( HashSet )
 

@@ -38,6 +38,14 @@ module Intentio.Compiler.Monad
   , pushDiagnostics
   , pushDiagnosticE
   , pushDiagnosticsE
+  , pushNote
+  , pushNoteFor
+  , pushHint
+  , pushHintFor
+  , pushWarning
+  , pushWarningFor
+  , pushError
+  , pushErrorFor
   , pushIce
   , pushIceFor
   )
@@ -56,6 +64,14 @@ import           System.IO.Error                ( tryIOError )
 import           Intentio.Diagnostics           ( Diagnostic
                                                 , DiagnosticSeverity(..)
                                                 , diagnosticSeverity
+                                                , cnote
+                                                , cnoteFor
+                                                , chint
+                                                , chintFor
+                                                , cwarning
+                                                , cwarningFor
+                                                , cerror
+                                                , cerrorFor
                                                 , ice
                                                 , iceFor
                                                 , SourcePos
@@ -206,25 +222,68 @@ currentDiagnosticSeverity =
   use compileDiagnostics
     <&> fmap (^. diagnosticSeverity)
     <&> foldr' max minBound
+{-# INLINABLE currentDiagnosticSeverity #-}
 
 pushDiagnostic :: Monad m => Diagnostic -> CompileT m ()
 pushDiagnostic = pushDiagnostic_ DiagnosticError
+{-# INLINABLE pushDiagnostic #-}
 
 pushDiagnostics :: (Foldable t, Monad m) => t Diagnostic -> CompileT m ()
 pushDiagnostics = pushDiagnostics_ DiagnosticError
+{-# INLINABLE pushDiagnostics #-}
 
 pushDiagnosticE :: Monad m => Diagnostic -> CompileT m ()
 pushDiagnosticE = pushDiagnostic_ DiagnosticICE
+{-# INLINABLE pushDiagnosticE #-}
 
 pushDiagnosticsE :: (Foldable t, Monad m) => t Diagnostic -> CompileT m ()
 pushDiagnosticsE = pushDiagnostics_ DiagnosticICE
+{-# INLINABLE pushDiagnosticsE #-}
+
+pushNote :: forall a m . (Monad m) => SourcePos -> Text -> CompileT m a
+pushNote s t = pushDiagnostic (cnote s t) >> unreachable
+{-# INLINABLE pushNote #-}
+
+pushNoteFor
+  :: forall a m s . (Monad m, HasSourcePos s) => s -> Text -> CompileT m a
+pushNoteFor s t = pushDiagnostic (cnoteFor s t) >> unreachable
+{-# INLINABLE pushNoteFor #-}
+
+pushHint :: forall a m . (Monad m) => SourcePos -> Text -> CompileT m a
+pushHint s t = pushDiagnostic (chint s t) >> unreachable
+{-# INLINABLE pushHint #-}
+
+pushHintFor
+  :: forall a m s . (Monad m, HasSourcePos s) => s -> Text -> CompileT m a
+pushHintFor s t = pushDiagnostic (chintFor s t) >> unreachable
+{-# INLINABLE pushHintFor #-}
+
+pushWarning :: forall a m . (Monad m) => SourcePos -> Text -> CompileT m a
+pushWarning s t = pushDiagnostic (cwarning s t) >> unreachable
+{-# INLINABLE pushWarning #-}
+
+pushWarningFor
+  :: forall a m s . (Monad m, HasSourcePos s) => s -> Text -> CompileT m a
+pushWarningFor s t = pushDiagnostic (cwarningFor s t) >> unreachable
+{-# INLINABLE pushWarningFor #-}
+
+pushError :: forall a m . (Monad m) => SourcePos -> Text -> CompileT m a
+pushError s t = pushDiagnostic (cerror s t) >> unreachable
+{-# INLINABLE pushError #-}
+
+pushErrorFor
+  :: forall a m s . (Monad m, HasSourcePos s) => s -> Text -> CompileT m a
+pushErrorFor s t = pushDiagnostic (cerrorFor s t) >> unreachable
+{-# INLINABLE pushErrorFor #-}
 
 pushIce :: forall a m . (Monad m) => SourcePos -> Text -> CompileT m a
 pushIce s t = pushDiagnostic (ice s t) >> unreachable
+{-# INLINABLE pushIce #-}
 
 pushIceFor
   :: forall a m s . (Monad m, HasSourcePos s) => s -> Text -> CompileT m a
 pushIceFor s t = pushDiagnostic (iceFor s t) >> unreachable
+{-# INLINABLE pushIceFor #-}
 
 pushDiagnostic_ :: Monad m => DiagnosticSeverity -> Diagnostic -> CompileT m ()
 pushDiagnostic_ s d = do

@@ -40,7 +40,6 @@ import           Intentio.Diagnostics           ( Diagnostic
                                                 , HasSourcePos(..)
                                                 , sourcePos
                                                 , cerror
-                                                , cnote
                                                 )
 
 import qualified Language.Intentio.AST         as AST

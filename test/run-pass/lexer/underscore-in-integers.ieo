@@ -1,4 +1,3 @@
-
 # - run:
 #     stdout: 
 #       - "succ"
@@ -6,6 +5,6 @@
 
 fun main() {
   let a = 123_456__789;
-  println(12345 == 1___234_5_);
+  assert(12345 == 1___234_5_);
   println(a);
 }

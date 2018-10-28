@@ -1,10 +1,9 @@
-
 # - run:
 #     stdout: 
 #       - "succ"
 #       - "One: #, two: ##, even three: ###"
 
 fun main() {
-  println(r##"Hash: #"## == "Hash: #");
+  assert(r##"Hash: #"## == "Hash: #");
   println(r##"One: #, two: ##, even three: ###"##);
 }

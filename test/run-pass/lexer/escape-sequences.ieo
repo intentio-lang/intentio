@@ -1,4 +1,3 @@
-
 # - run:
 #     stdout:
 #       - "succ"
@@ -6,7 +5,7 @@
 #       - "succ"
 
 fun main() {
-  println(r"'" == "\'");
-  println(r" " == "\t");
-  println(r"\" == "\\");
+  assert(r"'" == "\'");
+  assert(r" " == "\t");
+  assert(r"\" == "\\");
 }

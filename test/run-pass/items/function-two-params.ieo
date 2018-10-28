@@ -1,13 +1,16 @@
-
 # - run:
 #     stdin:
 #       - "2"
-#       - "3.0"
+#       - "2"
 #     stdout:
-#       - "5.0"
+#       - "4"
 
 fun main() {
   let a = int(scanln());
   let b = int(scanln());
-  println(a * b);
+  println(add(a, b));
+}
+
+fun add() {
+  a + b;
 }

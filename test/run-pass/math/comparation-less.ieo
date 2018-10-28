@@ -1,11 +1,9 @@
-
 # - run:
 #     stdout:
-#       - "succ"
 #       - "succ"
 
 fun main() {
   let a = 2;
-  println(a >= a);
-  println(a >= a + 1);
+  let b = 3;
+  assert(a < b);
 }

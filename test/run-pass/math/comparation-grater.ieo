@@ -1,4 +1,3 @@
-
 # - run:
 #     stdout:
 #       - "succ"
@@ -6,5 +5,5 @@
 fun main() {
   let a = 4;
   let b = 3;
-  println(a > b);
+  assert(a > b);
 }

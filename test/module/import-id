@@ -1,7 +1,0 @@
-
-import export-file
-
-fun main() {
-  export-file:hello()
-}
-

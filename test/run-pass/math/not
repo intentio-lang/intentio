@@ -1,0 +1,9 @@
+
+# - run:
+#     stdout:
+#       - "succ"
+
+fun main() {
+  let a = succ;
+  println(not a == fail);
+}

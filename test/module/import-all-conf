@@ -1,9 +1,0 @@
-
-- compile:
-    - export-file.ieo
-    - import-all.ieo
-- run:
-    stdout:
-      - "Hello world!"
-      - "Nothing"
-

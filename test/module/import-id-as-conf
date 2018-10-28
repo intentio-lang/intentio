@@ -1,8 +1,0 @@
-
-- compile:
-    - export-file.ieo
-    - import-id-as.ieo
-- run:
-    stdout:
-      - "Hello world!"
-

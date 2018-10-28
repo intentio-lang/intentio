@@ -1,0 +1,13 @@
+
+# - run:
+#     stdout:
+#       - "succ"
+#       - "fail"
+
+fun main() {
+  let a = 2;
+  let b = 2.0;
+  let c = 2;
+  println(a !== b);
+  println(a !== c);
+}

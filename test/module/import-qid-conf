@@ -1,8 +1,0 @@
-
-- compile:
-    - export-file.ieo
-    - import-qid.ieo
-- run:
-    stdout:
-      - "Nothing"
-

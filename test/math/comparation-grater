@@ -1,9 +1,0 @@
-
-# - run:
-
-fun main() {
-  let a = 4;
-  let b = 3;
-  assert(a > b);
-}
-

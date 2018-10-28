@@ -1,0 +1,7 @@
+
+- compile:
+    - export-file.ieo
+    - main.ieo
+- run:
+    stdout: 
+        - "Hello world!"

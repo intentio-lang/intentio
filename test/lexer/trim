@@ -1,9 +1,0 @@
-
-# - run:
-#     stdout: "Trim."
-
-fun main() {
-  assert(t"   a   " == "a")
-  println(tr#"   "Trim."   "#);
-}
-

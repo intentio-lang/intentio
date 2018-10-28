@@ -1,9 +1,0 @@
-
-# - run:
-
-fun main() {
-  let a = 7;
-  assert(--a == a)
-}
-
-

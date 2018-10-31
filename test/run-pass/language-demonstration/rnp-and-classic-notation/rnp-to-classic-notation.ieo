@@ -1,0 +1,5 @@
+export classic-notation
+
+fun classic-notation {
+    # TODO; special find ignore parenthesis; first-case<=>second-case
+}

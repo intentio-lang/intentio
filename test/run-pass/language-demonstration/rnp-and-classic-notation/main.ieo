@@ -1,0 +1,19 @@
+import check-classic-notation:check-classic-notation
+import classic-notation-to-rnp:rnp
+import rnp-to-classic-notation:classic-notation
+
+fun main() {
+    while (let input = readln()) {
+        if (check-classic-notation(input)) {
+            let rnp = rnp(input)
+            #checking the correctness of the function
+            if (input == classic-notation(rnp)) {
+                println("rnp: " + rnp);
+            } else {
+                println("Error");
+            }
+        } else {
+            println("Incorrect input; please use only proper expressions in classic notation build with: (,),*,+,a,b,c");
+        }
+    }
+}

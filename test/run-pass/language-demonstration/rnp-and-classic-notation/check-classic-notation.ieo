@@ -1,0 +1,56 @@
+export (check-classic-notation)
+
+# check if expressions in classic notation made with (,),+,*,a,b,c are correct
+
+# Expression = Component | Component "+" Expression
+fun Expression(in) {
+    let first_case = Component(in);
+    if (first_case) { return first_case; }
+
+    #second_case
+    let position = find("+", in);
+    return Component(strcut(0, eval(position), in)
+        and (strcut(position+1, position+2, in) == "+"
+        and Expression(strcut(eval(position+2), length(in), in);
+   
+}
+
+# Component = Factor | Factor "*" Component
+fun Component(in) {
+    let first_case = Factor(in);
+    if (first_case) { return first_case; }
+
+    #second_case
+    let position = find("*", in);
+    return Factor(strcut(0, eval(position), in)
+        and strcut(position+1, position+2, in) == "*"
+        and Component(strcut(eval(position+2), length(in), in);
+    }
+}
+
+# Factor = Identity | "(" Expression ")"
+fun Factor(in) {
+    #first_case
+    if (length(in) == 1) { return Identity(in); }
+
+    #second_case
+    return strcut(0, 1, in) == "("
+        and Expression(strcut(position+1, length(in)-1, in)
+        and (strcut(0, 1, in) == ")";
+}
+
+# Identity = "a" | "b" | "c"
+fun Identity(in)  {
+	if (in == "a" or in == "b" or in = "c") { return succ }
+    return fail;
+}
+
+fun check-classic-notation() {
+    Expression(input);
+}
+
+fun main() {
+	while (let input = readln()) {
+        println(Expression(input));
+    }
+}

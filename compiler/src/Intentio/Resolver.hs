@@ -6,7 +6,7 @@ module Intentio.Resolver
   , _ResolvedLocal
   , _Unresolved
   , _NotApplicable
-  , resolve
+  , resolveAssembly
   )
 where
 
@@ -22,6 +22,7 @@ import           Intentio.Compiler              ( Assembly
                                                 , assemblyModules
                                                 , forModulesM
                                                 , itemName
+                                                , mapModules
                                                 , pushErrorFor
                                                 , pushIceFor
                                                 , pushWarningFor
@@ -29,6 +30,7 @@ import           Intentio.Compiler              ( Assembly
 import           Intentio.Util.NodeId           ( NodeId
                                                 , nodeId
                                                 )
+import qualified Intentio.Util.NodeId          as NodeId
 import           Language.Intentio.AST
 
 --------------------------------------------------------------------------------
@@ -134,13 +136,15 @@ withScope n k f = pushScope n k *> f <* popScope
 --------------------------------------------------------------------------------
 -- Resolution algorithm
 
-resolve :: Assembly (Module NodeId) -> CompilePure (Assembly (Module RS))
-resolve asm = do
-  ensureUniqueModuleNames asm
-  sharedCtx <- buildSharedResolveCtx asm
-  forModulesM asm $ \modul -> do
-    let ctx = buildLocalResolveCtx sharedCtx modul
-    evalStateT processCurrentModule ctx
+resolveAssembly :: Assembly (Module ()) -> CompilePure (Assembly (Module RS))
+resolveAssembly = go . mapModules NodeId.assign
+ where
+  go asm = do
+    ensureUniqueModuleNames asm
+    sharedCtx <- buildSharedResolveCtx asm
+    forModulesM asm $ \modul -> do
+      let ctx = buildLocalResolveCtx sharedCtx modul
+      evalStateT resolveCurrentModule ctx
 
 ensureUniqueModuleNames :: Assembly (Module NodeId) -> CompilePure ()
 ensureUniqueModuleNames asm =
@@ -150,24 +154,24 @@ ensureUniqueModuleNames asm =
     when isDuplicate . lift $ pushErrorFor m (errDupModule name)
     modify $ HS.insert name
 
-processCurrentModule :: ResolveM (Module RS)
-processCurrentModule =
+resolveCurrentModule :: ResolveM (Module RS)
+resolveCurrentModule =
   uses currentModule (fmap (, NotApplicable))
-    >>= (moduleExport #%%~ mapM processExportDecl)
-    >>= (moduleItems #%%~ mapM processItemDecl)
+    >>= (moduleExport #%%~ mapM resolveExportDecl)
+    >>= (moduleItems #%%~ mapM resolveItemDecl)
 
-processExportDecl :: ExportDecl RS -> ResolveM (ExportDecl RS)
-processExportDecl = exportDeclItems #%%~ mapM processId
+resolveExportDecl :: ExportDecl RS -> ResolveM (ExportDecl RS)
+resolveExportDecl = exportDeclItems #%%~ mapM resolveId
  where
-  processId sid = do
+  resolveId sid = do
     let itName = ItemName $ sid ^. unScopeId
     modName <- use $ currentModule . moduleName
     use (globalItemNameMap . at (modName, itName)) >>= \case
       Just _  -> return (sid & resolution .~ ResolvedItem modName itName)
       Nothing -> lift . pushErrorFor sid $ errModuleExportsUndefined itName
 
-processItemDecl :: ItemDecl RS -> ResolveM (ItemDecl RS)
-processItemDecl = undefined
+resolveItemDecl :: ItemDecl RS -> ResolveM (ItemDecl RS)
+resolveItemDecl i = lift $ pushIceFor i "resolveItemDecl not implemented"
 
 --------------------------------------------------------------------------------
 -- Resolve context creation

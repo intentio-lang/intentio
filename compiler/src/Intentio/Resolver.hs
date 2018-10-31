@@ -86,12 +86,15 @@ class HasResolution a where
 
 instance HasResolution Resolution where
   resolution = id
+  {-# INLINE resolution #-}
 
 instance HasResolution RS where
   resolution = _2
+  {-# INLINE resolution #-}
 
 instance Annotated a => HasResolution (a RS) where
   resolution = ann . resolution
+  {-# INLINE resolution #-}
 
 makePrisms ''Resolution
 makeLenses ''Scope

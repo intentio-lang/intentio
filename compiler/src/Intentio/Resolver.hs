@@ -1,51 +1,200 @@
-module Intentio.Resolver where
+module Intentio.Resolver
+  ( Resolution(..)
+  , _ResolvedItem
+  , _ResolvedLocal
+  , _Unresolved
+  , _NotApplicable
+  , resolve
+  )
+where
 
 import           Intentio.Prelude
 
 import qualified Data.HashMap.Strict           as HMS
 import qualified Data.HashSet                  as HS
+import qualified Data.List.NonEmpty            as NE
 
 import           Intentio.Annotated             ( ann )
 import           Intentio.Compiler              ( Assembly
                                                 , CompilePure
                                                 , assemblyModules
+                                                , forModulesM
                                                 , itemName
-                                                , moduleItems
-                                                , moduleName
                                                 , pushErrorFor
+                                                , pushIceFor
+                                                , pushWarningFor
                                                 , unItemName
+                                                , unModuleName
                                                 )
 import           Intentio.Util.NodeId           ( NodeId )
-import           Language.Intentio.AST          ( ModuleName(..)
-                                                , ItemName(..)
-                                                )
-import qualified Language.Intentio.AST         as A
+import           Language.Intentio.AST
 
-data ItemIndex = ItemIndex
-  { _importNameMap :: HMS.HashMap ModuleName (HashSet ItemName)
-  , _itemNameMap   :: HMS.HashMap (ModuleName, ItemName) NodeId
+--------------------------------------------------------------------------------
+-- Types
+
+data Resolution
+  = ResolvedItem ModuleName ItemName
+  | ResolvedLocal NodeId
+  | Unresolved
+  | NotApplicable
+  deriving (Show, Eq)
+
+data KnownName
+  = KnownQid Text Text
+  | KnownScopeId Text
+  deriving (Show, Eq, Generic)
+
+instance Hashable KnownName
+
+data ScopeKind
+  = GlobalScope
+  | ItemScope
+  | VariableScope
+  deriving (Show, Eq)
+
+type ScopeName = Text
+
+data Scope = Scope
+  { _scopeKind :: ScopeKind
+  , _scopeName :: ScopeName
+  , _scopeIds  :: HMS.HashMap KnownName NodeId
   }
   deriving (Show, Eq)
 
-makeLenses ''ItemIndex
+data SharedResolveCtx = SharedResolveCtx
+  { _sharedGlobalExports     :: HMS.HashMap ModuleName (HashSet ItemName)
+  , _sharedGlobalItemNameMap :: HMS.HashMap (ModuleName, ItemName) NodeId
+  }
+  deriving (Show, Eq)
 
-buildItemIndex :: Assembly (A.Module NodeId) -> CompilePure ItemIndex
-buildItemIndex = undefined
+data ResolveCtx = ResolveCtx
+  { _globalExports     :: HMS.HashMap ModuleName (HashSet ItemName)
+  , _globalItemNameMap :: HMS.HashMap (ModuleName, ItemName) NodeId
+  , _currentModule     :: Module NodeId
+  , _scopeStack        :: NonEmpty Scope
+  }
+  deriving (Show, Eq)
+
+type ResolveM a = StateT ResolveCtx CompilePure a
+
+makePrisms ''Resolution
+makeLenses ''Scope
+makeLenses ''SharedResolveCtx
+makeLenses ''ResolveCtx
+
+showScopeKind :: ScopeKind -> Text
+showScopeKind GlobalScope   = "g"
+showScopeKind ItemScope     = "i"
+showScopeKind VariableScope = "v"
+
+showScopeName :: Scope -> Text
+showScopeName s = (s ^. scopeName) <> "/" <> (s ^. scopeKind & showScopeKind)
+
+emptyScopeStack :: ModuleName -> NonEmpty Scope
+emptyScopeStack (ModuleName n) = Scope GlobalScope n mempty :| []
+
+currentScope :: ResolveM Scope
+currentScope = uses scopeStack NE.head
+
+pushScope :: ScopeKind -> ScopeName -> ResolveM ()
+pushScope GlobalScope _ = do
+  m <- use currentModule
+  lift $ pushIceFor m "Cannot push global scope"
+pushScope k n = scopeStack %= NE.cons (Scope k n mempty)
+
+popScope :: ResolveM ()
+popScope = uses scopeStack NE.uncons >>= \case
+  (_, Just st) -> scopeStack .= st
+  (_, Nothing) -> do
+    m <- use currentModule
+    lift $ pushIceFor m "Cannot pop global scope"
+
+withScope :: ScopeKind -> ScopeName -> ResolveM a -> ResolveM a
+withScope n k f = pushScope n k *> f <* popScope
+
+--------------------------------------------------------------------------------
+-- Resolution algorithm
+
+resolve
+  :: Assembly (Module NodeId)
+  -> CompilePure (Assembly (Module (NodeId, Resolution)))
+resolve asm = do
+  ensureUniqueModuleNames asm
+  sharedCtx <- buildSharedResolveCtx asm
+  forModulesM asm $ \modul -> do
+    let ctx = buildLocalResolveCtx sharedCtx modul
+    evalStateT processCurrentModule ctx
+
+ensureUniqueModuleNames :: Assembly (Module NodeId) -> CompilePure ()
+ensureUniqueModuleNames asm =
+  flip evalStateT HS.empty . forM_ (asm ^. assemblyModules) $ \m -> do
+    let name = m ^. moduleName
+    isDuplicate <- use $ contains name
+    when isDuplicate . lift $ pushErrorFor m (errDupModule name)
+    modify $ HS.insert name
+
+processCurrentModule :: ResolveM (Module (NodeId, Resolution))
+processCurrentModule = do
+  modul <- uses currentModule (fmap (, NotApplicable))
+  let modItems = modul ^. moduleItems
+  modItems' <- mapM processItem modItems
+  let modul' = modul & moduleItems .~ modItems'
+  return modul'
+
+processItem
+  :: ItemDecl (NodeId, Resolution) -> ResolveM (ItemDecl (NodeId, Resolution))
+processItem = undefined
+
+--------------------------------------------------------------------------------
+-- Resolve context creation
+
+buildLocalResolveCtx :: SharedResolveCtx -> Module NodeId -> ResolveCtx
+buildLocalResolveCtx sctx modul =
+  let _globalExports     = sctx ^. sharedGlobalExports
+      _globalItemNameMap = sctx ^. sharedGlobalItemNameMap
+      _currentModule     = modul
+      _scopeStack        = emptyScopeStack $ modul ^. moduleName
+  in  ResolveCtx { .. }
+
+buildSharedResolveCtx
+  :: Assembly (Module NodeId) -> CompilePure SharedResolveCtx
+buildSharedResolveCtx asm =
+  SharedResolveCtx <$> buildExportNameMap asm <*> buildItemNameMap asm
+
+buildExportNameMap
+  :: Assembly (Module NodeId)
+  -> CompilePure (HMS.HashMap ModuleName (HashSet ItemName))
+buildExportNameMap asm =
+  HMS.fromList . zip (mods <&> view moduleName) <$> mapM collectExports mods
+ where
+  mods = asm ^. assemblyModules & toList
+
+  collectExports m = execStateT (mapM procExport $ getExportDecls m) HS.empty
+
+  getExportDecls m = case m ^. moduleExport of
+    Nothing -> []
+    Just e  -> e ^. exportDeclItems
+
+  procExport sid = do
+    let iName = convert sid
+    isDuplicate <- use $ contains iName
+    when isDuplicate . lift $ pushWarningFor sid (errDupExport iName)
+    modify $ HS.insert iName
 
 buildItemNameMap
-  :: Assembly (A.Module NodeId)
+  :: Assembly (Module NodeId)
   -> CompilePure (HMS.HashMap (ModuleName, ItemName) NodeId)
 buildItemNameMap asm = HMS.fromList . concat <$> mapM procMod mods
  where
   mods = asm ^. assemblyModules & toList
 
-  procMod :: A.Module NodeId -> CompilePure [((ModuleName, ItemName), NodeId)]
+  procMod :: Module NodeId -> CompilePure [((ModuleName, ItemName), NodeId)]
   procMod m = fmap (key $ m ^. moduleName) <$> collItems m
 
   key :: ModuleName -> (ItemName, NodeId) -> ((ModuleName, ItemName), NodeId)
   key m (k, v) = ((m, k), v)
 
-  collItems :: A.Module NodeId -> CompilePure [(ItemName, NodeId)]
+  collItems :: Module NodeId -> CompilePure [(ItemName, NodeId)]
   collItems m =
     catMaybes <$> evalStateT (mapM procItem $ m ^. moduleItems) HS.empty
 
@@ -57,4 +206,14 @@ buildItemNameMap asm = HMS.fromList . concat <$> mapM procMod mods
       modify $ HS.insert iName
       return $ Just (iName, item ^. ann)
 
-  errDupName n = "Multiple definitions of item \"" <> n ^. unItemName <> "\"."
+--------------------------------------------------------------------------------
+-- Error messages
+
+errDupModule :: ModuleName -> Text
+errDupModule n = "Duplicate module with same name: " <> n ^. unModuleName
+
+errDupName :: ItemName -> Text
+errDupName n = "Multiple definitions of item: " <> n ^. unItemName
+
+errDupExport :: ItemName -> Text
+errDupExport n = "Duplicate export of same item: " <> n ^. unItemName

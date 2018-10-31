@@ -110,8 +110,7 @@ instance FromJSON a => FromJSON (ItemDecl a)
 instance (Eq a, Show a) => A.Item (ItemDecl a) where
   _itemName ItemDecl { _itemDeclKind = ImportItemDecl _ } = Nothing
   _itemName ItemDecl { _itemDeclKind = FunItemDecl f } =
-    let FunDecl { _funDeclName = ScopeId { _unScopeId } } = f
-    in  Just $ ItemName _unScopeId
+    Just . convert $ _funDeclName f
 
 data ItemDeclKind a
   = ImportItemDecl (ImportDecl a)
@@ -425,3 +424,9 @@ instance Convertible TokenType UnOpKind where
 
 instance Convertible Token UnOpKind where
   safeConvert Token { _ty } = safeConvert _ty
+
+--------------------------------------------------------------------------------
+-- Utilities
+
+instance Convertible (ScopeId a) ItemName where
+  safeConvert ScopeId { _unScopeId } = Right $ ItemName _unScopeId

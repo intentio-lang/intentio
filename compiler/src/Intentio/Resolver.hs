@@ -1,5 +1,7 @@
 module Intentio.Resolver
   ( Resolution(..)
+  , HasResolution(..)
+  , RS
   , _ResolvedItem
   , _ResolvedLocal
   , _Unresolved
@@ -14,7 +16,7 @@ import qualified Data.HashMap.Strict           as HMS
 import qualified Data.HashSet                  as HS
 import qualified Data.List.NonEmpty            as NE
 
-import           Intentio.Annotated             ( ann )
+import           Intentio.Annotated             ( Annotated(..) )
 import           Intentio.Compiler              ( Assembly
                                                 , CompilePure
                                                 , assemblyModules
@@ -23,21 +25,14 @@ import           Intentio.Compiler              ( Assembly
                                                 , pushErrorFor
                                                 , pushIceFor
                                                 , pushWarningFor
-                                                , unItemName
-                                                , unModuleName
                                                 )
-import           Intentio.Util.NodeId           ( NodeId )
+import           Intentio.Util.NodeId           ( NodeId
+                                                , nodeId
+                                                )
 import           Language.Intentio.AST
 
 --------------------------------------------------------------------------------
 -- Types
-
-data Resolution
-  = ResolvedItem ModuleName ItemName
-  | ResolvedLocal NodeId
-  | Unresolved
-  | NotApplicable
-  deriving (Show, Eq)
 
 data KnownName
   = KnownQid Text Text
@@ -77,6 +72,27 @@ data ResolveCtx = ResolveCtx
 
 type ResolveM a = StateT ResolveCtx CompilePure a
 
+type RS = (NodeId, Resolution)
+
+data Resolution
+  = ResolvedItem ModuleName ItemName
+  | ResolvedLocal NodeId
+  | Unresolved
+  | NotApplicable
+  deriving (Show, Eq)
+
+class HasResolution a where
+  resolution :: Lens' a Resolution
+
+instance HasResolution Resolution where
+  resolution = id
+
+instance HasResolution RS where
+  resolution = _2
+
+instance Annotated a => HasResolution (a RS) where
+  resolution = ann . resolution
+
 makePrisms ''Resolution
 makeLenses ''Scope
 makeLenses ''SharedResolveCtx
@@ -115,9 +131,7 @@ withScope n k f = pushScope n k *> f <* popScope
 --------------------------------------------------------------------------------
 -- Resolution algorithm
 
-resolve
-  :: Assembly (Module NodeId)
-  -> CompilePure (Assembly (Module (NodeId, Resolution)))
+resolve :: Assembly (Module NodeId) -> CompilePure (Assembly (Module RS))
 resolve asm = do
   ensureUniqueModuleNames asm
   sharedCtx <- buildSharedResolveCtx asm
@@ -133,17 +147,24 @@ ensureUniqueModuleNames asm =
     when isDuplicate . lift $ pushErrorFor m (errDupModule name)
     modify $ HS.insert name
 
-processCurrentModule :: ResolveM (Module (NodeId, Resolution))
-processCurrentModule = do
-  modul <- uses currentModule (fmap (, NotApplicable))
-  let modItems = modul ^. moduleItems
-  modItems' <- mapM processItem modItems
-  let modul' = modul & moduleItems .~ modItems'
-  return modul'
+processCurrentModule :: ResolveM (Module RS)
+processCurrentModule =
+  uses currentModule (fmap (, NotApplicable))
+    >>= (moduleExport #%%~ mapM processExportDecl)
+    >>= (moduleItems #%%~ mapM processItemDecl)
 
-processItem
-  :: ItemDecl (NodeId, Resolution) -> ResolveM (ItemDecl (NodeId, Resolution))
-processItem = undefined
+processExportDecl :: ExportDecl RS -> ResolveM (ExportDecl RS)
+processExportDecl = exportDeclItems #%%~ mapM processId
+ where
+  processId sid = do
+    let itName = ItemName $ sid ^. unScopeId
+    modName <- use $ currentModule . moduleName
+    use (globalItemNameMap . at (modName, itName)) >>= \case
+      Just _  -> return (sid & resolution .~ ResolvedItem modName itName)
+      Nothing -> lift . pushErrorFor sid $ errModuleExportsUndefined itName
+
+processItemDecl :: ItemDecl RS -> ResolveM (ItemDecl RS)
+processItemDecl = undefined
 
 --------------------------------------------------------------------------------
 -- Resolve context creation
@@ -178,7 +199,7 @@ buildExportNameMap asm =
   procExport sid = do
     let iName = convert sid
     isDuplicate <- use $ contains iName
-    when isDuplicate . lift $ pushWarningFor sid (errDupExport iName)
+    when isDuplicate . lift $ pushWarningFor sid (warnDupExport iName)
     modify $ HS.insert iName
 
 buildItemNameMap
@@ -204,16 +225,20 @@ buildItemNameMap asm = HMS.fromList . concat <$> mapM procMod mods
       isDuplicate <- use $ contains iName
       when isDuplicate . lift $ pushErrorFor item (errDupName iName)
       modify $ HS.insert iName
-      return $ Just (iName, item ^. ann)
+      return $ Just (iName, item ^. nodeId)
 
 --------------------------------------------------------------------------------
 -- Error messages
 
 errDupModule :: ModuleName -> Text
-errDupModule n = "Duplicate module with same name: " <> n ^. unModuleName
+errDupModule (ModuleName n) = "Duplicate module with same name: " <> n
 
 errDupName :: ItemName -> Text
-errDupName n = "Multiple definitions of item: " <> n ^. unItemName
+errDupName (ItemName n) = "Multiple definitions of item: " <> n
 
-errDupExport :: ItemName -> Text
-errDupExport n = "Duplicate export of same item: " <> n ^. unItemName
+errModuleExportsUndefined :: ItemName -> Text
+errModuleExportsUndefined (ItemName n) =
+  "Module exports item '" <> n <> "' but does not define it."
+
+warnDupExport :: ItemName -> Text
+warnDupExport (ItemName n) = "Duplicate export of same item: " <> n

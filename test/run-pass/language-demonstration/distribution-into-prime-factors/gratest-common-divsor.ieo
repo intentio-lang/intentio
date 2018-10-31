@@ -1,0 +1,23 @@
+# - run:
+#     stdin:
+#       - "1620"
+#       - "35"
+#     stdout: 
+#       - "5"
+
+fun main() {
+    let a = int(readln());
+    let factor = 2;
+    let gcd = 1;
+    while (a >= factor * factor or a == 1) {
+        let tmpa = a / factor;
+        if (tmpa * factor == a) {
+            let tmpb = b /factor;
+            if (tmpb * factor == b) {
+                gcd = factor;
+            }
+        }
+        factor = factor + 1;
+    }
+    println(str(gcd));
+}

@@ -1,0 +1,20 @@
+# - run:
+#     stdin:
+#       - "1621"
+#     stdout: 
+#       - "yes"
+
+fun main() {
+    let a = int(readln());
+    let factor = 2;
+    while (a >= factor * factor) {
+        let tmp = a / factor;
+        if (tmp * factor == a) {
+            println("no");
+            return fail;
+        }
+        factor = factor + 1;
+    }
+    println("yes");
+    return succ;
+}

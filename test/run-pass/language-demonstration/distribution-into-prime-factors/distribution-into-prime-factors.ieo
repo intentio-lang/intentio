@@ -1,0 +1,26 @@
+# - run:
+#     stdin:
+#       - "1620"
+#     stdout: 
+#       - "2"
+#       - "2"
+#       - "3"
+#       - "3"
+#       - "3"
+#       - "3"
+#       - "5"
+
+fun main() {
+    let a = int(readln());
+    let b = int(readln());
+    let factor = 2;
+    while (a >= factor * factor or a == 1) {
+        let tmp = a / factor;
+        while (tmp * factor == a) {
+            println(str(factor));
+            a = tmp;
+            tmp = a /factor;
+        }
+        factor = factor + 1;
+    }
+}

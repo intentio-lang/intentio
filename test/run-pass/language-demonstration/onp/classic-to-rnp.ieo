@@ -1,0 +1,60 @@
+# rnp for expressions made with (,),+,*,a,b,c
+
+# Expression = Component | Component "+" Expression
+fun Expression(in) {
+    let first_case = Component(in);
+    if (first_case) { return first_case; }
+
+    let position = find ("+", in);
+    let second_case_part_1 = Component(strcut(0, position, in);
+    let second_case_part_2 = Expression(strcut(position+2, length(in), in);
+    if (second_case_part_1
+        and (strcut(position+1, position+2, in) == "+"
+        second_case_part_2 {
+            return stradd(stradd(second_case_part_1, second_case_part_2),"+")
+    } 
+    return fail;
+}
+
+# Component = Factor | Factor "*" Component
+fun Component(in) {
+    let first_case = Factor(in);
+    if (first_case) { return first_case; }
+
+    let position = find ("*", in);
+    let second_case_part_1 = Factor(strcut(0, position, in);
+    let second_case_part_2 = Component(strcut(position+2, length(in), in);
+    if (second_case_part_1
+        and (strcut(position+1, position+2, in) == "*"
+        second_case_part_2 {
+            return stradd(stradd(second_case_part_1, second_case_part_2), "*")
+    } 
+    return fail;
+}
+
+# Factor = Identity | "(" Expression ")"
+procedure Factor()
+	return I() or "(" and Expression() and ")"
+end
+fun Factor(in) {
+    if (length(in) == 1) { return Identity(in); }
+    let tmp = Expression((strcut(position+1, length(in)-1, in);
+    if ((strcut(0, 1, in) == "("
+        and tmp
+        and (strcut(0, 1, in) == ")") {
+        return stradd("(", stradd(tmp, ")"));
+    } 
+    return fail;
+}
+
+# Identity = "a" | "b" | "c"
+procedure Identity(in)
+	if (in == "a" or in == "b" or in = "c") { return in }
+    return false;
+end
+
+procedure main()
+	while (let input = readln()) {
+        println(Expression(input));
+    }
+end

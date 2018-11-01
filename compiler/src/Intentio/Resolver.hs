@@ -1,3 +1,5 @@
+{-# LANGUAGE AllowAmbiguousTypes #-}
+
 module Intentio.Resolver
   ( Resolution(..)
   , HasResolution(..)
@@ -27,6 +29,10 @@ import           Intentio.Compiler              ( Assembly
                                                 , pushIceFor
                                                 , pushWarningFor
                                                 )
+import           Intentio.Diagnostics           ( SourcePos
+                                                , HasSourcePos
+                                                , sourcePos
+                                                )
 import           Intentio.Util.NodeId           ( NodeId
                                                 , nodeId
                                                 )
@@ -34,54 +40,17 @@ import qualified Intentio.Util.NodeId          as NodeId
 import           Language.Intentio.AST
 
 --------------------------------------------------------------------------------
--- Types
-
-data KnownName
-  = KnownQid Text Text
-  | KnownScopeId Text
-  deriving (Show, Eq, Generic)
-
-instance Hashable KnownName
-
-data ScopeKind
-  = GlobalScope
-  | ItemScope
-  | VariableScope
-  deriving (Show, Eq)
-
-type ScopeName = Text
-
-data Scope = Scope
-  { _scopeKind :: ScopeKind
-  , _scopeName :: ScopeName
-  , _scopeIds  :: HMS.HashMap KnownName NodeId
-  }
-  deriving (Show, Eq)
-
-data SharedResolveCtx = SharedResolveCtx
-  { _sharedGlobalExports     :: HMS.HashMap ModuleName (HashSet ItemName)
-  , _sharedGlobalItemNameMap :: HMS.HashMap (ModuleName, ItemName) NodeId
-  }
-  deriving (Show, Eq)
-
-data ResolveCtx = ResolveCtx
-  { _globalExports     :: HMS.HashMap ModuleName (HashSet ItemName)
-  , _globalItemNameMap :: HMS.HashMap (ModuleName, ItemName) NodeId
-  , _currentModule     :: Module NodeId
-  , _scopeStack        :: NonEmpty Scope
-  }
-  deriving (Show, Eq)
-
-type ResolveM a = StateT ResolveCtx CompilePure a
-
-type RS = (NodeId, Resolution)
+-- Name resolution result types
 
 data Resolution
-  = ResolvedItem ModuleName ItemName
+  = ResolvedModule ModuleName
+  | ResolvedItem ModuleName ItemName
   | ResolvedLocal NodeId
   | Unresolved
   | NotApplicable
   deriving (Show, Eq)
+
+type RS = (NodeId, Resolution)
 
 class HasResolution a where
   resolution :: Lens' a Resolution
@@ -98,40 +67,160 @@ instance Annotated a => HasResolution (a RS) where
   resolution = ann . resolution
   {-# INLINE resolution #-}
 
+--------------------------------------------------------------------------------
+-- Scope data type
+
+data ScopeKind
+  = GlobalScope
+  | ItemScope
+  | VariableScope
+  deriving (Show, Eq)
+
+type ScopeName = Text
+
+data Scope n = Scope
+  { _scopeKind :: ScopeKind
+  , _scopeName :: ScopeName
+  , _scopeIds  :: HMS.HashMap n (ResolvesTo n, SourcePos)
+  }
+
+deriving instance Name n => Show (Scope n)
+
+--------------------------------------------------------------------------------
+-- Name class
+
+class (Hashable n, Show n, Eq n, Show (ResolvesTo n)) => Name n
+ where
+  type ResolvesTo n :: *
+
+  showName :: n -> Text
+
+  scopeStack :: Lens' ResolveCtx (NonEmpty (Scope n))
+
+class Name n => ToName a n | a -> n where
+  toName :: a -> n
+
+--------------------------------------------------------------------------------
+-- Value namespace
+
+newtype ValueName = ValueName { _unValueName :: Text }
+  deriving (Show, Eq, Ord, Hashable)
+
+data ValueResolvesTo
+  = ToItem ModuleName ItemName
+  | ToNodeId NodeId
+  deriving (Show)
+
+instance Name ValueName where
+  type ResolvesTo ValueName = ValueResolvesTo
+  showName = _unValueName
+  scopeStack = lens _valueScopeStack (\c s -> c{_valueScopeStack=s})
+
+instance ToName ValueName ValueName where
+  toName = id
+
+instance ToName Text ValueName where
+  toName = ValueName
+
+instance ToName ItemName ValueName where
+  toName (ItemName n) = ValueName n
+
+instance ToName (ScopeId a) ValueName where
+  toName = toName . view unScopeId
+
+--------------------------------------------------------------------------------
+-- Module namespace
+
+instance Name ModuleName where
+  type ResolvesTo ModuleName = ModuleName
+  showName = _unModuleName
+  scopeStack = lens _moduleScopeStack (\c s -> c{_moduleScopeStack=s})
+
+instance ToName ModuleName ModuleName where
+  toName = id
+
+instance ToName (ModId a) ModuleName where
+  toName = ModuleName . view unModId
+
+--------------------------------------------------------------------------------
+-- Name resolver state data types and monads
+
+data SharedResolveCtx = SharedResolveCtx
+  { _sharedGlobalExports     :: HMS.HashMap ModuleName (HashSet ItemName)
+  , _sharedGlobalItemNameMap :: HMS.HashMap (ModuleName, ItemName) NodeId
+  }
+  deriving (Show)
+
+data ResolveCtx = ResolveCtx
+  { _globalExports     :: HMS.HashMap ModuleName (HashSet ItemName)
+  , _globalItemNameMap :: HMS.HashMap (ModuleName, ItemName) NodeId
+  , _currentModule     :: Module NodeId
+  , _valueScopeStack   :: NonEmpty (Scope ValueName)
+  , _moduleScopeStack  :: NonEmpty (Scope ModuleName)
+  }
+  deriving (Show)
+
+type ResolveM a = StateT ResolveCtx CompilePure a
+
+--------------------------------------------------------------------------------
+-- Lenses
+
 makePrisms ''Resolution
 makeLenses ''Scope
 makeLenses ''SharedResolveCtx
 makeLenses ''ResolveCtx
+
+--------------------------------------------------------------------------------
+-- Functions for manipulating name resolution state
 
 showScopeKind :: ScopeKind -> Text
 showScopeKind GlobalScope   = "g"
 showScopeKind ItemScope     = "i"
 showScopeKind VariableScope = "v"
 
-showScopeName :: Scope -> Text
+showScopeName :: forall n . Name n => Scope n -> Text
 showScopeName s = (s ^. scopeName) <> "/" <> (s ^. scopeKind & showScopeKind)
 
-emptyScopeStack :: ModuleName -> NonEmpty Scope
+emptyScopeStack :: forall n . Name n => ModuleName -> NonEmpty (Scope n)
 emptyScopeStack (ModuleName n) = Scope GlobalScope n mempty :| []
 
-currentScope :: ResolveM Scope
-currentScope = uses scopeStack NE.head
+currentScope :: forall n . Name n => Lens' ResolveCtx (Scope n)
+currentScope = lens getter setter
+ where
+  getter = NE.head . view (scopeStack @n)
+  setter c s = c & scopeStack @n %~ \(_ :| ss) -> s :| ss
 
-pushScope :: ScopeKind -> ScopeName -> ResolveM ()
+pushScope :: forall n . Name n => ScopeKind -> ScopeName -> ResolveM ()
 pushScope GlobalScope _ = do
   m <- use currentModule
   lift $ pushIceFor m "Cannot push global scope"
-pushScope k n = scopeStack %= NE.cons (Scope k n mempty)
+pushScope k n = scopeStack @n %= NE.cons (Scope k n mempty)
 
-popScope :: ResolveM ()
-popScope = uses scopeStack NE.uncons >>= \case
+popScope :: forall n . Name n => ResolveM ()
+popScope = uses (scopeStack @n) NE.uncons >>= \case
   (_, Just st) -> scopeStack .= st
   (_, Nothing) -> do
     m <- use currentModule
     lift $ pushIceFor m "Cannot pop global scope"
 
-withScope :: ScopeKind -> ScopeName -> ResolveM a -> ResolveM a
-withScope n k f = pushScope n k *> f <* popScope
+withScope
+  :: forall n a . Name n => ScopeKind -> ScopeName -> ResolveM a -> ResolveM a
+withScope n k f = pushScope @n n k *> f <* popScope @n
+
+define
+  :: forall n a t
+   . (Name n, ToName a n, HasSourcePos t)
+  => t
+  -> a
+  -> ResolvesTo n
+  -> ResolveM ()
+define target name' resolvesTo = do
+  let name = toName name'
+  scope <- use currentScope
+  case scope ^. scopeIds . at name of
+    Just (_, sp) -> lift . pushErrorFor target $ errAlreadyDefined name sp
+    Nothing ->
+      currentScope . scopeIds . at name ?= (resolvesTo, target ^. sourcePos)
 
 --------------------------------------------------------------------------------
 -- Resolution algorithm
@@ -171,17 +260,58 @@ resolveExportDecl = exportDeclItems #%%~ mapM resolveId
       Nothing -> lift . pushErrorFor sid $ errModuleExportsUndefined itName
 
 resolveItemDecl :: ItemDecl RS -> ResolveM (ItemDecl RS)
-resolveItemDecl i = lift $ pushIceFor i "resolveItemDecl not implemented"
+resolveItemDecl it = case it ^. itemDeclKind of
+  ImportItemDecl d -> go resolveImportDecl ImportItemDecl d
+  FunItemDecl    d -> go resolveFunDecl FunItemDecl d
+ where
+  go
+    :: (Annotated a)
+    => (a RS -> ResolveM (a RS))
+    -> (a RS -> ItemDeclKind RS)
+    -> a RS
+    -> ResolveM (ItemDecl RS)
+  go f c d =
+    f d <&> \d' ->
+      it & (itemDeclKind .~ c d') & (resolution .~ d' ^. resolution)
+
+resolveImportDecl :: ImportDecl RS -> ResolveM (ImportDecl RS)
+resolveImportDecl imp = case imp ^. importDeclKind of
+  ImportQid q -> do
+    let mName = q ^. qidMod & ModuleName
+    let iName = q ^. qidScope & ItemName
+    define imp iName (ToItem mName iName)
+    return $ imp & resolution .~ ResolvedItem mName iName
+
+  ImportQidAs q a -> do
+    let mName = q ^. qidMod & ModuleName
+    let iName = q ^. qidScope & ItemName
+    define imp a (ToItem mName iName)
+    return $ imp & resolution .~ ResolvedItem mName iName
+
+  ImportId m -> do
+    define imp m (toName m)
+    return $ imp & resolution .~ ResolvedModule (toName m)
+
+  ImportIdAs m a -> do
+    define imp a (toName m)
+    return $ imp & resolution .~ ResolvedModule (toName m)
+
+  ImportAll _ -> lift $ pushIceFor imp "Import-all is not implemented yet."
+
+resolveFunDecl :: FunDecl RS -> ResolveM (FunDecl RS)
+resolveFunDecl = undefined
 
 --------------------------------------------------------------------------------
 -- Resolve context creation
 
 buildLocalResolveCtx :: SharedResolveCtx -> Module NodeId -> ResolveCtx
 buildLocalResolveCtx sctx modul =
-  let _globalExports     = sctx ^. sharedGlobalExports
+  let mName              = modul ^. moduleName
+      _globalExports     = sctx ^. sharedGlobalExports
       _globalItemNameMap = sctx ^. sharedGlobalItemNameMap
       _currentModule     = modul
-      _scopeStack        = emptyScopeStack $ modul ^. moduleName
+      _valueScopeStack   = emptyScopeStack mName
+      _moduleScopeStack  = emptyScopeStack mName
   in  ResolveCtx { .. }
 
 buildSharedResolveCtx
@@ -237,15 +367,24 @@ buildItemNameMap asm = HMS.fromList . concat <$> mapM procMod mods
 --------------------------------------------------------------------------------
 -- Error messages
 
+errAlreadyDefined :: (Name n, HasSourcePos p) => n -> p -> Text
+errAlreadyDefined name pos =
+  quoted (showName name)
+    <> " has been already defined at "
+    <> (pos ^. sourcePos & show)
+
 errDupModule :: ModuleName -> Text
-errDupModule (ModuleName n) = "Duplicate module with same name: " <> n
+errDupModule (ModuleName n) = "Duplicate module " <> quoted n
 
 errDupName :: ItemName -> Text
-errDupName (ItemName n) = "Multiple definitions of item: " <> n
+errDupName (ItemName n) = "Multiple definitions of item " <> quoted n
 
 errModuleExportsUndefined :: ItemName -> Text
 errModuleExportsUndefined (ItemName n) =
-  "Module exports item '" <> n <> "' but does not define it."
+  "Module exports item " <> quoted n <> " but does not define it."
 
 warnDupExport :: ItemName -> Text
-warnDupExport (ItemName n) = "Duplicate export of same item: " <> n
+warnDupExport (ItemName n) = "Duplicate export of same item " <> quoted n
+
+quoted :: Text -> Text
+quoted n = ('\'' <| n) |> '\''

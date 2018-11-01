@@ -128,6 +128,9 @@ instance ToName ItemName ValueName where
 instance ToName (ScopeId a) ValueName where
   toName = toName . view unScopeId
 
+instance ToName (Qid a) ValueName where
+  toName = toName . view qidScope
+
 --------------------------------------------------------------------------------
 -- Module namespace
 
@@ -276,27 +279,32 @@ resolveItemDecl it = case it ^. itemDeclKind of
 
 resolveImportDecl :: ImportDecl RS -> ResolveM (ImportDecl RS)
 resolveImportDecl imp = case imp ^. importDeclKind of
-  ImportQid q -> do
+  ImportQid q     -> doQid q q
+  ImportQidAs q a -> doQid q a
+  ImportId m      -> doMod m m
+  ImportIdAs m a  -> doMod m a
+  ImportAll _     -> lift $ pushIceFor imp "Import-all is not implemented yet."
+ where
+  doQid :: ToName a ValueName => Qid RS -> a -> ResolveM (ImportDecl RS)
+  doQid q a = do
     let mName = q ^. qidMod & ModuleName
     let iName = q ^. qidScope & ItemName
-    define imp iName (ToItem mName iName)
-    return $ imp & resolution .~ ResolvedItem mName iName
-
-  ImportQidAs q a -> do
-    let mName = q ^. qidMod & ModuleName
-    let iName = q ^. qidScope & ItemName
+    ge <- use globalExports
+    case ge ^. at mName of
+      Just hs -> when (hs ^. contains iName & not) $ do
+        lift . pushErrorFor q $ errUnknownQid mName iName
+      Nothing -> lift . pushErrorFor q $ errUnknownModule mName
     define imp a (ToItem mName iName)
     return $ imp & resolution .~ ResolvedItem mName iName
 
-  ImportId m -> do
-    define imp m (toName m)
-    return $ imp & resolution .~ ResolvedModule (toName m)
-
-  ImportIdAs m a -> do
-    define imp a (toName m)
-    return $ imp & resolution .~ ResolvedModule (toName m)
-
-  ImportAll _ -> lift $ pushIceFor imp "Import-all is not implemented yet."
+  doMod :: ToName a ModuleName => ModId RS -> a -> ResolveM (ImportDecl RS)
+  doMod m a = do
+    let mName = toName m
+    ge <- use globalExports
+    when (at mName `hasn't` ge) $ do
+      lift . pushErrorFor m $ errUnknownModule mName
+    define imp a mName
+    return $ imp & resolution .~ ResolvedModule mName
 
 resolveFunDecl :: FunDecl RS -> ResolveM (FunDecl RS)
 resolveFunDecl = undefined
@@ -372,19 +380,28 @@ errAlreadyDefined name pos =
   quoted (showName name)
     <> " has been already defined at "
     <> (pos ^. sourcePos & show)
+    <> "."
 
 errDupModule :: ModuleName -> Text
-errDupModule (ModuleName n) = "Duplicate module " <> quoted n
+errDupModule (ModuleName n) = "Duplicate module " <> quoted n <> "."
 
 errDupName :: ItemName -> Text
-errDupName (ItemName n) = "Multiple definitions of item " <> quoted n
+errDupName (ItemName n) = "Multiple definitions of item " <> quoted n <> "."
 
 errModuleExportsUndefined :: ItemName -> Text
 errModuleExportsUndefined (ItemName n) =
   "Module exports item " <> quoted n <> " but does not define it."
 
+errUnknownModule :: ModuleName -> Text
+errUnknownModule (ModuleName n) = "Unknown module " <> quoted n <> "."
+
+errUnknownQid :: ModuleName -> ItemName -> Text
+errUnknownQid (ModuleName m) (ItemName i) =
+  "Unknown item " <> quoted (m <> ":" <> i) <> "."
+
 warnDupExport :: ItemName -> Text
-warnDupExport (ItemName n) = "Duplicate export of same item " <> quoted n
+warnDupExport (ItemName n) =
+  "Duplicate export of same item " <> quoted n <> "."
 
 quoted :: Text -> Text
 quoted n = ('\'' <| n) |> '\''

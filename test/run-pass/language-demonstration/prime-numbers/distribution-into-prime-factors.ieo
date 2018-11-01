@@ -12,9 +12,9 @@
 
 fun main() {
     let a = int(readln());
-    let b = int(readln());
+    if (a <= 0) { println("The number should be positive"); return fail; }
     let factor = 2;
-    while (a >= factor * factor or a == 1) {
+    while (a >= factor * factor) {
         let tmp = a / factor;
         while (tmp * factor == a) {
             println(str(factor));
@@ -22,5 +22,8 @@ fun main() {
             tmp = a /factor;
         }
         factor = factor + 1;
+    }
+    if (a != 1) {
+        println(str(factor));
     }
 }

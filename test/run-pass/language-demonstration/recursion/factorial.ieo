@@ -4,8 +4,13 @@
 #     stdout: 
 #       - "120"
 
-fun main(n) {
-    if (n < 0) { println("The number should be positive"); }
+fun main() {
+    let n = int(readln());
+    factorial(n);
+}
+
+fun factorial(n) {
+    if (n < 0) { println("The number should be non-negative"); return fail; }
     if (n == 0) { return 1; }
     return main(n - 1) * main(n - 2);
 }

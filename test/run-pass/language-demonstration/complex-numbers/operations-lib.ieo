@@ -1,0 +1,17 @@
+#  TODO: real, imaginary, mul, div, yaml, main
+
+add(a, b) {
+    ar = real(a);
+    ai = imaginary(a);
+    br = real(b);
+    bi = imaginary(b);
+    return stradd(str(ar + br), stradd(" + ", stradd(str(ai + bi), "i")));
+}
+
+sub(a, b) {
+    ar = real(a);
+    ai = imaginary(a);
+    br = real(b);
+    bi = imaginary(b);
+    return stradd(str(ar - br), stradd(" + ", stradd(str(ai - bi), "i")));
+}

@@ -7,17 +7,25 @@
 
 fun main() {
     let a = int(readln());
+    let b = int(readln());
+    if (a < 0 or b < 0) { println("The numbers should be positive"); return fail; }
     let factor = 2;
     let gcd = 1;
-    while (a >= factor * factor or a == 1) {
+    while (a >= factor * factor) {
         let tmpa = a / factor;
         if (tmpa * factor == a) {
-            let tmpb = b /factor;
+            let tmpb = b / factor;
             if (tmpb * factor == b) {
                 gcd = factor;
             }
         }
         factor = factor + 1;
+    }
+    if (a != 1) {
+        let tmpb = b / a;
+            if (tmpb * a == b) {
+                gcd = a;
+            }
     }
     println(str(gcd));
 }

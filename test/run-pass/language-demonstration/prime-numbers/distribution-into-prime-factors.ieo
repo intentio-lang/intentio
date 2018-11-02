@@ -12,18 +12,18 @@
 
 fun main() {
     let a = int(readln());
-    if (a <= 0) { println("The number should be positive"); return fail; }
+    if(a <= 0) { println("The number should be positive"); return fail; }
     let factor = 2;
-    while (a >= factor * factor) {
+    while(a >= factor * factor) {
         let tmp = a / factor;
-        while (tmp * factor == a) {
+        while(tmp * factor == a) {
             println(str(factor));
             a = tmp;
             tmp = a /factor;
         }
         factor = factor + 1;
     }
-    if (a != 1) {
+    if(a != 1) {
         println(str(factor));
     }
 }

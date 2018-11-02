@@ -8,16 +8,16 @@
 fun main() {
     let a = readln();
     let mode = readln();
-    if (mode != "even" and mode != "odd") { 
+    if(mode != "even" and mode != "odd") { 
         println(r#"The mode should be "even" or "odd""#); 
         return fail; 
         }
     let obverse = a;
     let reverse = "";
-    while (length(a) > 0) {
+    while(length(a) > 0) {
         stradd(reverse, strcut(length(a)-1, length(a), a));
     }
-    if (mode == "even") { 
+    if(mode == "even") { 
         println(obverse + reverse);
     } else {
         println(obverse + strcut(1, length(reverse), reverse));

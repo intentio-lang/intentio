@@ -10,8 +10,8 @@ fun main() {
 }
 
 fun fibonacci(n) {
-    if (n < 0) { println("The number should be non-negative"); return fail; }
-    if (n == 0) { return 0; }
-    if (n == 1) { return 1; }
+    if(n < 0) { println("The number should be non-negative"); return fail; }
+    if(n == 0) { return 0; }
+    if(n == 1) { return 1; }
     return main(n - 1) + main(n - 2);
 }

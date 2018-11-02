@@ -8,10 +8,10 @@ fun main() {
     let a = readln();
     let obverse = a;
     let reverse = "";
-    while (length(a) > 0) {
+    while(length(a) > 0) {
         stradd(reverse, strcut(length(a)-1, length(a), a));
     }
-    if (obverse == reverse) { 
+    if(obverse == reverse) { 
         println("yes");
     } else {
         println("no");

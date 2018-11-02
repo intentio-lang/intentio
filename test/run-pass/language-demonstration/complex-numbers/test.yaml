@@ -1,0 +1,13 @@
+- compile:
+    - operations-lib,ieo
+    - main.ieo
+- run:
+    stdin: 
+      - "1+8i"
+      - "2+3i"
+    stdout:
+      - "3+12i"
+      - "-1+5i"
+      - "-22+3i"
+      - "2+1i"
+      

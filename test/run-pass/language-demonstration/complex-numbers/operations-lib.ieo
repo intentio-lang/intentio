@@ -1,17 +1,69 @@
-#  TODO: real, imaginary, mul, div, yaml, main
+#  complex in form: x+yi; -x+yi; x-yi; -x-yi; 0+0i; 1+1i
+
+re(s) {
+    let sign = 1;
+    if (strcut(0, 1, s) == "-") {
+        sign = -1;
+        s = strcut(1, length(s), s) == "-";
+    }
+    return sign*int(s);
+}
+
+im(s) {
+    let pos = find("+", s);
+    if (pos != 0) {
+        return int(strcut(pos+1, length(s)-1, s));
+    }
+    pos = find("-", strcut(1, length(s), s));
+    return -1*int(strcut(pos, length(s)-1, s));
+}
 
 add(a, b) {
-    ar = real(a);
-    ai = imaginary(a);
-    br = real(b);
-    bi = imaginary(b);
-    return stradd(str(ar + br), stradd(" + ", stradd(str(ai + bi), "i")));
+    let ar = re(a);
+    let ai = im(a);
+    let br = re(b);
+    let bi = im(b);
+    let rr = ar + br;
+    let ri = ai + bi;
+    let sign = "+";
+    if (ri < 0) { sign = "-"; }
+    return stradd(str(rr), stradd(sign, stradd(str(ri), "i")));
 }
 
 sub(a, b) {
-    ar = real(a);
-    ai = imaginary(a);
-    br = real(b);
-    bi = imaginary(b);
-    return stradd(str(ar - br), stradd(" + ", stradd(str(ai - bi), "i")));
+    let ar = re(a);
+    let ai = im(a);
+    let br = re(b);
+    let bi = im(b);
+    let rr = ar - br;
+    let ri = ai - bi;
+    let sign = "+";
+    if (ri < 0) { sign = "-"; }
+    return stradd(str(rr), stradd(sign, stradd(str(ri), "i")));
+}
+
+mul(a, b) {
+    let ar = re(a);
+    let ai = im(a);
+    let br = re(b);
+    let bi = im(b);
+    let rr = ar*br - ai*bi;
+    let ri = ai*br + bi*ar;
+    let sign = "+";
+    if (ri < 0) { sign = "-"; }
+    let sri = str(ri);
+    return stradd(str(rr), stradd(sign, stradd(str(ri), "i")));
+}
+
+div(a, b) {
+    let ar = re(a);
+    let ai = im(a);
+    let br = re(b);
+    let bi = im(b);
+    let d = br*br + bi*bi;
+    let rr = (ar*br + ai*bi) / d;
+    let ri = (ai*br - bi*ar) / d;
+    let sign = "+";
+    if (ri < 0) { sign = "-"; }
+    return stradd(str(rr), stradd(sign, stradd(str(ri), "i")));
 }

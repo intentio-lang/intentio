@@ -111,10 +111,14 @@ data ValueResolvesTo
   | ToNodeId NodeId
   deriving (Show)
 
+instance Convertible ValueResolvesTo Resolution where
+  safeConvert (ToItem m n) = Right $ ResolvedItem m n
+  safeConvert (ToNodeId n) = Right $ ResolvedLocal n
+
 instance Name ValueName where
   type ResolvesTo ValueName = ValueResolvesTo
-  showName = _unValueName
-  scopeStack = lens getValueScopeStack (\c s -> c{getValueScopeStack=s})
+  showName   = _unValueName
+  scopeStack = lens getValueScopeStack (\c s -> c { getValueScopeStack = s })
 
 instance ToName ValueName ValueName where
   toName = id
@@ -136,8 +140,8 @@ instance ToName (Qid a) ValueName where
 
 instance Name ModuleName where
   type ResolvesTo ModuleName = ModuleName
-  showName = _unModuleName
-  scopeStack = lens getModuleScopeStack (\c s -> c{getModuleScopeStack=s})
+  showName   = _unModuleName
+  scopeStack = lens getModuleScopeStack (\c s -> c { getModuleScopeStack = s })
 
 instance ToName ModuleName ModuleName where
   toName = id
@@ -148,15 +152,13 @@ instance ToName (ModId a) ModuleName where
 --------------------------------------------------------------------------------
 -- Name resolver state data types and monads
 
-data SharedResolveCtx = SharedResolveCtx
+newtype SharedResolveCtx = SharedResolveCtx
   { _sharedGlobalExports     :: HMS.HashMap ModuleName (HashSet ItemName)
-  , _sharedGlobalItemNameMap :: HMS.HashMap (ModuleName, ItemName) NodeId
   }
   deriving (Show)
 
 data ResolveCtx = ResolveCtx
   { _globalExports      :: HMS.HashMap ModuleName (HashSet ItemName)
-  , _globalItemNameMap  :: HMS.HashMap (ModuleName, ItemName) NodeId
   , _currentModule      :: Module NodeId
   , getValueScopeStack  :: NonEmpty (Scope ValueName)
   , getModuleScopeStack :: NonEmpty (Scope ModuleName)
@@ -210,6 +212,28 @@ withScope
   :: forall n a . Name n => ScopeKind -> ScopeName -> ResolveM a -> ResolveM a
 withScope n k f = pushScope @n n k *> f <* popScope @n
 
+lookupWithDefinitionPos
+  :: forall n a
+   . (Name n, ToName a n)
+  => a
+  -> ResolveM (Maybe (ResolvesTo n, SourcePos))
+lookupWithDefinitionPos name = asum . fmap goScope <$> use scopeStack
+  where goScope scope = scope ^. scopeIds . at (toName name)
+
+lookup
+  :: forall n a . (Name n, ToName a n) => a -> ResolveM (Maybe (ResolvesTo n))
+lookup name = preview (_Just . _1) <$> lookupWithDefinitionPos name
+
+redefine
+  :: forall n a t
+   . (Name n, ToName a n, HasSourcePos t)
+  => t
+  -> a
+  -> ResolvesTo n
+  -> ResolveM ()
+redefine tg name resolvesTo =
+  currentScope . scopeIds . at (toName name) ?= (resolvesTo, tg ^. sourcePos)
+
 define
   :: forall n a t
    . (Name n, ToName a n, HasSourcePos t)
@@ -217,13 +241,23 @@ define
   -> a
   -> ResolvesTo n
   -> ResolveM ()
-define target name' resolvesTo = do
-  let name = toName name'
-  scope <- use currentScope
-  case scope ^. scopeIds . at name of
-    Just (_, sp) -> lift . pushErrorFor target $ errAlreadyDefined name sp
-    Nothing ->
-      currentScope . scopeIds . at name ?= (resolvesTo, target ^. sourcePos)
+define tg name resolvesTo =
+  use (currentScope . scopeIds . at (toName name)) >>= \case
+    Just (_, sp) -> lift . pushErrorFor tg $ errAlreadyDefined (toName name) sp
+    Nothing      -> redefine tg name resolvesTo
+
+lookupOrDefine
+  :: forall n a t
+   . (Name n, ToName a n, HasSourcePos t)
+  => t
+  -> a
+  -> ResolvesTo n
+  -> ResolveM (ResolvesTo n)
+lookupOrDefine tg name resolvesTo = lookup name >>= \case
+  Just r  -> return r
+  Nothing -> do
+    redefine tg name resolvesTo
+    return resolvesTo
 
 --------------------------------------------------------------------------------
 -- Resolution algorithm
@@ -249,18 +283,21 @@ ensureUniqueModuleNames asm =
 resolveCurrentModule :: ResolveM (Module RS)
 resolveCurrentModule =
   uses currentModule (fmap (, NotApplicable))
-    >>= (moduleExport #%%~ mapM resolveExportDecl)
-    >>= (moduleItems #%%~ mapM resolveItemDecl)
+    >>= (moduleExport %%~ mapM resolveExportDecl)
+    >>= (moduleItems %%~ mapM resolveItemDecl)
+    >>= (moduleItems %%~ mapM resolveItemDeclBodies)
 
 resolveExportDecl :: ExportDecl RS -> ResolveM (ExportDecl RS)
-resolveExportDecl = exportDeclItems #%%~ mapM resolveId
- where
-  resolveId sid = do
-    let itName = ItemName $ sid ^. unScopeId
-    modName <- use $ currentModule . moduleName
-    use (globalItemNameMap . at (modName, itName)) >>= \case
-      Just _  -> return (sid & resolution .~ ResolvedItem modName itName)
-      Nothing -> lift . pushErrorFor sid $ errModuleExportsUndefined itName
+resolveExportDecl ed = do
+  modName     <- use $ currentModule . moduleName
+  myItemNames <- mapMaybe (view itemName) <$> use (currentModule . moduleItems)
+  ed & exportDeclItems %%~ mapM
+    (\sid -> do
+      let itName = ItemName $ sid ^. unScopeId
+      if itName `elem` myItemNames
+        then return (sid & resolution .~ ResolvedItem modName itName)
+        else lift . pushErrorFor sid $ errModuleExportsUndefined itName
+    )
 
 resolveItemDecl :: ItemDecl RS -> ResolveM (ItemDecl RS)
 resolveItemDecl it = case it ^. itemDeclKind of
@@ -330,8 +367,124 @@ resolveFunDecl fn = do
   let itName  = funName ^. unScopeId & ItemName
   define fn funName $ ToItem mName itName
   return $ fn & funDeclName . resolution .~ ResolvedItem mName itName
-  -- withScope @ValueName ItemScope (funName ^. unScopeId) $ do
-  --   undefined
+
+resolveItemDeclBodies :: ItemDecl RS -> ResolveM (ItemDecl RS)
+resolveItemDeclBodies it = case it ^. itemDeclKind of
+  FunItemDecl d -> go resolveFunDeclBodies FunItemDecl d
+  _             -> return it
+ where
+  go
+    :: (Annotated a)
+    => (a RS -> ResolveM (a RS))
+    -> (a RS -> ItemDeclKind RS)
+    -> a RS
+    -> ResolveM (ItemDecl RS)
+  go f c d = f d <&> \d' -> it & (itemDeclKind .~ c d')
+
+resolveFunDeclBodies :: FunDecl RS -> ResolveM (FunDecl RS)
+resolveFunDeclBodies fn = do
+  let funName = fn ^. funDeclName
+  withScope @ValueName ItemScope (funName ^. unScopeId)
+    $   fn
+    &   (funDeclParams %%~ mapM resolveFunParam)
+    >>= (funDeclBody . funBodyBlock %%~ resolveBlock)
+
+resolveFunParam :: FunParam RS -> ResolveM (FunParam RS)
+resolveFunParam p = do
+  define p (p ^. funParamId) $ ToNodeId (p ^. funParamId . nodeId)
+  return $ p & funParamId . resolution .~ ResolvedLocal
+    (p ^. funParamId . nodeId)
+
+resolveBlock :: Block RS -> ResolveM (Block RS)
+resolveBlock = blockStmts %%~ mapM resolveStmt
+
+resolveStmt :: Stmt RS -> ResolveM (Stmt RS)
+resolveStmt s = case s ^. stmtKind of
+  AssignStmt sid expr -> do
+    resolvedToNodeId <-
+      lookupOrDefine sid sid (ToNodeId (sid ^. nodeId)) >>= \case
+        ToNodeId ni        -> return ni
+        ToItem mName iName -> do
+          void . lift . pushWarningFor s $ warnItemShadow sid mName iName
+          redefine sid sid $ ToNodeId (sid ^. nodeId)
+          return (sid ^. nodeId)
+    let sid' = sid & resolution .~ ResolvedLocal resolvedToNodeId
+    expr' <- resolveExpr expr
+    return $ s & stmtKind .~ AssignStmt sid' expr'
+
+  ExprStmt expr -> do
+    expr' <- resolveExpr expr
+    return $ s & stmtKind .~ ExprStmt expr'
+
+resolveExpr :: Expr RS -> ResolveM (Expr RS)
+resolveExpr e = case e ^. exprKind of
+  IdExpr (ScopeId' sid) -> lookup sid >>= \case
+    Just rt ->
+      let sid' = sid & resolution .~ convert rt
+      in  return $ e & exprKind .~ IdExpr (ScopeId' sid')
+    Nothing -> lift . pushErrorFor sid $ errUndefinedSymbol sid
+
+  IdExpr (Qid' qid) ->
+    let mName' = qid ^. qidMod & ModuleName
+        iName  = qid ^. qidScope & ItemName
+    in  lookup mName' >>= \case
+          Nothing    -> lift . pushErrorFor qid $ errUnknownModule mName'
+          Just mName -> do
+            ge <- use globalExports
+            let hs = ge ^. at mName ^?! _Just
+            if hs ^. contains iName
+              then
+                let qid' = qid & resolution .~ ResolvedItem mName iName
+                in  return $ e & exprKind .~ IdExpr (Qid' qid')
+              else lift . pushErrorFor qid $ errUnknownQid mName iName
+
+  LitExpr   _     -> return e
+
+  BlockExpr block -> do
+    block' <- resolveBlock block
+    return $ e & exprKind .~ BlockExpr block'
+
+  SuccExpr expr -> do
+    expr' <- resolveExpr expr
+    return $ e & exprKind .~ SuccExpr expr'
+
+  FailExpr expr -> do
+    expr' <- resolveExpr expr
+    return $ e & exprKind .~ FailExpr expr'
+
+  UnExpr o expr -> do
+    expr' <- resolveExpr expr
+    return $ e & exprKind .~ UnExpr o expr'
+
+  BinExpr o lhs rhs -> do
+    lhs' <- resolveExpr lhs
+    rhs' <- resolveExpr rhs
+    return $ e & exprKind .~ BinExpr o lhs' rhs'
+
+  CallExpr expr args -> do
+    expr' <- resolveExpr expr
+    args' <- mapM resolveExpr args
+    return $ e & exprKind .~ CallExpr expr' args'
+
+  WhileExpr cond block -> do
+    cond'  <- resolveExpr cond
+    block' <- resolveBlock block
+    return $ e & exprKind .~ WhileExpr cond' block'
+
+  IfExpr cond ifBlock elseBlockOpt -> do
+    cond'         <- resolveExpr cond
+    ifBlock'      <- resolveBlock ifBlock
+    elseBlockOpt' <- mapM resolveBlock elseBlockOpt
+    return $ e & exprKind .~ IfExpr cond' ifBlock' elseBlockOpt'
+
+  ParenExpr expr -> do
+    expr' <- resolveExpr expr
+    return $ e & exprKind .~ ParenExpr expr'
+
+  ReturnExpr exprOpt -> do
+    exprOpt' <- mapM resolveExpr exprOpt
+    return $ e & exprKind .~ ReturnExpr exprOpt'
+
 
 --------------------------------------------------------------------------------
 -- Resolve context creation
@@ -340,7 +493,6 @@ buildLocalResolveCtx :: SharedResolveCtx -> Module NodeId -> ResolveCtx
 buildLocalResolveCtx sctx modul =
   let mName               = modul ^. moduleName
       _globalExports      = sctx ^. sharedGlobalExports
-      _globalItemNameMap  = sctx ^. sharedGlobalItemNameMap
       _currentModule      = modul
       getValueScopeStack  = emptyScopeStack mName
       getModuleScopeStack = emptyScopeStack mName
@@ -348,8 +500,7 @@ buildLocalResolveCtx sctx modul =
 
 buildSharedResolveCtx
   :: Assembly (Module NodeId) -> CompilePure SharedResolveCtx
-buildSharedResolveCtx asm =
-  SharedResolveCtx <$> buildExportNameMap asm <*> buildItemNameMap asm
+buildSharedResolveCtx asm = SharedResolveCtx <$> buildExportNameMap asm
 
 buildExportNameMap
   :: Assembly (Module NodeId)
@@ -371,31 +522,6 @@ buildExportNameMap asm =
     when isDuplicate . lift $ pushWarningFor sid (warnDupExport iName)
     modify $ HS.insert iName
 
-buildItemNameMap
-  :: Assembly (Module NodeId)
-  -> CompilePure (HMS.HashMap (ModuleName, ItemName) NodeId)
-buildItemNameMap asm = HMS.fromList . concat <$> mapM procMod mods
- where
-  mods = asm ^. assemblyModules & toList
-
-  procMod :: Module NodeId -> CompilePure [((ModuleName, ItemName), NodeId)]
-  procMod m = fmap (key $ m ^. moduleName) <$> collItems m
-
-  key :: ModuleName -> (ItemName, NodeId) -> ((ModuleName, ItemName), NodeId)
-  key m (k, v) = ((m, k), v)
-
-  collItems :: Module NodeId -> CompilePure [(ItemName, NodeId)]
-  collItems m =
-    catMaybes <$> evalStateT (mapM procItem $ m ^. moduleItems) HS.empty
-
-  procItem item = case item ^. itemName of
-    Nothing    -> pure Nothing
-    Just iName -> do
-      isDuplicate <- use $ contains iName
-      when isDuplicate . lift $ pushErrorFor item (errDupName iName)
-      modify $ HS.insert iName
-      return $ Just (iName, item ^. nodeId)
-
 --------------------------------------------------------------------------------
 -- Error messages
 
@@ -409,12 +535,13 @@ errAlreadyDefined name pos =
 errDupModule :: ModuleName -> Text
 errDupModule (ModuleName n) = "Duplicate module " <> quoted n <> "."
 
-errDupName :: ItemName -> Text
-errDupName (ItemName n) = "Multiple definitions of item " <> quoted n <> "."
-
 errModuleExportsUndefined :: ItemName -> Text
 errModuleExportsUndefined (ItemName n) =
   "Module exports item " <> quoted n <> " but does not define it."
+
+errUndefinedSymbol :: ScopeId a -> Text
+errUndefinedSymbol sid =
+  "Undefined symbol " <> quoted (sid ^. unScopeId) <> "."
 
 errUnknownModule :: ModuleName -> Text
 errUnknownModule (ModuleName n) = "Unknown module " <> quoted n <> "."
@@ -426,6 +553,14 @@ errUnknownQid (ModuleName m) (ItemName i) =
 warnDupExport :: ItemName -> Text
 warnDupExport (ItemName n) =
   "Duplicate export of same item " <> quoted n <> "."
+
+warnItemShadow :: ScopeId a -> ModuleName -> ItemName -> Text
+warnItemShadow sid (ModuleName m) (ItemName n) =
+  "Variable "
+    <> quoted (sid ^. unScopeId)
+    <> " shadows item "
+    <> quoted (m <> ":" <> n)
+    <> "."
 
 quoted :: Text -> Text
 quoted n = ('\'' <| n) |> '\''

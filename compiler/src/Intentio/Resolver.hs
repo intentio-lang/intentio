@@ -114,7 +114,7 @@ data ValueResolvesTo
 instance Name ValueName where
   type ResolvesTo ValueName = ValueResolvesTo
   showName = _unValueName
-  scopeStack = lens _valueScopeStack (\c s -> c{_valueScopeStack=s})
+  scopeStack = lens getValueScopeStack (\c s -> c{getValueScopeStack=s})
 
 instance ToName ValueName ValueName where
   toName = id
@@ -137,7 +137,7 @@ instance ToName (Qid a) ValueName where
 instance Name ModuleName where
   type ResolvesTo ModuleName = ModuleName
   showName = _unModuleName
-  scopeStack = lens _moduleScopeStack (\c s -> c{_moduleScopeStack=s})
+  scopeStack = lens getModuleScopeStack (\c s -> c{getModuleScopeStack=s})
 
 instance ToName ModuleName ModuleName where
   toName = id
@@ -155,11 +155,11 @@ data SharedResolveCtx = SharedResolveCtx
   deriving (Show)
 
 data ResolveCtx = ResolveCtx
-  { _globalExports     :: HMS.HashMap ModuleName (HashSet ItemName)
-  , _globalItemNameMap :: HMS.HashMap (ModuleName, ItemName) NodeId
-  , _currentModule     :: Module NodeId
-  , _valueScopeStack   :: NonEmpty (Scope ValueName)
-  , _moduleScopeStack  :: NonEmpty (Scope ModuleName)
+  { _globalExports      :: HMS.HashMap ModuleName (HashSet ItemName)
+  , _globalItemNameMap  :: HMS.HashMap (ModuleName, ItemName) NodeId
+  , _currentModule      :: Module NodeId
+  , getValueScopeStack  :: NonEmpty (Scope ValueName)
+  , getModuleScopeStack :: NonEmpty (Scope ModuleName)
   }
   deriving (Show)
 
@@ -273,20 +273,23 @@ resolveItemDecl it = case it ^. itemDeclKind of
     -> (a RS -> ItemDeclKind RS)
     -> a RS
     -> ResolveM (ItemDecl RS)
-  go f c d =
-    f d <&> \d' ->
-      it & (itemDeclKind .~ c d') & (resolution .~ d' ^. resolution)
+  go f c d = f d <&> \d' -> it & (itemDeclKind .~ c d')
 
 resolveImportDecl :: ImportDecl RS -> ResolveM (ImportDecl RS)
 resolveImportDecl imp = case imp ^. importDeclKind of
-  ImportQid q     -> doQid q q
-  ImportQidAs q a -> doQid q a
-  ImportId m      -> doMod m m
-  ImportIdAs m a  -> doMod m a
-  ImportAll _     -> lift $ pushIceFor imp "Import-all is not implemented yet."
- where
-  doQid :: ToName a ValueName => Qid RS -> a -> ResolveM (ImportDecl RS)
-  doQid q a = do
+  ImportQid q -> do
+    let mName = q ^. qidMod & ModuleName
+    let iName = q ^. qidScope & ItemName
+    ge <- use globalExports
+    case ge ^. at mName of
+      Just hs -> when (hs ^. contains iName & not) $ do
+        lift . pushErrorFor q $ errUnknownQid mName iName
+      Nothing -> lift . pushErrorFor q $ errUnknownModule mName
+    define imp q (ToItem mName iName)
+    return $ imp & importDeclKind .~ ImportQid
+      (q & resolution .~ ResolvedItem mName iName)
+
+  ImportQidAs q a -> do
     let mName = q ^. qidMod & ModuleName
     let iName = q ^. qidScope & ItemName
     ge <- use globalExports
@@ -295,31 +298,52 @@ resolveImportDecl imp = case imp ^. importDeclKind of
         lift . pushErrorFor q $ errUnknownQid mName iName
       Nothing -> lift . pushErrorFor q $ errUnknownModule mName
     define imp a (ToItem mName iName)
-    return $ imp & resolution .~ ResolvedItem mName iName
+    return $ imp & importDeclKind .~ ImportQidAs
+      (q & resolution .~ ResolvedItem mName iName)
+      (a & resolution .~ ResolvedItem mName iName)
 
-  doMod :: ToName a ModuleName => ModId RS -> a -> ResolveM (ImportDecl RS)
-  doMod m a = do
+  ImportId m -> do
+    let mName = toName m
+    ge <- use globalExports
+    when (at mName `hasn't` ge) $ do
+      lift . pushErrorFor m $ errUnknownModule mName
+    define imp m mName
+    return $ imp & importDeclKind .~ ImportId
+      (m & resolution .~ ResolvedModule mName)
+
+  ImportIdAs m a -> do
     let mName = toName m
     ge <- use globalExports
     when (at mName `hasn't` ge) $ do
       lift . pushErrorFor m $ errUnknownModule mName
     define imp a mName
-    return $ imp & resolution .~ ResolvedModule mName
+    return $ imp & importDeclKind .~ ImportIdAs
+      (m & resolution .~ ResolvedModule mName)
+      (a & resolution .~ ResolvedModule mName)
+
+  ImportAll _ -> lift $ pushIceFor imp "Import-all is not implemented yet."
 
 resolveFunDecl :: FunDecl RS -> ResolveM (FunDecl RS)
-resolveFunDecl = undefined
+resolveFunDecl fn = do
+  mName <- use $ currentModule . moduleName
+  let funName = fn ^. funDeclName
+  let itName  = funName ^. unScopeId & ItemName
+  define fn funName $ ToItem mName itName
+  return $ fn & funDeclName . resolution .~ ResolvedItem mName itName
+  -- withScope @ValueName ItemScope (funName ^. unScopeId) $ do
+  --   undefined
 
 --------------------------------------------------------------------------------
 -- Resolve context creation
 
 buildLocalResolveCtx :: SharedResolveCtx -> Module NodeId -> ResolveCtx
 buildLocalResolveCtx sctx modul =
-  let mName              = modul ^. moduleName
-      _globalExports     = sctx ^. sharedGlobalExports
-      _globalItemNameMap = sctx ^. sharedGlobalItemNameMap
-      _currentModule     = modul
-      _valueScopeStack   = emptyScopeStack mName
-      _moduleScopeStack  = emptyScopeStack mName
+  let mName               = modul ^. moduleName
+      _globalExports      = sctx ^. sharedGlobalExports
+      _globalItemNameMap  = sctx ^. sharedGlobalItemNameMap
+      _currentModule      = modul
+      getValueScopeStack  = emptyScopeStack mName
+      getModuleScopeStack = emptyScopeStack mName
   in  ResolveCtx { .. }
 
 buildSharedResolveCtx

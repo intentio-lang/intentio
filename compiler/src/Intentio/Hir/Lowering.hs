@@ -13,4 +13,4 @@ import           Intentio.Resolver              ( RS )
 import qualified Language.Intentio.AST         as A
 
 lowerAssembly :: Assembly (A.Module RS) -> CompilePure (Assembly (H.Module ()))
-lowerAssembly = undefined
+lowerAssembly = (\a -> a `seq` error "not implemented") . traceShowId

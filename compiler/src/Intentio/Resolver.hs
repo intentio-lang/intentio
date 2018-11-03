@@ -34,6 +34,7 @@ import           Intentio.Diagnostics           ( SourcePos
                                                 , sourcePos
                                                 )
 import           Intentio.Util.NodeId           ( NodeId
+                                                , HasNodeId
                                                 , nodeId
                                                 )
 import qualified Intentio.Util.NodeId          as NodeId
@@ -79,9 +80,10 @@ data ScopeKind
 type ScopeName = Text
 
 data Scope n = Scope
-  { _scopeKind :: ScopeKind
-  , _scopeName :: ScopeName
-  , _scopeIds  :: HMS.HashMap n (ResolvesTo n, SourcePos)
+  { _scopeKind             :: ScopeKind
+  , _scopeName             :: ScopeName
+  , _scopeIds              :: HMS.HashMap n (ResolvesTo n, SourcePos)
+  , _scopeWriteTransparent :: Bool
   }
 
 deriving instance Name n => Show (Scope n)
@@ -186,8 +188,27 @@ showScopeKind VariableScope = "v"
 showScopeName :: forall n . Name n => Scope n -> Text
 showScopeName s = (s ^. scopeName) <> "/" <> (s ^. scopeKind & showScopeKind)
 
+mkScope :: forall n . Name n => ScopeKind -> ScopeName -> Scope n
+mkScope _scopeKind _scopeName =
+  let _scopeIds              = mempty
+      _scopeWriteTransparent = False
+  in  Scope { .. }
+
+mkScopeT
+  :: forall n a
+   . (Name n, HasNodeId a)
+  => ScopeKind
+  -> ScopeName
+  -> a
+  -> Scope n
+mkScopeT k n a = mkScope k (n <> ":" <> show (a ^. nodeId & fromEnum))
+
+mkScopeN
+  :: forall n a m . (Name n, Name m, ToName a m) => ScopeKind -> a -> Scope n
+mkScopeN k a = mkScope @n k (showName $ toName a)
+
 emptyScopeStack :: forall n . Name n => ModuleName -> NonEmpty (Scope n)
-emptyScopeStack (ModuleName n) = Scope GlobalScope n mempty :| []
+emptyScopeStack (ModuleName n) = mkScope GlobalScope n :| []
 
 currentScope :: forall n . Name n => Lens' ResolveCtx (Scope n)
 currentScope = lens getter setter
@@ -195,11 +216,11 @@ currentScope = lens getter setter
   getter = NE.head . view (scopeStack @n)
   setter c s = c & scopeStack @n %~ \(_ :| ss) -> s :| ss
 
-pushScope :: forall n . Name n => ScopeKind -> ScopeName -> ResolveM ()
-pushScope GlobalScope _ = do
+pushScope :: forall n . Name n => Scope n -> ResolveM ()
+pushScope Scope { _scopeKind = GlobalScope } = do
   m <- use currentModule
   lift $ pushIceFor m "Cannot push global scope"
-pushScope k n = scopeStack @n %= NE.cons (Scope k n mempty)
+pushScope s = scopeStack @n %= NE.cons s
 
 popScope :: forall n . Name n => ResolveM ()
 popScope = uses (scopeStack @n) NE.uncons >>= \case
@@ -208,9 +229,8 @@ popScope = uses (scopeStack @n) NE.uncons >>= \case
     m <- use currentModule
     lift $ pushIceFor m "Cannot pop global scope"
 
-withScope
-  :: forall n a . Name n => ScopeKind -> ScopeName -> ResolveM a -> ResolveM a
-withScope n k f = pushScope @n n k *> f <* popScope @n
+withScope :: forall n a . Name n => Scope n -> ResolveM a -> ResolveM a
+withScope s f = pushScope @n s *> f <* popScope @n
 
 lookupWithDefinitionPos
   :: forall n a
@@ -231,8 +251,13 @@ redefine
   -> a
   -> ResolvesTo n
   -> ResolveM ()
-redefine tg name resolvesTo =
-  currentScope . scopeIds . at (toName name) ?= (resolvesTo, tg ^. sourcePos)
+redefine tg name resolvesTo = scopeStack @n %= fromList . go . toList
+ where
+  entry = (resolvesTo, tg ^. sourcePos)
+
+  go []       = unreachable
+  go (s@Scope { _scopeWriteTransparent = True } : ss) = s : go ss
+  go (s : ss) = (s & scopeIds . at (toName name) ?~ entry) : ss
 
 define
   :: forall n a t
@@ -241,10 +266,9 @@ define
   -> a
   -> ResolvesTo n
   -> ResolveM ()
-define tg name resolvesTo =
-  use (currentScope . scopeIds . at (toName name)) >>= \case
-    Just (_, sp) -> lift . pushErrorFor tg $ errAlreadyDefined (toName name) sp
-    Nothing      -> redefine tg name resolvesTo
+define tg name resolvesTo = lookupWithDefinitionPos name >>= \case
+  Just (_, sp) -> lift . pushErrorFor tg $ errAlreadyDefined (toName name) sp
+  Nothing      -> redefine tg name resolvesTo
 
 lookupOrDefine
   :: forall n a t
@@ -384,7 +408,7 @@ resolveItemDeclBodies it = case it ^. itemDeclKind of
 resolveFunDeclBodies :: FunDecl RS -> ResolveM (FunDecl RS)
 resolveFunDeclBodies fn = do
   let funName = fn ^. funDeclName
-  withScope @ValueName ItemScope (funName ^. unScopeId)
+  withScope (mkScopeN @ValueName ItemScope funName)
     $   fn
     &   (funDeclParams %%~ mapM resolveFunParam)
     >>= (funDeclBody . funBodyBlock %%~ resolveBlock)
@@ -466,16 +490,20 @@ resolveExpr e = case e ^. exprKind of
     args' <- mapM resolveExpr args
     return $ e & exprKind .~ CallExpr expr' args'
 
-  WhileExpr cond block -> do
-    cond'  <- resolveExpr cond
-    block' <- resolveBlock block
-    return $ e & exprKind .~ WhileExpr cond' block'
+  WhileExpr cond block ->
+    withScope (mkScopeT @ValueName VariableScope "while" e) $ do
+      cond' <- resolveExpr cond
+      currentScope @ValueName . scopeWriteTransparent .= True
+      block' <- resolveBlock block
+      return $ e & exprKind .~ WhileExpr cond' block'
 
-  IfExpr cond ifBlock elseBlockOpt -> do
-    cond'         <- resolveExpr cond
-    ifBlock'      <- resolveBlock ifBlock
-    elseBlockOpt' <- mapM resolveBlock elseBlockOpt
-    return $ e & exprKind .~ IfExpr cond' ifBlock' elseBlockOpt'
+  IfExpr cond ifBlock elseBlockOpt ->
+    withScope (mkScopeT @ValueName VariableScope "if" e) $ do
+      cond' <- resolveExpr cond
+      currentScope @ValueName . scopeWriteTransparent .= True
+      ifBlock'      <- resolveBlock ifBlock
+      elseBlockOpt' <- mapM resolveBlock elseBlockOpt
+      return $ e & exprKind .~ IfExpr cond' ifBlock' elseBlockOpt'
 
   ParenExpr expr -> do
     expr' <- resolveExpr expr

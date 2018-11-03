@@ -382,7 +382,16 @@ resolveImportDecl imp = case imp ^. importDeclKind of
       (m & resolution .~ ResolvedModule mName)
       (a & resolution .~ ResolvedModule mName)
 
-  ImportAll _ -> lift $ pushIceFor imp "Import-all is not implemented yet."
+  ImportAll m -> do
+    let mName = toName m
+    ge <- use globalExports
+    case ge ^. at mName of
+      Nothing -> lift . pushErrorFor m $ errUnknownModule mName
+      Just hs -> do
+        define imp m mName
+        forM_ hs $ \iName -> define imp iName (ToItem mName iName)
+        return $ imp & importDeclKind .~ ImportAll
+          (m & resolution .~ ResolvedModule mName)
 
 resolveFunDecl :: FunDecl RS -> ResolveM (FunDecl RS)
 resolveFunDecl fn = do

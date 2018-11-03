@@ -26,5 +26,5 @@ fun main() {
         o = o + str(a) + " ";
         a = a + 2;
     }
-    println(strcut(0, length(o)-1, o));
+    println(cut(0, len(o)-1, o));
 }

@@ -10,8 +10,8 @@
 # https://pl.spoj.com/problems/JPESEL/
 
 fun main(){
-    let n = int(readln());
-    let i = 0;
+    n = int(readln());
+    i = 0;
     while(i < n) {
         i = i + 1;
         check_pesel();
@@ -26,11 +26,11 @@ fun check_pesel() {
         return fail;
     }
     result = 0;
-    while(length(pesel) > 0){
-        result = result + cut(0, 1, pesel) * cut(0, 1, factors);
+    while(len(pesel) > 0){
+        result = result + int(cut(0, 1, pesel)) * int(cut(0, 1, factors));
     }
     result = str(result);
-    if(cut(length(result)-1, length(result), result) == "0"){
+    if(cut(len(result) - 1, len(result), result) == "0"){
         println("D");
     } else {
         println("N");

@@ -6,26 +6,32 @@
 #       - "5"
 
 fun main() {
-    let a = int(readln());
-    let b = int(readln());
-    if(a < 0 or b < 0) { println("The numbers should be positive"); return fail; }
-    let factor = 2;
-    let gcd = 1;
+    a = int(readln());
+    b = int(readln());
+    println(str(gratest_common_divisor(a, b));
+}
+
+fun gratest_common_divisor(a, b) {
+    if(a < 0 or b < 0) { 
+        println("The numbers should be positive"); 
+        return fail; 
+    }
+    factor = 2;
+    gcd = 1;
     while(a >= factor * factor) {
-        let tmpa = a / factor;
+        tmpa = a / factor;
         if(tmpa * factor == a) {
-            let tmpb = b / factor;
-            if(tmpb * factor == b) {
+            if(tmpb = b / factor and tmpb * factor == b) {
                 gcd = factor;
             }
         }
         factor = factor + 1;
     }
     if(a != 1) {
-        let tmpb = b / a;
-            if(tmpb * a == b) {
-                gcd = a;
-            }
+        tmp = b / a;
+        if(tmp * a == b) {
+            gcd = a;
+        }
     }
-    println(str(gcd));
+    return gcd;
 }

@@ -1,6 +1,6 @@
 - compile:
-    - operations-lib,ieo
     - main.ieo
+    - operations-lib.ieo
 - run:
     stdin: 
       - "1+8i"

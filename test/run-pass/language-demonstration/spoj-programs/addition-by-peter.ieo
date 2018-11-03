@@ -12,29 +12,30 @@
 # https://pl.spoj.com/problems/BFN1/
 
 fun main(){
-    let n = int(readln());
-    let i = 0;
+    n = int(readln());
+    i = 0;
     while(i < n) {
-        i = i + 1;
         addition_by_peter();
+        i = i + 1;
     }
 }
 
 fun addition_by_peter() {
-    let a = readln();
-    let obverse = a;
-    let reverse = "";
-    let steps = 0;
+    obverse = readln();
+    reverse = "";
+    steps = 0;
     while(succ) {
-        while(length(a) > 0) {
-            stradd(reverse, strcut(length(a)-1, length(a), a));
+        len = len(obverse);
+        i = 0;
+        while(i < len) {
+            reverse = reverse + cut(len - i - 1, len - i, a);
+            i = i + 1;
         }
         if(obverse == reverse) { 
             println(obverse + " " + steps);
             return succ;
         }
-        a = str(int(obverse) + int(reverse));
-        obverse = a;
+        obverse = str(int(obverse) + int(reverse));
         reverse = "";
         steps = steps + 1;
     }    

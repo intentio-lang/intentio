@@ -1,11 +1,8 @@
-import oparetions-lib:add
-import oparetions-lib:sub
-import oparetions-lib:mul
-import oparetions-lib:div
+import oparations-lib:*
 
 fun main() {
-  a = scanln();
-  b = scanln();
+  a = readln();
+  b = readln();
   println(add(a, b));
   println(sub(a, b));
   println(mul(a, b));

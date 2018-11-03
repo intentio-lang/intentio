@@ -5,14 +5,20 @@
 #       - "yes"
 
 fun main() {
-    let a = int(readln());
-    if(a <= 0) { println("The number should be positive"); return fail; }
-    let factor = 2;
+    a = int(readln());
+    println(check_if_prime_number(a));
+}
+
+fun check_if_prime_number(a) {
+    if(a <= 0) { 
+        println("The number should be positive"); 
+        return fail; 
+    }
+    factor = 2;
     while(a >= factor * factor) {
-        let tmp = a / factor;
+        tmp = a / factor;
         if (tmp * factor == a) {
             println("no");
-            return fail;
         }
         factor = factor + 1;
     }

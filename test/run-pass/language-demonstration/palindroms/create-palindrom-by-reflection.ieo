@@ -6,20 +6,24 @@
 #       - "aabbcdedcbbaa"
 
 fun main() {
-    let a = readln();
-    let mode = readln();
+    a = readln();
+    mode = readln();
+    println(create_palindrom_by_reflection(a, mode));
+}
+
+fun create_palindrom_by_reflection(a, mode) {
     if(mode != "even" and mode != "odd") { 
         println(r#"The mode should be "even" or "odd""#); 
         return fail; 
-        }
-    let obverse = a;
-    let reverse = "";
-    while(length(a) > 0) {
-        stradd(reverse, strcut(length(a)-1, length(a), a));
     }
-    if(mode == "even") { 
-        println(obverse + reverse);
-    } else {
-        println(obverse + strcut(1, length(reverse), reverse));
+    obverse = a;
+    reverse = "";
+    len = len(obverse);
+    i = 0;
+    while(i < len) {
+        reverse = reverse + cut(len - i - 1, len - i, a);
+        i = i + 1;
     }
+    if(mode == "even") { return obverse + reverse; }
+    return obverse + cut(1, len, reverse);
 }

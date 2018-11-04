@@ -1,57 +1,54 @@
-export (check-classic-notation)
+export (check_classic_notation)
+
+import utility:find_out
 
 # check if expressions in classic notation made with (,),+,*,a,b,c are correct
+
+fun check_classic_notation(input) {
+    Expression(input);
+}
 
 # Expression = Component "+" Expression | Component
 fun Expression(in) {
     # first_case
-    let position = find("+", in);
-    return Component(strcut(0, eval(position), in)
-        and (strcut(position+1, position+2, in) == "+"
-        and Expression(strcut(eval(position+2), length(in), in);
+    position = find_out("+", in, "(", ")");
+    if (position) {
+        return Component(cut(0, position, in)
+            and Expression(cut(position + 1, len(in), in);
+    }
 
     # second_case
-    let second_case = Component(in);
-    if(second_case) { return second_case; }
+    return Component(in);
 }
 
 # Component = Factor "*" Component | Factor
 fun Component(in) {
     # first_case
-    let position = find("*", in);
-    return Factor(strcut(0, eval(position), in)
-        and strcut(position+1, position+2, in) == "*"
-        and Component(strcut(eval(position+2), length(in), in);
+    position = find("*", in, "(", ")");
+    if (position) {
+        return Factor(cut(0, position, in)
+            and Component(cut(position + 1, len(in), in);
     }
 
     # second_case
-    let second_case = Factor(in);
-    if(second_case) { return second_case; }
+    return Factor(in);
 }
 
 # Factor = Identity | "(" Expression ")"
 fun Factor(in) {
+    len = len(in);
+
     #first_case
-    if(length(in) == 1) { return Identity(in); }
+    if(len == 1) { return Identity(in); }
 
     #second_case
-    return strcut(0, 1, in) == "("
-        and Expression(strcut(position+1, length(in)-1, in)
-        and (strcut(0, 1, in) == ")";
+    return cut(0, 1, in) == "("
+        and Expression(cut(position + 1, len - 1, in)
+        and (cut(len - 1, len, in) == ")";
 }
 
 # Identity = "a" | "b" | "c"
 fun Identity(in)  {
 	if(in == "a" or in == "b" or in = "c") { return succ }
     return fail;
-}
-
-fun check-classic-notation() {
-    Expression(input);
-}
-
-fun main() {
-	while(let input = readln()) {
-        println(Expression(input));
-    }
 }

@@ -3,6 +3,7 @@
     - classic-notation-to-rnp.ieo
     - rnp-to-classic-notation.ieo
     - main.ieo
+    - utility.ieo
 - run:
     stdin: 
       - "(a+b)*c+a*b"

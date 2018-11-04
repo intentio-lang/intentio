@@ -1,13 +1,13 @@
-import check-classic-notation:check-classic-notation
+import check-classic-notation:check_classic_notation
 import classic-notation-to-rnp:rnp
-import rnp-to-classic-notation:classic-notation
+import rnp-to-classic-notation:classic_notation
 
 fun main() {
-    while(let input = readln()) {
-        if(check-classic-notation(input)) {
-            let rnp = rnp(input)
+    while(input = readln()) {
+        if(check_classic_notation(input)) {
+            rnp = rnp(input);
             # checking the correctness of the function
-            if(input == classic-notation(rnp)) {
+            if(input == classic_notation(rnp)) {
                 println("rnp: " + rnp);
             } else {
                 println("Error");

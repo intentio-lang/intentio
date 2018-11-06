@@ -18,6 +18,9 @@ import           Intentio.Compiler              ( Assembly
                                                 , compileDiagnostics
                                                 , runCompileFresh
                                                 )
+import           Intentio.Compiler.ModulePath   ( injectStd
+                                                , resolveModuleFiles
+                                                )
 import           Intentio.Diagnostics           ( diagnosticShow )
 import           Intentio.Hir.Lowering          ( lowerAssembly )
 import           Intentio.Resolver              ( resolveAssembly )
@@ -32,7 +35,9 @@ import           Intentioc.Opts                 ( buildInputAssembly )
 
 compilerPipeline :: Assembly SourceFile -> Compile ()
 compilerPipeline =
-  parseSourceFiles
+  (return . injectStd)
+    >=> resolveModuleFiles
+    >=> parseSourceFiles
     >=> (impurify . resolveAssembly)
     >=> (impurify . lowerAssembly)
     >=> (impurify . emitCAssembly)

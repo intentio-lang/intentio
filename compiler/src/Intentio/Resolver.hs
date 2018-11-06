@@ -31,6 +31,7 @@ import           Intentio.Compiler              ( Assembly
                                                 )
 import           Intentio.Diagnostics           ( SourcePos
                                                 , HasSourcePos
+                                                , diagnosticShow
                                                 , sourcePos
                                                 )
 import           Intentio.Util.NodeId           ( NodeId
@@ -308,8 +309,21 @@ resolveCurrentModule :: ResolveM (Module RS)
 resolveCurrentModule =
   uses currentModule (fmap (, NotApplicable))
     >>= (moduleExport %%~ mapM resolveExportDecl)
+    >>= (importPrelude $>)
     >>= (moduleItems %%~ mapM resolveItemDecl)
     >>= (moduleItems %%~ mapM resolveItemDeclBodies)
+
+importPrelude :: ResolveM ()
+importPrelude = do
+  let prelude = ModuleName "prelude"
+  m <- use currentModule
+  unless (m ^. moduleName == prelude) $ do
+    ge <- use globalExports
+    case ge ^. at prelude of
+      Nothing -> lift $ pushErrorFor m errNoPrelude
+      Just hs -> do
+        define m prelude prelude
+        forM_ hs $ \iName -> define m iName (ToItem prelude iName)
 
 resolveExportDecl :: ExportDecl RS -> ResolveM (ExportDecl RS)
 resolveExportDecl ed = do
@@ -343,7 +357,7 @@ resolveImportDecl imp = case imp ^. importDeclKind of
     let iName = q ^. qidScope & ItemName
     ge <- use globalExports
     case ge ^. at mName of
-      Just hs -> when (hs ^. contains iName & not) $ do
+      Just hs -> unless (hs ^. contains iName) $ do
         lift . pushErrorFor q $ errUnknownQid mName iName
       Nothing -> lift . pushErrorFor q $ errUnknownModule mName
     define imp q (ToItem mName iName)
@@ -355,7 +369,7 @@ resolveImportDecl imp = case imp ^. importDeclKind of
     let iName = q ^. qidScope & ItemName
     ge <- use globalExports
     case ge ^. at mName of
-      Just hs -> when (hs ^. contains iName & not) $ do
+      Just hs -> unless (hs ^. contains iName) $ do
         lift . pushErrorFor q $ errUnknownQid mName iName
       Nothing -> lift . pushErrorFor q $ errUnknownModule mName
     define imp a (ToItem mName iName)
@@ -566,7 +580,7 @@ errAlreadyDefined :: (Name n, HasSourcePos p) => n -> p -> Text
 errAlreadyDefined name pos =
   quoted (showName name)
     <> " has been already defined at "
-    <> (pos ^. sourcePos & show)
+    <> (pos ^. sourcePos & diagnosticShow)
     <> "."
 
 errDupModule :: ModuleName -> Text
@@ -575,6 +589,9 @@ errDupModule (ModuleName n) = "Duplicate module " <> quoted n <> "."
 errModuleExportsUndefined :: ItemName -> Text
 errModuleExportsUndefined (ItemName n) =
   "Module exports item " <> quoted n <> " but does not define it."
+
+errNoPrelude :: Text
+errNoPrelude = "No module named 'prelude' in current module path."
 
 errUndefinedSymbol :: ScopeId a -> Text
 errUndefinedSymbol sid =

@@ -1,4 +1,4 @@
-export find_out
+export (find_out)
 
 # find first position of string x in string s, but only if it's not between l and r
 # where x, l, r - characters

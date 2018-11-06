@@ -1,4 +1,4 @@
-import oparations-lib:*
+import oparations_lib:*
 
 fun main() {
   a = readln();

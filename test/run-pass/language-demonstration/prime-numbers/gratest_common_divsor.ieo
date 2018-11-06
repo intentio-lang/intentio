@@ -33,5 +33,5 @@ fun gratest_common_divisor(a, b) {
             gcd = a;
         }
     }
-    return gcd;
+    gcd;
 }

@@ -9,11 +9,11 @@
 fun main() {
     if(n == 1 or n == 2) { 
         println("NIE");
-        return fail;
+        return fail None;
     }
     if(n == 3) { 
         println("2,0,3,1");
-        return succ;
+        return succ None;
     }
     a = 0;
     o = "";

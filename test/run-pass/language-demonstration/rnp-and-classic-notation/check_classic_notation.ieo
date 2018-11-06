@@ -18,7 +18,7 @@ fun Expression(in) {
     }
 
     # second_case
-    return Component(in);
+    Component(in);
 }
 
 # Component = Factor "*" Component | Factor
@@ -31,7 +31,7 @@ fun Component(in) {
     }
 
     # second_case
-    return Factor(in);
+    Factor(in);
 }
 
 # Factor = Identity | "(" Expression ")"
@@ -42,13 +42,13 @@ fun Factor(in) {
     if(len == 1) { return Identity(in); }
 
     #second_case
-    return cut(0, 1, in) == "("
+    cut(0, 1, in) == "("
         and Expression(cut(position + 1, len - 1, in)
         and (cut(len - 1, len, in) == ")";
 }
 
 # Identity = "a" | "b" | "c"
 fun Identity(in)  {
-	if(in == "a" or in == "b" or in = "c") { return succ }
-    return fail;
+	if(in == "a" or in == "b" or in = "c") { return succ None}
+    fail None;
 }

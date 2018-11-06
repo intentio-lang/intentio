@@ -1,0 +1,11 @@
+
+# - run:
+#     stdin:
+#       - "2"
+#     stdout:
+#       - "2"
+
+fun main() {
+  let a = int(scanln());
+  println(a);
+}

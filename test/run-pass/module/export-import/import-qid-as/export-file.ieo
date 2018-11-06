@@ -1,0 +1,10 @@
+
+export (hello, nothing)
+
+fun hello() {
+  println("Hello World!");
+}
+
+fun nothing() {
+  println("Nothing");
+}

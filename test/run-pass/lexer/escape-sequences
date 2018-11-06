@@ -1,0 +1,12 @@
+
+# - run:
+#     stdout:
+#       - "succ"
+#       - "succ"
+#       - "succ"
+
+fun main() {
+  println(r"'" == "\'");
+  println(r" " == "\t");
+  println(r"\" == "\\");
+}

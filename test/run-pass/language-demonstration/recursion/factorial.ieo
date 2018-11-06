@@ -15,5 +15,5 @@ fun factorial(n) {
         return fail; 
     }
     if(n == 0) { return 1; }
-    return main(n - 1) * main(n - 2);
+    factorial(n - 1) * factorial(n - 2);
 }

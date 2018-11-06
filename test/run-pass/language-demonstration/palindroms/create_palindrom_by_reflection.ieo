@@ -25,5 +25,5 @@ fun create_palindrom_by_reflection(a, mode) {
         i = i + 1;
     }
     if(mode == "even") { return obverse + reverse; }
-    return obverse + cut(1, len, reverse);
+    obverse + cut(1, len, reverse);
 }

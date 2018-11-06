@@ -1,8 +1,8 @@
 - compile:
+    - main.ieo
     - check-classic-notation.ieo
     - classic-notation-to-rnp.ieo
     - rnp-to-classic-notation.ieo
-    - main.ieo
     - utility.ieo
 - run:
     stdin: 

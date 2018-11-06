@@ -21,7 +21,7 @@ fun main(){
 fun check_pesel() {
     factors = "13791379131";
     pesel = readln();
-    if(length(pesel) != 11) {
+    if(len(pesel) != 11) {
         println("PESEL should have 11 digits");
         return fail;
     }

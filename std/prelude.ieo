@@ -1,0 +1,14 @@
+export (
+  println,
+  scanln,
+
+  int,
+  str,
+)
+
+fun println(s) {}
+fun scanln() {}
+
+fun int(x) {}
+
+fun str(x) {}

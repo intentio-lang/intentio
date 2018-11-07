@@ -31,7 +31,7 @@ data ModId a = ModId
   , _modIdSourcePos :: SourcePos
   , _unModId        :: Text
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance HasSourcePos (ModId a) where
   _sourcePos = _modIdSourcePos
@@ -44,7 +44,7 @@ data ScopeId a = ScopeId
   , _scopeIdSourcePos :: SourcePos
   , _unScopeId        :: Text
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance HasSourcePos (ScopeId a) where
   _sourcePos = _scopeIdSourcePos
@@ -58,7 +58,7 @@ data Qid a = Qid
   , _qidMod       :: Text
   , _qidScope     :: Text
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance HasSourcePos (Qid a) where
   _sourcePos = _qidSourcePos
@@ -69,7 +69,7 @@ instance FromJSON a => FromJSON (Qid a)
 data AnyId a
   = Qid' (Qid a)
   | ScopeId' (ScopeId a)
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (AnyId a)
 instance FromJSON a => FromJSON (AnyId a)
@@ -81,7 +81,7 @@ data Module a = Module
   , _moduleExport    :: Maybe (ExportDecl a)
   , _moduleItems     :: [ItemDecl a]
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance HasSourcePos (Module a) where
   _sourcePos = _moduleSourcePos
@@ -99,7 +99,7 @@ data ItemDecl a = ItemDecl
   , _itemDeclSourcePos :: SourcePos
   , _itemDeclKind      :: ItemDeclKind a
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance HasSourcePos (ItemDecl a) where
   _sourcePos = _itemDeclSourcePos
@@ -110,13 +110,12 @@ instance FromJSON a => FromJSON (ItemDecl a)
 instance (Eq a, Show a) => A.Item (ItemDecl a) where
   _itemName ItemDecl { _itemDeclKind = ImportItemDecl _ } = Nothing
   _itemName ItemDecl { _itemDeclKind = FunItemDecl f } =
-    let FunDecl { _funDeclName = ScopeId { _unScopeId } } = f
-    in  Just $ ItemName _unScopeId
+    Just . convert $ _funDeclName f
 
 data ItemDeclKind a
   = ImportItemDecl (ImportDecl a)
   | FunItemDecl (FunDecl a)
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (ItemDeclKind a)
 instance FromJSON a => FromJSON (ItemDeclKind a)
@@ -126,7 +125,7 @@ data ExportDecl a = ExportDecl
   , _exportDeclSourcePos :: SourcePos
   , _exportDeclItems     :: [ScopeId a]
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance HasSourcePos (ExportDecl a) where
   _sourcePos = _exportDeclSourcePos
@@ -139,7 +138,7 @@ data ImportDecl a = ImportDecl
   , _importDeclSourcePos :: SourcePos
   , _importDeclKind      :: ImportDeclKind a
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance HasSourcePos (ImportDecl a) where
   _sourcePos = _importDeclSourcePos
@@ -153,7 +152,7 @@ data ImportDeclKind a
   | ImportId (ModId a)
   | ImportIdAs (ModId a) (ModId a)
   | ImportAll (ModId a)
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (ImportDeclKind a)
 instance FromJSON a => FromJSON (ImportDeclKind a)
@@ -165,7 +164,7 @@ data FunDecl a = FunDecl
   , _funDeclParams    :: [FunParam a]
   , _funDeclBody      :: FunBody a
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance HasSourcePos (FunDecl a) where
   _sourcePos = _funDeclSourcePos
@@ -174,17 +173,17 @@ instance ToJSON a => ToJSON (FunDecl a)
 instance FromJSON a => FromJSON (FunDecl a)
 
 newtype FunParam a = FunParam { _funParamId :: ScopeId a }
-  deriving (Show, Eq, Generic, HasSourcePos, ToJSON, FromJSON)
+  deriving (Show, Eq, Generic, HasSourcePos, ToJSON, FromJSON, Functor, Foldable, Traversable)
 
 newtype FunBody a = FunBody { _funBodyBlock :: Block a }
-  deriving (Show, Eq, Generic, HasSourcePos, ToJSON, FromJSON)
+  deriving (Show, Eq, Generic, HasSourcePos, ToJSON, FromJSON, Functor, Foldable, Traversable)
 
 data Stmt a = Stmt
   { _stmtAnn       :: a
   , _stmtSourcePos :: SourcePos
   , _stmtKind      :: StmtKind a
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance HasSourcePos (Stmt a) where
   _sourcePos = _stmtSourcePos
@@ -195,7 +194,7 @@ instance FromJSON a => FromJSON (Stmt a)
 data StmtKind a
   = AssignStmt (ScopeId a) (Expr a)
   | ExprStmt (Expr a)
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (StmtKind a)
 instance FromJSON a => FromJSON (StmtKind a)
@@ -205,7 +204,7 @@ data Expr a = Expr
   , _exprSourcePos :: SourcePos
   , _exprKind      :: ExprKind a
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance HasSourcePos (Expr a) where
   _sourcePos = _exprSourcePos
@@ -226,7 +225,7 @@ data ExprKind a
   | IfExpr (Expr a) (Block a) (Maybe (Block a))
   | ParenExpr (Expr a)
   | ReturnExpr (Maybe (Expr a))
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (ExprKind a)
 instance FromJSON a => FromJSON (ExprKind a)
@@ -236,7 +235,7 @@ data Block a = Block
   , _blockSourcePos :: SourcePos
   , _blockStmts     :: [Stmt a]
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance HasSourcePos (Block a) where
   _sourcePos = _blockSourcePos
@@ -250,7 +249,7 @@ data Lit a = Lit
   , _litText      :: Text
   , _litKind      :: LitKind
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (Lit a)
 instance FromJSON a => FromJSON (Lit a)
@@ -274,7 +273,7 @@ data UnOp a = UnOp
   , _unOpSourcePos :: SourcePos
   , _unOpKind      :: UnOpKind
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (UnOp a)
 instance FromJSON a => FromJSON (UnOp a)
@@ -295,7 +294,7 @@ data BinOp a = BinOp
   , _binOpSourcePos :: SourcePos
   , _binOpKind      :: BinOpKind
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (BinOp a)
 instance FromJSON a => FromJSON (BinOp a)
@@ -425,3 +424,9 @@ instance Convertible TokenType UnOpKind where
 
 instance Convertible Token UnOpKind where
   safeConvert Token { _ty } = safeConvert _ty
+
+--------------------------------------------------------------------------------
+-- Utilities
+
+instance Convertible (ScopeId a) ItemName where
+  safeConvert ScopeId { _unScopeId } = Right $ ItemName _unScopeId

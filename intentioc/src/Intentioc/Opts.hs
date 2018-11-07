@@ -26,7 +26,7 @@ import           Options.Applicative            ( Parser
                                                 , strOption
                                                 , value
                                                 )
-import           System.FilePath                ( takeBaseName )
+import           System.FilePath                ( splitSearchPath, takeBaseName )
 
 import           Intentio.Cache.WorkDir         ( WorkDirComponent(..) )
 import           Intentio.Codegen.GCC           ( GCCOptionsComponent(..) )
@@ -39,19 +39,24 @@ import           Intentio.Compiler              ( Compile
                                                 , mkAssembly
                                                 , component
                                                 )
+import           Intentio.Compiler.ModulePath   ( ModulePath(..) )
 import           Language.Intentio.Compiler     ( SourceFile(..) )
 
 data Opts = Opts
-  { assemblyName :: Maybe Text
-  , assemblyType :: AssemblyType
-  , outputPath   :: FilePath
-  , mainModule   :: FilePath
-  , otherModules :: [FilePath]
-  , workDir      :: FilePath
-  , includeDirs  :: [FilePath]
-  , libraryDirs  :: [FilePath]
+  { assemblyName       :: Maybe Text
+  , assemblyType       :: AssemblyType
+  , outputPath         :: FilePath
+  , mainModule         :: FilePath
+  , otherModules       :: [FilePath]
+  , workDir            :: FilePath
+  , includeDirs        :: [FilePath]
+  , libraryDirs        :: [FilePath]
+  , modulePathOverride :: Maybe [FilePath]
   }
   deriving (Show)
+
+defaultModulePath :: [FilePath]
+defaultModulePath = ["."]
 
 options :: Parser Opts
 options =
@@ -64,6 +69,7 @@ options =
     <*> workDirO
     <*> includeDirsO
     <*> libraryDirsO
+    <*> modulePathOverrideO
  where
   assemblyNameO =
     (optional <$> strOption)
@@ -123,6 +129,13 @@ options =
       <> "linked libraries. This also affects searching for "
       <> "the Intentio Runtime library."
 
+  modulePathOverrideO =
+    (optional . fmap splitSearchPath <$> strOption)
+      $  long "modulepath-override"
+      <> metavar "paths"
+      <> help modulePathOverrideHelp
+  modulePathOverrideHelp = "Override module search path, discarding defaults."
+
 opts :: ParserInfo Opts
 opts = info (helper <*> options) fullDesc
 
@@ -135,6 +148,9 @@ buildInputAssembly = do
   let modlist = SourceFile <$> mainModule o :| otherModules o
   let asm     = mkAssembly (assemblyType o) name (outputPath o) modlist
 
+  let modulePath = modulePathOverride o <|> Just defaultModulePath
+
+  component .= (ModulePath <$> modulePath)
   component .= Just (WorkDirComponent (workDir o))
 
   let _gccIncludeDirs = includeDirs o

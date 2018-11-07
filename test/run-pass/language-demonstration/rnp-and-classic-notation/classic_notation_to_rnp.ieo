@@ -1,6 +1,6 @@
 export rnp;
 
-import utility:find_out
+import utility:bal
 
 # rnp for expressions made with (,),+,*,a,b,c
 
@@ -12,7 +12,7 @@ fun rnp(input) {
 # Expression = Component "+" Expression | Component
 fun Expression(in) {
     
-    position = find_out("+", in, "(", ")");
+    position = bal("+", in, "(", ")");
     if (position) {
         first_case_l = Component(cut(0, position, in);
         first_case_r = Expression(cut(position + 1, len(in), in);
@@ -27,7 +27,7 @@ fun Expression(in) {
 # Component = Factor "*" Component | Factor
 fun Component(in) {
     # first_case
-    let position = find_out("*", in, "(", ")");
+    let position = bal("*", in, "(", ")");
     if (position) {
         first_case_l = Factor(cut(0, position, in);
         first_case_r = Component(cut(position + 1, len(in), in);

@@ -4,17 +4,23 @@
 #       - "odd"
 #     stdout: 
 #       - "aabbcdedcbbaa"
+# - run:
+#     stdin:
+#       - "aabbcde"
+#       - "even"
+#     stdout: 
+#       - "aabbcdeedcbbaa"
 
 fun main() {
-    a = readln();
-    mode = readln();
+    a = scanln();
+    mode = scanln();
     println(create_palindrom_by_reflection(a, mode));
 }
 
 fun create_palindrom_by_reflection(a, mode) {
     if(mode != "even" and mode != "odd") { 
         println(r#"The mode should be "even" or "odd""#); 
-        return fail; 
+        return fail None; 
     }
     obverse = a;
     reverse = "";

@@ -3,7 +3,7 @@
 #       - "succ"
 
 fun main() {
-  let a = 4;
-  let b = 3;
-  assert(a > b);
+  a = 4;
+  b = 3;
+  if(a > b) { println("succ"); };
 }

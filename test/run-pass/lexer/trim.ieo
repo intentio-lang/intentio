@@ -4,6 +4,6 @@
 #       - "Trim."
 
 fun main() {
-  assert(t"   a   " == "a");
+  if(t"   a   " == "a") { println("succ"); };
   println(tr#"   "Trim."   "#);
 }

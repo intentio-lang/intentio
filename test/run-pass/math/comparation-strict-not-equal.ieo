@@ -4,9 +4,9 @@
 #       - "fail"
 
 fun main() {
-  let a = 2;
-  let b = 2.0;
-  let c = 2;
-  assert(a !== b);
-  assert(a !== c);
+  a = 2;
+  b = 2.0;
+  c = 2;
+  if(a !== b) { println("succ"); };
+  if(a !== c) { println("succ"); } else { println("fail"); };
 }

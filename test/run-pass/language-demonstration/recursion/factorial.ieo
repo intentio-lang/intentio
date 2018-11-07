@@ -5,14 +5,14 @@
 #       - "120"
 
 fun main() {
-    n = int(readln());
+    n = int(scanln());
     println(str(factorial(n)));
 }
 
 fun factorial(n) {
     if(n < 0) { 
         println("The number should be non-negative"); 
-        return fail; 
+        return fail None; 
     }
     if(n == 0) { return 1; }
     factorial(n - 1) * factorial(n - 2);

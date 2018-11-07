@@ -7,6 +7,7 @@
 # https://pl.spoj.com/problems/NIEKOLEJ/
 
 fun main() {
+    n = int(scanln());
     if(n == 1 or n == 2) { 
         println("NIE");
         return fail None;

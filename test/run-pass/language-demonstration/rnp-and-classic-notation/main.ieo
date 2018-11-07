@@ -3,7 +3,7 @@ import classic-notation-to-rnp:rnp
 import rnp-to-classic-notation:classic_notation
 
 fun main() {
-    while(input = readln()) {
+    while(input = scanln()) {
         if(check_classic_notation(input)) {
             rnp = rnp(input);
             # checking the correctness of the function

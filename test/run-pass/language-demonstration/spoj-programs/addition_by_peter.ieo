@@ -12,7 +12,7 @@
 # https://pl.spoj.com/problems/BFN1/
 
 fun main(){
-    n = int(readln());
+    n = int(scanln());
     i = 0;
     while(i < n) {
         addition_by_peter();
@@ -21,7 +21,7 @@ fun main(){
 }
 
 fun addition_by_peter() {
-    obverse = readln();
+    obverse = scanln();
     reverse = "";
     steps = 0;
     while(succ) {
@@ -33,7 +33,7 @@ fun addition_by_peter() {
         }
         if(obverse == reverse) { 
             println(obverse + " " + steps);
-            return succ;
+            return succ None;
         }
         obverse = str(int(obverse) + int(reverse));
         reverse = "";

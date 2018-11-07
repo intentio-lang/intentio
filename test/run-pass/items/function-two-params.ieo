@@ -6,11 +6,11 @@
 #       - "4"
 
 fun main() {
-  let a = int(scanln());
-  let b = int(scanln());
+  a = int(scanln());
+  b = int(scanln());
   println(add(a, b));
 }
 
-fun add() {
+fun add(a, b) {
   a + b;
 }

@@ -3,6 +3,6 @@
 #       - "succ"
 
 fun main() {
-  let a = 7;
-  assert(--a == a);
+  a = 7;
+  if(--a == a) { println("succ"); };
 }

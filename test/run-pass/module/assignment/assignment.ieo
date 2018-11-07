@@ -3,6 +3,6 @@
 #       - "4"
 
 fun main() {
-  let a = 4;
+  a = 4;
   println(a);
 }

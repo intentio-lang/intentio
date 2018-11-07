@@ -4,7 +4,7 @@
 #       - "succ"
 
 fun main() {
-  let a = 2;
-  assert(a <= a);
-  assert(a - 1 <= a);
+  a = 2;
+  if(a <= a) { println("succ"); };
+  if(a - 1 <= a) { println("succ"); };
 }

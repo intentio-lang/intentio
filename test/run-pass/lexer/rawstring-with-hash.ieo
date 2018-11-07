@@ -4,6 +4,6 @@
 #       - "One: #, two: ##, even three: ###"
 
 fun main() {
-  assert(r##"Hash: #"## == "Hash: #");
+  if(r##"Hash: #"## == "Hash: #") { println("succ"); };
   println(r##"One: #, two: ##, even three: ###"##);
 }

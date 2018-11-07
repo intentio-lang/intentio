@@ -1,8 +1,8 @@
 import oparations_lib:*
 
 fun main() {
-  a = readln();
-  b = readln();
+  a = scanln();
+  b = scanln();
   println(add(a, b));
   println(sub(a, b));
   println(mul(a, b));

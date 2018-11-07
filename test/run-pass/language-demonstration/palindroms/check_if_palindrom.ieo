@@ -5,7 +5,7 @@
 #       - "yes"
 
 fun main() {
-    obverse = readln();
+    obverse = scanln();
     reverse = "";
     len = len(obverse);
     i = 0;

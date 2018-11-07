@@ -17,7 +17,7 @@ fun classic_notation (input){
             stack = elem + stack;
         }
     }
-    return cut(1, len(stack), stack);
+    cut(1, len(stack), stack);
 }
 
 # returns first elem from stack
@@ -35,7 +35,7 @@ fun add_parens_if_needed(data, op) {
     if(int(cut(0, 1, data)) <  int(cut(0, 1, op))) { 
         return cut(0, 1, data) + "(" + cut(1, len(data), data) + ")";
     }
-    return data1;
+    data1;
 }
 
 # priorities:
@@ -55,5 +55,5 @@ fun add_priorities(in) {
             res = res + "3" + char;
         }
     }
-    return res;
+    res;
 }

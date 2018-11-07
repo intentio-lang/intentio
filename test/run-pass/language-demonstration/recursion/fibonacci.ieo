@@ -5,14 +5,14 @@
 #       - "21"
 
 fun main() {
-    n = int(readln());
+    n = int(scanln());
     println(str(fibonacci(n)));
 }
 
 fun fibonacci(n) {
     if(n < 0) { 
         println("The number should be non-negative"); 
-        return fail; 
+        return fail None; 
     }
     if(n == 0) { return 0; }
     if(n == 1) { return 1; }

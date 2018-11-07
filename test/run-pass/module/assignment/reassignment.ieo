@@ -5,7 +5,7 @@
 #        - "4"
 
 fun main() {
-  let a = 2;
+  a = 2;
   a = int(scanln());
   println(a);
 }

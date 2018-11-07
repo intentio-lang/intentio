@@ -1,8 +1,8 @@
-export (find_out)
+export (bal)
 
 # find first position of string x in string s, but only if it's not between l and r
 # where x, l, r - characters
-fun find_out(x, s, l, r) {
+fun bal(x, s, l, r) {
     pos = 0;
     i = 0;
     while(pos < len(s)) {

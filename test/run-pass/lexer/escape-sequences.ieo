@@ -5,7 +5,7 @@
 #       - "succ"
 
 fun main() {
-  assert(r"'" == "\'");
-  assert(r" " == "\t");
-  assert(r"\" == "\\");
+  if(r"'" == "\'") { println("succ"); };
+  if(r" " == "\t") { println("succ"); };
+  if(r"\" == "\\") { println("succ"); };
 }

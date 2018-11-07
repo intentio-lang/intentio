@@ -10,7 +10,7 @@
 # https://pl.spoj.com/problems/JPESEL/
 
 fun main(){
-    n = int(readln());
+    n = int(scanln());
     i = 0;
     while(i < n) {
         i = i + 1;
@@ -20,10 +20,10 @@ fun main(){
 
 fun check_pesel() {
     factors = "13791379131";
-    pesel = readln();
+    pesel = scanln();
     if(len(pesel) != 11) {
         println("PESEL should have 11 digits");
-        return fail;
+        return fail None;
     }
     result = 0;
     while(len(pesel) > 0){

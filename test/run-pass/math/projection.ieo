@@ -6,7 +6,7 @@
 #       - "5.0"
 
 fun main() {
-  let a = int(scanln());
-  let b = int(scanln());
+  a = int(scanln());
+  b = int(scanln());
   println(a * b);
 }

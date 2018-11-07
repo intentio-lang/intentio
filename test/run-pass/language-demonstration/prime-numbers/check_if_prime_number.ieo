@@ -5,14 +5,14 @@
 #       - "yes"
 
 fun main() {
-    a = int(readln());
+    a = int(scanln());
     println(check_if_prime_number(a));
 }
 
 fun check_if_prime_number(a) {
     if(a <= 0) { 
         println("The number should be positive"); 
-        return fail; 
+        return fail None; 
     }
     factor = 2;
     while(a >= factor * factor) {

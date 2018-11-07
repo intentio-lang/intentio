@@ -23,25 +23,19 @@ idModule :: Module ()
 idModule = Module ()
                   (SourcePos "id.ieo" 0 0)
                   (ModuleName "id")
-                  [ItemId 1]
+                  (fromList [ItemName "id"])
+                  (fromList [(ModuleName "some", ItemName "_unused")])
                   items
-                  [ItemId 0, ItemId 1]
-                  (fromList [(ItemName "id", ItemId 1)])
+                  [ItemId 0]
+                  (fromList [(ItemName "id", ItemId 0)])
                   bodies
                   [BodyId 0]
  where
   items = fromList
     [ ( 0
       , Item ()
-             (SourcePos "id.ieo" 5 0)
-             (ItemId 0)
-             Nothing
-             (ImportItem (ModuleName "some") (ItemName "_unused"))
-      )
-    , ( 1
-      , Item ()
              (SourcePos "id.ieo" 10 0)
-             (ItemId 1)
+             (ItemId 0)
              (Just $ ItemName "id")
              (FnItem (BodyId 0))
       )
@@ -62,7 +56,7 @@ idModule = Module ()
             (Expr
               ()
               (SourcePos "id.ieo" 11 2)
-              (PathExpr (Path () (SourcePos "id.ieo" 11 10) (Local (VarId 0))))
+              (PathExpr (Path () (SourcePos "id.ieo" 11 10) (ToVar (VarId 0))))
             )
           )
         )

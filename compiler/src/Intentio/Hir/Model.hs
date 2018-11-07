@@ -41,7 +41,8 @@ data Module a = Module
 
   , _moduleName       :: ModuleName
 
-  , _moduleExports    :: [ItemId]
+  , _moduleExports    :: HashSet ItemName
+  , _moduleImports    :: HashSet (ModuleName, ItemName)
 
   , _moduleItems      :: IM.IntMap (Item a)
   , _moduleItemIds    :: [ItemId]
@@ -82,9 +83,8 @@ instance HasSourcePos (Item a) where
 instance (Eq a, Show a) => C.Item (Item a) where
   _itemName = Intentio.Hir.Model._itemName
 
-data ItemKind a
-  = ImportItem ModuleName ItemName
-  | FnItem BodyId
+newtype ItemKind a
+  = FnItem BodyId
   deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (ItemKind a)
@@ -214,8 +214,9 @@ instance HasSourcePos (Path a) where
   _sourcePos = _pathSourcePos
 
 data PathKind a
-  = Local VarId
-  | Global ItemId
+  = ToVar VarId
+  | ToItem ItemId
+  | ToGlobal ModuleName ItemName
   deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (PathKind a)

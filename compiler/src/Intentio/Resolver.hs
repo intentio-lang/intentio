@@ -4,6 +4,7 @@ module Intentio.Resolver
   ( Resolution(..)
   , HasResolution(..)
   , RS
+  , _ResolvedModule
   , _ResolvedItem
   , _ResolvedLocal
   , _NotApplicable

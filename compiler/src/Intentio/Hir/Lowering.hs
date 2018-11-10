@@ -120,7 +120,7 @@ lowerItems = do
 lowerItem :: A.ItemDecl RS -> LowerM [H.Item ()]
 lowerItem item = case item ^. A.itemDeclKind of
   A.ImportItemDecl _ -> return [] -- Handled by 'collectImports'
-  A.FunItemDecl    d -> (: []) <$> lowerFunDecl d
+  A.FunItemDecl    d -> pure <$> lowerFunDecl d
 
 lowerFunDecl :: A.FunDecl RS -> LowerM (H.Item ())
 lowerFunDecl af = do

@@ -21,7 +21,7 @@ import           Intentio.Compiler             as X
 import           Intentio.Diagnostics           ( SourcePos(..)
                                                 , HasSourcePos(..)
                                                 )
-import Intentio.Util.NodeId (NodeId)
+import           Intentio.Util.NodeId           ( NodeId )
 
 --------------------------------------------------------------------------------
 -- HIR data structures
@@ -117,9 +117,10 @@ instance HasSourcePos (Body a) where
   _sourcePos = _sourcePos . _bodyValue
 
 data Var a = Var
-  { _varAnn   :: a
-  , _varId    :: VarId
-  , _varIdent :: Ident a
+  { _varAnn       :: a
+  , _varSourcePos :: SourcePos
+  , _varId        :: VarId
+  , _varName      :: Text
   }
   deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
@@ -127,7 +128,7 @@ instance ToJSON a => ToJSON (Var a)
 instance FromJSON a => FromJSON (Var a)
 
 instance HasSourcePos (Var a) where
-  _sourcePos = _sourcePos . _varIdent
+  _sourcePos = _varSourcePos
 
 newtype Param a = Param { _paramVarId :: VarId }
   deriving (Show, Eq, Generic, Functor, Foldable, Traversable, ToJSON, FromJSON)
@@ -160,19 +161,6 @@ data ExprKind a
 
 instance ToJSON a => ToJSON (ExprKind a)
 instance FromJSON a => FromJSON (ExprKind a)
-
-data Ident a = Ident
-  { _identAnn       :: a
-  , _identSourcePos :: SourcePos
-  , _identName      :: Text
-  }
-  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
-
-instance ToJSON a => ToJSON (Ident a)
-instance FromJSON a => FromJSON (Ident a)
-
-instance HasSourcePos (Ident a) where
-  _sourcePos = _identSourcePos
 
 data Lit a = Lit
   { _litAnn       :: a
@@ -302,7 +290,6 @@ makeLenses ''Var
 makeLenses ''Param
 makeLenses ''Expr
 makePrisms ''ExprKind
-makeLenses ''Ident
 makeLenses ''Lit
 makePrisms ''LitKind
 makeLenses ''Block
@@ -336,9 +323,6 @@ instance Annotated Var where
 
 instance Annotated Expr where
   ann = exprAnn
-
-instance Annotated Ident where
-  ann = identAnn
 
 instance Annotated Lit where
   ann = litAnn

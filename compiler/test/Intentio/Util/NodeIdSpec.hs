@@ -44,9 +44,7 @@ someHir = Module ()
         ()
         (BodyId 0)
         [Param (VarId 0)]
-        (fromList
-          [(0, Var () (VarId 0) (Ident () (SourcePos "id.ieo" 10 10) "x"))]
-        )
+        (fromList [(0, Var () (SourcePos "id.ieo" 10 10) (VarId 0) "x")])
         [VarId 0]
         (Expr
           ()
@@ -90,23 +88,18 @@ someHirWithId = Module (NodeId.mk 0)
         (BodyId 0)
         [Param (VarId 0)]
         (fromList
-          [ ( 0
-            , Var (NodeId.mk 3)
-                  (VarId 0)
-                  (Ident (NodeId.mk 4) (SourcePos "id.ieo" 10 10) "x")
-            )
-          ]
+          [(0, Var (NodeId.mk 3) (SourcePos "id.ieo" 10 10) (VarId 0) "x")]
         )
         [VarId 0]
         (Expr
-          (NodeId.mk 5)
+          (NodeId.mk 4)
           (SourcePos "id.ieo" 10 0)
           (ReturnExpr
             (Expr
-              (NodeId.mk 6)
+              (NodeId.mk 5)
               (SourcePos "id.ieo" 11 2)
               (PathExpr
-                (Path (NodeId.mk 7) (SourcePos "id.ieo" 11 10) (ToVar (VarId 0))
+                (Path (NodeId.mk 6) (SourcePos "id.ieo" 11 10) (ToVar (VarId 0))
                 )
               )
             )

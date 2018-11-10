@@ -75,8 +75,7 @@ emitVarIdById :: MonadImpBodyEmit m => I.VarId -> m C.Id
 emitVarIdById = getImpVarById >=> emitVarId
 
 emitVarId :: MonadImpBodyEmit m => I.Var () -> m C.Id
-emitVarId var = return $ C.Id i noLoc
-  where i = var ^. I.varIdent . I.identName & toS
+emitVarId var = return $ C.Id i noLoc where i = var ^. I.varName & toS
 
 emitExpr :: MonadImpBodyEmit m => I.Expr () -> m C.Exp
 emitExpr = fail "Codegen for expressions is not implemented"

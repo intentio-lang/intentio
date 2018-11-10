@@ -28,10 +28,7 @@ import           Intentio.Hir                  as X
                                                 , Var(..)
                                                 , varAnn
                                                 , varId
-                                                , varIdent
-                                                , Ident(..)
-                                                , identAnn
-                                                , identName
+                                                , varName
                                                 , Lit(..)
                                                 , litAnn
                                                 , litSourcePos

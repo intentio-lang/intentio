@@ -46,9 +46,7 @@ idModule = Module ()
         ()
         (BodyId 0)
         [Param (VarId 0)]
-        (fromList
-          [(0, Var () (VarId 0) (Ident () (SourcePos "id.ieo" 10 10) "x"))]
-        )
+        (fromList [(0, Var () (SourcePos "id.ieo" 10 10) (VarId 0) "x")])
         [VarId 0]
         (Expr
           ()

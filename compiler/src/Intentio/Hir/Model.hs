@@ -208,7 +208,6 @@ data LitKind
   = IntegerLit Integer
   | FloatLit Scientific
   | StringLit Text
-  | RegexLit Text
   | NoneLit
   deriving (Show, Eq, Generic)
 

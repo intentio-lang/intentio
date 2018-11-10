@@ -37,7 +37,6 @@ import           Intentio.Hir                  as X
                                                 , _IntegerLit
                                                 , _FloatLit
                                                 , _StringLit
-                                                , _RegexLit
                                                 , _NoneLit
                                                 , Path(..)
                                                 , pathAnn

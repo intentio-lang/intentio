@@ -21,6 +21,7 @@ import           Intentio.Compiler             as X
 import           Intentio.Diagnostics           ( SourcePos(..)
                                                 , HasSourcePos(..)
                                                 )
+import Intentio.Util.NodeId (NodeId)
 
 --------------------------------------------------------------------------------
 -- HIR data structures
@@ -28,11 +29,20 @@ import           Intentio.Diagnostics           ( SourcePos(..)
 newtype ItemId = ItemId { _unItemId :: IM.Key }
   deriving (Show, Eq, Ord, Hashable, Enum, Bounded, Generic, ToJSON, FromJSON)
 
+instance Convertible NodeId ItemId where
+  safeConvert = Right . ItemId . fromEnum
+
 newtype BodyId = BodyId { _unBodyId :: IM.Key }
   deriving (Show, Eq, Ord, Hashable, Enum, Bounded, Generic, ToJSON, FromJSON)
 
+instance Convertible NodeId BodyId where
+  safeConvert = Right . BodyId . fromEnum
+
 newtype VarId = VarId { _unVarId :: IM.Key }
   deriving (Show, Eq, Ord, Hashable, Enum, Bounded, Generic, ToJSON, FromJSON)
+
+instance Convertible NodeId VarId where
+  safeConvert = Right . VarId . fromEnum
 
 data Module a = Module
   { _moduleAnn        :: a

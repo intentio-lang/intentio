@@ -102,6 +102,7 @@ instance FromJSON a => FromJSON (ItemKind a)
 
 data Body a = Body
   { _bodyAnn     :: a
+  , _bodyId      :: BodyId
   , _bodyParams  :: [Param a]
   , _bodyVars    :: IM.IntMap (Var a)
   , _bodyVarIds  :: [VarId]

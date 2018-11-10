@@ -179,6 +179,8 @@ data ExprKind a
   = PathExpr (Path a)
   | LitExpr (Lit a)
   | BlockExpr (Block a)
+  | SuccExpr (Expr a)
+  | FailExpr (Expr a)
   | UnExpr (UnOp a) (Expr a)
   | BinExpr (BinOp a) (Expr a) (Expr a)
   | CallExpr (Expr a) [Expr a]

@@ -226,11 +226,9 @@ lowerExpr aexpr = case aexpr ^. A.exprKind of
 
   A.BlockExpr ab   -> lowerBlockToExpr ab
 
-  A.SuccExpr _ ->
-    lift . lift $ pushIceFor aexpr "Lowering: Succ expr not implemented."
+  A.SuccExpr  aie  -> mk . H.SuccExpr <$> lowerExpr aie
 
-  A.FailExpr _ ->
-    lift . lift $ pushIceFor aexpr "Lowering: Fail expr not implemented."
+  A.FailExpr  aie  -> mk . H.FailExpr <$> lowerExpr aie
 
   A.UnExpr aop aie -> H.UnExpr <$> pure (void aop) <*> lowerExpr aie <&> mk
 

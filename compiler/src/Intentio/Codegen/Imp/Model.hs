@@ -44,7 +44,6 @@ import           Intentio.Hir                  as X
                                                 , PathKind(..)
                                                 , _ToVar
                                                 , _ToItem
-                                                , _ToGlobal
                                                 )
 
 data Body a = Body

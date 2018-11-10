@@ -242,8 +242,7 @@ instance HasSourcePos (Path a) where
 
 data PathKind a
   = ToVar VarId
-  | ToItem ItemId
-  | ToGlobal ModuleName ItemName
+  | ToItem ModuleName ItemName
   deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (PathKind a)

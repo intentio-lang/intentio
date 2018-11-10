@@ -22,6 +22,35 @@ import           Intentio.Diagnostics           ( SourcePos(..)
                                                 , HasSourcePos(..)
                                                 )
 import           Intentio.Util.NodeId           ( NodeId )
+import           Language.Intentio.AST         as X
+                                                ( UnOp(..)
+                                                , UnOpKind(..)
+                                                , BinOp(..)
+                                                , BinOpKind(..)
+                                                , unOpAnn
+                                                , unOpSourcePos
+                                                , unOpKind
+                                                , binOpAnn
+                                                , binOpSourcePos
+                                                , binOpKind
+                                                , _UnNeg
+                                                , _UnNot
+                                                , _BinAdd
+                                                , _BinAnd
+                                                , _BinDiv
+                                                , _BinEq
+                                                , _BinGt
+                                                , _BinGtEq
+                                                , _BinLt
+                                                , _BinLtEq
+                                                , _BinMul
+                                                , _BinNeq
+                                                , _BinOr
+                                                , _BinSEq
+                                                , _BinSNeq
+                                                , _BinSub
+                                                , _BinXor
+                                                )
 
 --------------------------------------------------------------------------------
 -- HIR data structures
@@ -221,61 +250,6 @@ data PathKind a
 instance ToJSON a => ToJSON (PathKind a)
 instance FromJSON a => FromJSON (PathKind a)
 
-data UnOp a = UnOp
-  { _unOpAnn       :: a
-  , _unOpSourcePos :: SourcePos
-  , _unOpKind      :: UnOpKind
-  }
-  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
-
-instance ToJSON a => ToJSON (UnOp a)
-instance FromJSON a => FromJSON (UnOp a)
-
-instance HasSourcePos (UnOp a) where
-  _sourcePos = _unOpSourcePos
-
-data UnOpKind
-  = UnNeg
-  | UnNot
-  deriving (Show, Eq, Generic)
-
-instance ToJSON UnOpKind
-instance FromJSON UnOpKind
-
-data BinOp a = BinOp
-  { _binOpAnn       :: a
-  , _binOpSourcePos :: SourcePos
-  , _binOpKind      :: BinOpKind
-  }
-  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
-
-instance ToJSON a => ToJSON (BinOp a)
-instance FromJSON a => FromJSON (BinOp a)
-
-instance HasSourcePos (BinOp a) where
-  _sourcePos = _binOpSourcePos
-
-data BinOpKind
-  = BinAdd
-  | BinAnd
-  | BinDiv
-  | BinEq
-  | BinGt
-  | BinGtEq
-  | BinLt
-  | BinLtEq
-  | BinMul
-  | BinNeq
-  | BinOr
-  | BinSEq
-  | BinSNeq
-  | BinSub
-  | BinXor
-  deriving (Show, Eq, Generic)
-
-instance ToJSON BinOpKind
-instance FromJSON BinOpKind
-
 --------------------------------------------------------------------------------
 -- Lenses
 
@@ -295,10 +269,6 @@ makePrisms ''LitKind
 makeLenses ''Block
 makeLenses ''Path
 makePrisms ''PathKind
-makeLenses ''UnOp
-makePrisms ''UnOpKind
-makeLenses ''BinOp
-makePrisms ''BinOpKind
 
 moduleItem :: ItemId -> Traversal' (Module a) (Item a)
 moduleItem (ItemId i) = moduleItems . ix i
@@ -332,12 +302,6 @@ instance Annotated Block where
 
 instance Annotated Path where
   ann = pathAnn
-
-instance Annotated UnOp where
-  ann = unOpAnn
-
-instance Annotated BinOp where
-  ann = binOpAnn
 
 --------------------------------------------------------------------------------
 -- Helper accessors

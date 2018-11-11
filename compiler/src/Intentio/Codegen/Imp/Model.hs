@@ -28,10 +28,7 @@ import           Intentio.Hir                  as X
                                                 , Var(..)
                                                 , varAnn
                                                 , varId
-                                                , varIdent
-                                                , Ident(..)
-                                                , identAnn
-                                                , identName
+                                                , varName
                                                 , Lit(..)
                                                 , litAnn
                                                 , litSourcePos
@@ -40,14 +37,13 @@ import           Intentio.Hir                  as X
                                                 , _IntegerLit
                                                 , _FloatLit
                                                 , _StringLit
-                                                , _RegexLit
                                                 , _NoneLit
                                                 , Path(..)
                                                 , pathAnn
                                                 , pathKind
                                                 , PathKind(..)
-                                                , _Local
-                                                , _Global
+                                                , _ToVar
+                                                , _ToItem
                                                 )
 
 data Body a = Body

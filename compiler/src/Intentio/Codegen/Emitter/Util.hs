@@ -22,9 +22,7 @@ import           Intentio.Codegen.Emitter.Monad ( MonadModuleEmit(..)
                                                 , MonadImpBodyEmit(..)
                                                 )
 import qualified Intentio.Codegen.Imp          as I
-import           Intentio.Codegen.SymbolNames   ( cImportedItemName
-                                                , cItemName
-                                                )
+import           Intentio.Codegen.SymbolNames   ( cItemName )
 import qualified Intentio.Hir                  as H
 
 tyIeoTerm :: C.Type
@@ -55,9 +53,7 @@ getImpVarById varId = do
     Nothing -> fail $ "Bad Imp: missing variable #" <> show varId
 
 getMangledItemName :: MonadModuleEmit m => H.Item () -> m String
-getMangledItemName item = case item ^. H.itemKind of
-  H.ImportItem m i -> cImportedItemName m i & toS & return
-  _                -> askModule <&> flip cItemName item <&> toS
+getMangledItemName item = toS . flip cItemName item <$> askModule
 
 getParamVar :: MonadBodyEmit m => H.Param () -> m (H.Var ())
 getParamVar param = do

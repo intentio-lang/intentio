@@ -21,6 +21,36 @@ import           Intentio.Compiler             as X
 import           Intentio.Diagnostics           ( SourcePos(..)
                                                 , HasSourcePos(..)
                                                 )
+import           Intentio.Util.NodeId           ( NodeId )
+import           Language.Intentio.AST         as X
+                                                ( UnOp(..)
+                                                , UnOpKind(..)
+                                                , BinOp(..)
+                                                , BinOpKind(..)
+                                                , unOpAnn
+                                                , unOpSourcePos
+                                                , unOpKind
+                                                , binOpAnn
+                                                , binOpSourcePos
+                                                , binOpKind
+                                                , _UnNeg
+                                                , _UnNot
+                                                , _BinAdd
+                                                , _BinAnd
+                                                , _BinDiv
+                                                , _BinEq
+                                                , _BinGt
+                                                , _BinGtEq
+                                                , _BinLt
+                                                , _BinLtEq
+                                                , _BinMul
+                                                , _BinNeq
+                                                , _BinOr
+                                                , _BinSEq
+                                                , _BinSNeq
+                                                , _BinSub
+                                                , _BinXor
+                                                )
 
 --------------------------------------------------------------------------------
 -- HIR data structures
@@ -28,11 +58,20 @@ import           Intentio.Diagnostics           ( SourcePos(..)
 newtype ItemId = ItemId { _unItemId :: IM.Key }
   deriving (Show, Eq, Ord, Hashable, Enum, Bounded, Generic, ToJSON, FromJSON)
 
+instance Convertible NodeId ItemId where
+  safeConvert = Right . ItemId . fromEnum
+
 newtype BodyId = BodyId { _unBodyId :: IM.Key }
   deriving (Show, Eq, Ord, Hashable, Enum, Bounded, Generic, ToJSON, FromJSON)
 
+instance Convertible NodeId BodyId where
+  safeConvert = Right . BodyId . fromEnum
+
 newtype VarId = VarId { _unVarId :: IM.Key }
   deriving (Show, Eq, Ord, Hashable, Enum, Bounded, Generic, ToJSON, FromJSON)
+
+instance Convertible NodeId VarId where
+  safeConvert = Right . VarId . fromEnum
 
 data Module a = Module
   { _moduleAnn        :: a
@@ -41,7 +80,8 @@ data Module a = Module
 
   , _moduleName       :: ModuleName
 
-  , _moduleExports    :: [ItemId]
+  , _moduleExports    :: HashSet ItemName
+  , _moduleImports    :: HashSet (ModuleName, ItemName)
 
   , _moduleItems      :: IM.IntMap (Item a)
   , _moduleItemIds    :: [ItemId]
@@ -82,9 +122,8 @@ instance HasSourcePos (Item a) where
 instance (Eq a, Show a) => C.Item (Item a) where
   _itemName = Intentio.Hir.Model._itemName
 
-data ItemKind a
-  = ImportItem ModuleName ItemName
-  | FnItem BodyId
+newtype ItemKind a
+  = FnItem BodyId
   deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (ItemKind a)
@@ -92,6 +131,7 @@ instance FromJSON a => FromJSON (ItemKind a)
 
 data Body a = Body
   { _bodyAnn     :: a
+  , _bodyId      :: BodyId
   , _bodyParams  :: [Param a]
   , _bodyVars    :: IM.IntMap (Var a)
   , _bodyVarIds  :: [VarId]
@@ -106,9 +146,10 @@ instance HasSourcePos (Body a) where
   _sourcePos = _sourcePos . _bodyValue
 
 data Var a = Var
-  { _varAnn   :: a
-  , _varId    :: VarId
-  , _varIdent :: Ident a
+  { _varAnn       :: a
+  , _varSourcePos :: SourcePos
+  , _varId        :: VarId
+  , _varName      :: Text
   }
   deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
@@ -116,7 +157,7 @@ instance ToJSON a => ToJSON (Var a)
 instance FromJSON a => FromJSON (Var a)
 
 instance HasSourcePos (Var a) where
-  _sourcePos = _sourcePos . _varIdent
+  _sourcePos = _varSourcePos
 
 newtype Param a = Param { _paramVarId :: VarId }
   deriving (Show, Eq, Generic, Functor, Foldable, Traversable, ToJSON, FromJSON)
@@ -138,6 +179,8 @@ data ExprKind a
   = PathExpr (Path a)
   | LitExpr (Lit a)
   | BlockExpr (Block a)
+  | SuccExpr (Expr a)
+  | FailExpr (Expr a)
   | UnExpr (UnOp a) (Expr a)
   | BinExpr (BinOp a) (Expr a) (Expr a)
   | CallExpr (Expr a) [Expr a]
@@ -149,19 +192,6 @@ data ExprKind a
 
 instance ToJSON a => ToJSON (ExprKind a)
 instance FromJSON a => FromJSON (ExprKind a)
-
-data Ident a = Ident
-  { _identAnn       :: a
-  , _identSourcePos :: SourcePos
-  , _identName      :: Text
-  }
-  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
-
-instance ToJSON a => ToJSON (Ident a)
-instance FromJSON a => FromJSON (Ident a)
-
-instance HasSourcePos (Ident a) where
-  _sourcePos = _identSourcePos
 
 data Lit a = Lit
   { _litAnn       :: a
@@ -180,7 +210,6 @@ data LitKind
   = IntegerLit Integer
   | FloatLit Scientific
   | StringLit Text
-  | RegexLit Text
   | NoneLit
   deriving (Show, Eq, Generic)
 
@@ -214,67 +243,12 @@ instance HasSourcePos (Path a) where
   _sourcePos = _pathSourcePos
 
 data PathKind a
-  = Local VarId
-  | Global ItemId
+  = ToVar VarId
+  | ToItem ModuleName ItemName
   deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (PathKind a)
 instance FromJSON a => FromJSON (PathKind a)
-
-data UnOp a = UnOp
-  { _unOpAnn       :: a
-  , _unOpSourcePos :: SourcePos
-  , _unOpKind      :: UnOpKind
-  }
-  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
-
-instance ToJSON a => ToJSON (UnOp a)
-instance FromJSON a => FromJSON (UnOp a)
-
-instance HasSourcePos (UnOp a) where
-  _sourcePos = _unOpSourcePos
-
-data UnOpKind
-  = UnNeg
-  | UnNot
-  deriving (Show, Eq, Generic)
-
-instance ToJSON UnOpKind
-instance FromJSON UnOpKind
-
-data BinOp a = BinOp
-  { _binOpAnn       :: a
-  , _binOpSourcePos :: SourcePos
-  , _binOpKind      :: BinOpKind
-  }
-  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
-
-instance ToJSON a => ToJSON (BinOp a)
-instance FromJSON a => FromJSON (BinOp a)
-
-instance HasSourcePos (BinOp a) where
-  _sourcePos = _binOpSourcePos
-
-data BinOpKind
-  = BinAdd
-  | BinAnd
-  | BinDiv
-  | BinEq
-  | BinGt
-  | BinGtEq
-  | BinLt
-  | BinLtEq
-  | BinMul
-  | BinNeq
-  | BinOr
-  | BinSEq
-  | BinSNeq
-  | BinSub
-  | BinXor
-  deriving (Show, Eq, Generic)
-
-instance ToJSON BinOpKind
-instance FromJSON BinOpKind
 
 --------------------------------------------------------------------------------
 -- Lenses
@@ -290,16 +264,11 @@ makeLenses ''Var
 makeLenses ''Param
 makeLenses ''Expr
 makePrisms ''ExprKind
-makeLenses ''Ident
 makeLenses ''Lit
 makePrisms ''LitKind
 makeLenses ''Block
 makeLenses ''Path
 makePrisms ''PathKind
-makeLenses ''UnOp
-makePrisms ''UnOpKind
-makeLenses ''BinOp
-makePrisms ''BinOpKind
 
 moduleItem :: ItemId -> Traversal' (Module a) (Item a)
 moduleItem (ItemId i) = moduleItems . ix i
@@ -325,9 +294,6 @@ instance Annotated Var where
 instance Annotated Expr where
   ann = exprAnn
 
-instance Annotated Ident where
-  ann = identAnn
-
 instance Annotated Lit where
   ann = litAnn
 
@@ -336,12 +302,6 @@ instance Annotated Block where
 
 instance Annotated Path where
   ann = pathAnn
-
-instance Annotated UnOp where
-  ann = unOpAnn
-
-instance Annotated BinOp where
-  ann = binOpAnn
 
 --------------------------------------------------------------------------------
 -- Helper accessors

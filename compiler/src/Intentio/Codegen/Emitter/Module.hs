@@ -1,3 +1,4 @@
+{-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE QuasiQuotes #-}
 
 module Intentio.Codegen.Emitter.Module
@@ -10,6 +11,7 @@ where
 
 import           Intentio.Prelude
 
+import           Data.HashSet.Lens              ( setmapped )
 import qualified Data.Text                     as T
 import qualified Language.C.Quote              as C
 import           Language.C.Quote.C             ( cunit )
@@ -20,6 +22,7 @@ import           Intentio.Codegen.Emitter.Item  ( emitItemHeader
                                                 )
 import           Intentio.Codegen.Emitter.Monad ( ModuleEmit
                                                 , ItemEmit
+                                                , askModule
                                                 , runModuleEmit
                                                 , runItemEmit
                                                 )
@@ -46,14 +49,15 @@ emitModuleSource' = emitModule emitItemSource
 
 emitModule
   :: forall t
-   . GetCModuleFileName t
+   . (GetCModuleFileName t, ImportEmitter t)
   => ItemEmit [C.Definition]
   -> ModuleEmit (CModuleDef t)
 emitModule itemEmitter = do
   _cModuleDefSourcePos    <- view H.moduleSourcePos
   _cModuleDefIntentioName <- view H.moduleName
   _cModuleDefFileName     <- cModuleFileName @t <$> view H.moduleName
-  _cModuleDefDefinitions' <-
+  imports                 <- emitImports @t
+  defs                    <-
     view H.moduleItemIds
     >>= mapM (getItemById >=> runItemEmit itemEmitter)
     <&> concat
@@ -64,10 +68,26 @@ emitModule itemEmitter = do
   let _cModuleDefDefinitions = concat
         [ [cunit| $esc:headerText |]
         , [cunit| $esc:("#include <intentio.h>") |]
-        , _cModuleDefDefinitions'
+        , imports
+        , defs
         ]
 
   return CModuleDef { .. }
+
+class ImportEmitter t where
+  emitImports :: ModuleEmit [C.Definition]
+
+instance ImportEmitter CModuleHeader where
+  emitImports = pure []
+
+instance ImportEmitter CModuleSource where
+  emitImports =
+    concatMap (\t -> [cunit| $esc:t |])
+      .   toList
+      .   (setmapped %~ inc . fst)
+      .   view H.moduleImports
+      <$> askModule
+    where inc n = "#include \"" <> cModuleFileName @CModuleHeader n <> "\""
 
 -- brittany-disable-next-binding
 buildHeaderComment :: FilePath -> H.ModuleName -> Text

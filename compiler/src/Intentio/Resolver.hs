@@ -4,9 +4,9 @@ module Intentio.Resolver
   ( Resolution(..)
   , HasResolution(..)
   , RS
+  , _ResolvedModule
   , _ResolvedItem
   , _ResolvedLocal
-  , _Unresolved
   , _NotApplicable
   , resolveAssembly
   )
@@ -48,7 +48,6 @@ data Resolution
   = ResolvedModule ModuleName
   | ResolvedItem ModuleName ItemName
   | ResolvedLocal NodeId
-  | Unresolved
   | NotApplicable
   deriving (Show, Eq)
 

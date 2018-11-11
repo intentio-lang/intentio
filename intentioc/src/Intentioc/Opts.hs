@@ -26,7 +26,9 @@ import           Options.Applicative            ( Parser
                                                 , strOption
                                                 , value
                                                 )
-import           System.FilePath                ( splitSearchPath, takeBaseName )
+import           System.FilePath                ( splitSearchPath
+                                                , takeBaseName
+                                                )
 
 import           Intentio.Cache.WorkDir         ( WorkDirComponent(..) )
 import           Intentio.Codegen.GCC           ( GCCOptionsComponent(..) )
@@ -143,10 +145,10 @@ buildInputAssembly :: Compile (Assembly SourceFile)
 buildInputAssembly = do
   o <- liftIO $ execParser opts
 
-  let defName = toS . takeBaseName . mainModule $ o
-  let name    = AssemblyName $ fromMaybe defName (assemblyName o)
-  let modlist = SourceFile <$> mainModule o :| otherModules o
-  let asm     = mkAssembly (assemblyType o) name (outputPath o) modlist
+  let defName    = toS . takeBaseName . mainModule $ o
+  let name       = AssemblyName $ fromMaybe defName (assemblyName o)
+  let modlist    = SourceFile <$> mainModule o :| otherModules o
+  let asm        = mkAssembly (assemblyType o) name (outputPath o) modlist
 
   let modulePath = modulePathOverride o <|> Just defaultModulePath
 

@@ -49,4 +49,4 @@ cItemName' :: H.ModuleName -> H.ItemName -> Text
 cItemName' modul item = mangle [modul ^. _Wrapped, item ^. _Wrapped]
 
 cVarName :: (Eq a, Show a) => H.Var a -> String
-cVarName var = var ^. H.varIdent . H.identName & sanitize & toS
+cVarName var = var ^. H.varName & sanitize & toS

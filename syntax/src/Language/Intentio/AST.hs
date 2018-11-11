@@ -2,6 +2,8 @@ module Language.Intentio.AST
   ( module Language.Intentio.AST
   , ModuleName(..)
   , ItemName(..)
+  , unModuleName
+  , unItemName
   , getAnn
   , setAnn
   , ann
@@ -17,6 +19,8 @@ import           Intentio.Annotated             ( Annotated(..) )
 import qualified Language.Intentio.Assembly    as A
 import           Language.Intentio.Assembly     ( ModuleName(..)
                                                 , ItemName(..)
+                                                , unModuleName
+                                                , unItemName
                                                 )
 import           Language.Intentio.Token
 import           Language.Intentio.SourcePos    ( HasSourcePos(..)
@@ -70,6 +74,17 @@ data AnyId a
   = Qid' (Qid a)
   | ScopeId' (ScopeId a)
   deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
+
+instance HasSourcePos (AnyId a) where
+  _sourcePos (Qid'     i) = _sourcePos i
+  _sourcePos (ScopeId' i) = _sourcePos i
+
+instance Annotated AnyId where
+  getAnn (Qid'     i) = getAnn i
+  getAnn (ScopeId' i) = getAnn i
+
+  setAnn b (Qid'     i) = Qid' $ setAnn b i
+  setAnn b (ScopeId' i) = ScopeId' $ setAnn b i
 
 instance ToJSON a => ToJSON (AnyId a)
 instance FromJSON a => FromJSON (AnyId a)

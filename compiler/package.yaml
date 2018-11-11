@@ -13,6 +13,7 @@ dependencies:
   - intentio-prelude
   - intentio-syntax
   - language-c-quote
+  - lens
   - mainland-pretty
   - megaparsec
   - mtl

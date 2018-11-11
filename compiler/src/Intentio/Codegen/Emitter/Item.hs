@@ -21,16 +21,13 @@ import           Intentio.Codegen.Emitter.Monad ( ItemEmit
                                                 , askItem
                                                 , askBody
                                                 )
-import           Intentio.Codegen.Emitter.Types ( CModuleHeader )
 import           Intentio.Codegen.Emitter.Util  ( tyIeoTerm
                                                 , tyIeoResult
                                                 , getBodyById
                                                 , getMangledItemName
                                                 , getParamVar
                                                 )
-import           Intentio.Codegen.SymbolNames   ( GetCModuleFileName(..)
-                                                , cVarName
-                                                )
+import           Intentio.Codegen.SymbolNames   ( cVarName )
 import qualified Intentio.Codegen.Imp          as I
 import qualified Intentio.Hir                  as H
 
@@ -41,25 +38,13 @@ emitItemHeader :: ItemEmit [C.Definition]
 emitItemHeader = do
   item <- askItem
   case item ^. H.itemKind of
-    H.ImportItem modName _ -> emitImportHeader modName
-    H.FnItem bodyId        -> emitFnHeader bodyId
+    H.FnItem bodyId -> emitFnHeader bodyId
 
 emitItemSource :: ItemEmit [C.Definition]
 emitItemSource = do
   item <- askItem
   case item ^. H.itemKind of
-    H.ImportItem modName _ -> emitImportSource modName
-    H.FnItem bodyId        -> emitFnSource bodyId
-
---------------------------------------------------------------------------------
--- Import item emitter
-
-emitImportHeader :: H.ModuleName -> ItemEmit [C.Definition]
-emitImportHeader _ = pure []
-
-emitImportSource :: H.ModuleName -> ItemEmit [C.Definition]
-emitImportSource modName = return [cunit| $esc:t |]
-  where t = "#include \"" <> cModuleFileName @CModuleHeader modName <> "\""
+    H.FnItem bodyId -> emitFnSource bodyId
 
 --------------------------------------------------------------------------------
 -- Function item emitter

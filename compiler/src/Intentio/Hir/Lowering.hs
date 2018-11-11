@@ -289,11 +289,10 @@ lowerExpr aexpr = case aexpr ^. A.exprKind of
   A.ReturnExpr Nothing    -> return . mk . H.ReturnExpr $ H.Expr
     { _exprAnn       = ()
     , _exprSourcePos = () ^. sourcePos
-    , _exprKind      = H.LitExpr H.Lit
-      { _litAnn       = ()
-      , _litSourcePos = () ^. sourcePos
-      , _litKind      = H.NoneLit
-      }
+    , _exprKind      = H.LitExpr H.Lit { _litAnn       = ()
+                                       , _litSourcePos = () ^. sourcePos
+                                       , _litKind      = H.NoneLit
+                                       }
     }
  where
   _exprAnn       = ()

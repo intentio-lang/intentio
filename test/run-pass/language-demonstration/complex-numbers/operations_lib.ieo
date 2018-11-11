@@ -1,0 +1,67 @@
+export (add, sub, mu, div)
+
+# math operations on complex numbers
+# complex could have form: x+yi; -x+yi; x-yi; -x-yi; 0+0i; 1+1i
+
+# "x+yi" => x
+fun re(s) {
+    sign = 1;
+    if(cut(0, 1, s) == "-") {
+        sign = -1;
+        s = cut(1, len(s), s) == "-";
+    }
+    pos = find("+", s);
+    if(not pos) { pos = find("-", s); } 
+    sign * int(cut(0, pos, s));
+}
+
+# "x+yi" => y
+fun im(s) {
+    pos = find("+", s);
+    if(pos) {
+        return int(cut(pos + 1, len(s) - 1, s));
+    }
+    pos = find("-", cut(1, len(s), s));
+    -1 * int(cut(pos + 1, len(s) - 1, s));
+}
+
+fun add(a, b) {
+    rr = re(a) + re(b);
+    ri = im(a) + im(b);
+    sign = "+";
+    if(ri < 0) { sign = "-"; }
+    str(rr) + sign + str(ri) + "i";
+}
+
+fun sub(a, b) {
+    rr = re(a) - re(b);
+    ri = im(a) - im(b);
+    sign = "+";
+    if(ri < 0) { sign = "-"; }
+    str(rr) + sign + str(ri) + "i";
+}
+
+fun mul(a, b) {
+    ar = re(a);
+    ai = im(a);
+    br = re(b);
+    bi = im(b);
+    rr = ar*br - ai*bi;
+    ri = ai*br + bi*ar;
+    sign = "+";
+    if(ri < 0) { sign = "-"; }
+    str(rr) + sign + str(ri) + "i";
+}
+
+fun div(a, b) {
+    ar = re(a);
+    ai = im(a);
+    br = re(b);
+    bi = im(b);
+    d = br*br + bi*bi;
+    rr = (ar*br + ai*bi) / d;
+    ri = (ai*br - bi*ar) / d;
+    sign = "+";
+    if(ri < 0) { sign = "-"; }
+    str(rr) + sign + str(ri) + "i";
+}

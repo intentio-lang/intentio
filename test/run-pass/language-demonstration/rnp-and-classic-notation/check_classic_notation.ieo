@@ -1,0 +1,54 @@
+export (check_classic_notation)
+
+import utility:bal
+
+# check if expressions in classic notation made with (,),+,*,a,b,c are correct
+
+fun check_classic_notation(input) {
+    Expression(input);
+}
+
+# Expression = Component "+" Expression | Component
+fun Expression(in) {
+    # first_case
+    position = bal("+", in, "(", ")");
+    if (position) {
+        return Component(cut(0, position, in)
+            and Expression(cut(position + 1, len(in), in);
+    }
+
+    # second_case
+    Component(in);
+}
+
+# Component = Factor "*" Component | Factor
+fun Component(in) {
+    # first_case
+    position = bal("*", in, "(", ")");
+    if (position) {
+        return Factor(cut(0, position, in)
+            and Component(cut(position + 1, len(in), in);
+    }
+
+    # second_case
+    Factor(in);
+}
+
+# Factor = Identity | "(" Expression ")"
+fun Factor(in) {
+    len = len(in);
+
+    #first_case
+    if(len == 1) { return Identity(in); }
+
+    #second_case
+    return cut(0, 1, in) == "("
+        and Expression(cut(position + 1, len - 1, in)
+        and (cut(len - 1, len, in) == ")";
+}
+
+# Identity = "a" | "b" | "c"
+fun Identity(in)  {
+	if(in == "a" or in == "b" or in = "c") { return succ None}
+    fail None;
+}

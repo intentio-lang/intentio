@@ -1,0 +1,9 @@
+# - run:
+#     stdout: 
+#       - "succ"
+#       - "One: #, two: ##, even three: ###"
+
+fun main() {
+  if(r##"Hash: #"## == "Hash: #") { println("succ"); };
+  println(r##"One: #, two: ##, even three: ###"##);
+}

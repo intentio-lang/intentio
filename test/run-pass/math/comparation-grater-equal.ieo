@@ -1,0 +1,10 @@
+# - run:
+#     stdout:
+#       - "succ"
+#       - "succ"
+
+fun main() {
+  a = 2;
+  if(a >= a) { println("succ"); };
+  if(a >= a + 1) { println("succ"); };
+}

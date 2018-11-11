@@ -1,0 +1,12 @@
+# - run:
+#     stdin:
+#       - "2"
+#       - "3.0"
+#     stdout:
+#       - "5.0"
+
+fun main() {
+  a = int(scanln());
+  b = int(scanln());
+  println(a * b);
+}

@@ -1,0 +1,26 @@
+# - run:
+#     stdin:
+#       - "1621"
+#     stdout: 
+#       - "yes"
+
+fun main() {
+    a = int(scanln());
+    println(check_if_prime_number(a));
+}
+
+fun check_if_prime_number(a) {
+    if(a <= 0) { 
+        println("The number should be positive"); 
+        return fail None; 
+    }
+    factor = 2;
+    while(a >= factor * factor) {
+        tmp = a / factor;
+        if (tmp * factor == a) {
+            println("no");
+        }
+        factor = factor + 1;
+    }
+    println("yes");
+}

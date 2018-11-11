@@ -1,0 +1,9 @@
+# - run:
+#     stdout: 
+#       - "succ"
+#       - "Trim."
+
+fun main() {
+  if(t"   a   " == "a") { println("succ"); };
+  println(tr#"   "Trim."   "#);
+}

@@ -1,0 +1,21 @@
+# - run:
+#     stdin:
+#       - "aabbcdedcbbaa"
+#     stdout: 
+#       - "yes"
+
+fun main() {
+    obverse = scanln();
+    reverse = "";
+    len = len(obverse);
+    i = 0;
+    while(i < len) {
+        reverse = reverse + cut(len - i - 1, len - i, a);
+        i = i + 1;
+    }
+    if(obverse == reverse) { 
+        println("yes");
+    } else {
+        println("no");
+    }
+}

@@ -1,0 +1,22 @@
+# - run:
+#     stdin:
+#       - "1"
+#       - "2"
+#       - "88"
+#       - "42"
+#       - "99"
+#     stdout: 
+#       - "1"
+#       - "2"
+#       - "88"
+
+# https://www.spoj.com/problems/TEST/
+
+fun main() {
+    while(a = scanln()) {
+        if(a == 42) {
+            while(a = scanln()) {}
+        }
+        println(a);
+    }
+}

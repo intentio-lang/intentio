@@ -1,0 +1,37 @@
+# - run:
+#     stdin:
+#       - "1620"
+#       - "35"
+#     stdout: 
+#       - "5"
+
+fun main() {
+    a = int(scanln());
+    b = int(scanlnn());
+    println(str(gratest_common_divisor(a, b));
+}
+
+fun gratest_common_divisor(a, b) {
+    if(a < 0 or b < 0) { 
+        println("The numbers should be positive"); 
+        return fail None; 
+    }
+    factor = 2;
+    gcd = 1;
+    while(a >= factor * factor) {
+        tmpa = a / factor;
+        if(tmpa * factor == a) {
+            if(tmpb = b / factor and tmpb * factor == b) {
+                gcd = factor;
+            }
+        }
+        factor = factor + 1;
+    }
+    if(a != 1) {
+        tmp = b / a;
+        if(tmp * a == b) {
+            gcd = a;
+        }
+    }
+    gcd;
+}

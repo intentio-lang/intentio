@@ -1,7 +1,6 @@
-
 - compile:
-    - export-file.ieo
     - main.ieo
+    - export-file.ieo
 - run:
     stdout: 
         - "Nothing"

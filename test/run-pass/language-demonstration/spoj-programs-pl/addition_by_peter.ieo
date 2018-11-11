@@ -1,0 +1,42 @@
+# - run:
+#     stdin:
+#       - "3"
+#       - "28"
+#       - "68"
+#       - "5"
+#     stdout: 
+#       - "121 2"
+#       - "1111 3"
+#       - "5 0"
+
+# https://pl.spoj.com/problems/BFN1/
+
+fun main() {
+    n = int(scanln());
+    i = 0;
+    while(i < n) {
+        addition_by_peter();
+        i = i + 1;
+    }
+}
+
+fun addition_by_peter() {
+    obverse = scanln();
+    reverse = "";
+    steps = 0;
+    while(succ) {
+        len = len(obverse);
+        i = 0;
+        while(i < len) {
+            reverse = reverse + cut(len - i - 1, len - i, a);
+            i = i + 1;
+        }
+        if(obverse == reverse) { 
+            println(obverse + " " + steps);
+            return succ None;
+        }
+        obverse = str(int(obverse) + int(reverse));
+        reverse = "";
+        steps = steps + 1;
+    }    
+}

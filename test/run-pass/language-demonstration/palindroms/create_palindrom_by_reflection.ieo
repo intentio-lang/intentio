@@ -1,0 +1,35 @@
+# - run:
+#     stdin:
+#       - "aabbcde"
+#       - "odd"
+#     stdout: 
+#       - "aabbcdedcbbaa"
+# - run:
+#     stdin:
+#       - "aabbcde"
+#       - "even"
+#     stdout: 
+#       - "aabbcdeedcbbaa"
+
+fun main() {
+    a = scanln();
+    mode = scanln();
+    println(create_palindrom_by_reflection(a, mode));
+}
+
+fun create_palindrom_by_reflection(a, mode) {
+    if(mode != "even" and mode != "odd") { 
+        println(r#"The mode should be "even" or "odd""#); 
+        return fail None; 
+    }
+    obverse = a;
+    reverse = "";
+    len = len(obverse);
+    i = 0;
+    while(i < len) {
+        reverse = reverse + cut(len - i - 1, len - i, a);
+        i = i + 1;
+    }
+    if(mode == "even") { return obverse + reverse; }
+    obverse + cut(1, len, reverse);
+}

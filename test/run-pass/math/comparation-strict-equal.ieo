@@ -1,0 +1,13 @@
+# - run:
+#     stdout:
+#       - "succ"
+#       - "fail"
+
+fun main() {
+  a = 2;
+  b = 2;
+  c = 2.0;
+  if(a === b) { println("succ"); };
+  if(a === c) { println("succ"); } else { println("fail"); };
+}
+

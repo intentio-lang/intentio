@@ -1,0 +1,8 @@
+# - run:
+#     stdout:
+#       - "succ"
+
+fun main() {
+  a = 7;
+  if(--a == a) { println("succ"); };
+}

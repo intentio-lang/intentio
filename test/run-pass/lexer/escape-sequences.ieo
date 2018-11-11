@@ -1,0 +1,11 @@
+# - run:
+#     stdout:
+#       - "succ"
+#       - "succ"
+#       - "succ"
+
+fun main() {
+  if(r"'" == "\'") { println("succ"); };
+  if(r" " == "\t") { println("succ"); };
+  if(r"\" == "\\") { println("succ"); };
+}

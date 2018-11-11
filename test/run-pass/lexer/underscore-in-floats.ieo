@@ -1,0 +1,10 @@
+# - run:
+#     stdout: 
+#       - "succ"
+#       - "1.76"
+
+fun main() {
+  a = 1._76;
+  if(1.45 == 1.4__5) { println("succ"); };
+  println(a);
+}

@@ -1,0 +1,47 @@
+# - run:
+#     stdin:
+#       - "3"
+#       - "24 1"
+#       - "4358 754"
+#       - "305 794"
+#     stdout: 
+#       - "34"
+#       - "1998"
+#       - "1"
+
+# https://www.spoj.com/problems/ADDREV/
+
+fun main() {
+    n = int(scanln());
+    i = 0;
+    while(i < n) {
+        line_process();
+        i = i + 1;
+    }
+}
+
+fun line_process() {
+    l = scanln();
+    pos = find (" ", l);
+    reverse_add(cut(0, pos, l), cut(pos + 1, len(l), l));
+}
+
+fun reverse_add(a, b) {
+    a = reverse(a);
+    b = reverse(b);
+    println(reverse(str(int(a) + int(b))));
+}
+
+fun reverse(s) {
+    reverse = "";
+    len = len(s);
+    i = 0;
+    while(i < len) {
+        reverse = reverse + cut(len - i - 1, len - i, s);
+        i = i + 1;
+    }
+    while(cut(0, 1, reverse) == "0") {
+        reverse = (1, len(reverse), reverse);
+    }
+    reverse;
+}

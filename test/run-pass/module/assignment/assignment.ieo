@@ -1,0 +1,8 @@
+# - run:
+#     stdout: 
+#       - "4"
+
+fun main() {
+  a = 4;
+  println(a);
+}

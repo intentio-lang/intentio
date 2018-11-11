@@ -1,0 +1,16 @@
+# - run:
+#     stdin:
+#       - "2"
+#       - "2"
+#     stdout:
+#       - "4"
+
+fun main() {
+  a = int(scanln());
+  b = int(scanln());
+  println(add(a, b));
+}
+
+fun add(a, b) {
+  a + b;
+}

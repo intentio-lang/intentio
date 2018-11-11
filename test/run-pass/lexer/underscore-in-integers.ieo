@@ -1,0 +1,10 @@
+# - run:
+#     stdout: 
+#       - "succ"
+#       - "123456789"
+
+fun main() {
+  a = 123_456__789;
+  if(12345 == 1___234_5_) { println("succ"); };
+  println(a);
+}

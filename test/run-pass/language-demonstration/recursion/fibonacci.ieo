@@ -1,0 +1,20 @@
+# - run:
+#     stdin:
+#       - "8"
+#     stdout: 
+#       - "21"
+
+fun main() {
+    n = int(scanln());
+    println(str(fibonacci(n)));
+}
+
+fun fibonacci(n) {
+    if(n < 0) { 
+        println("The number should be non-negative"); 
+        return fail None; 
+    }
+    if(n == 0) { return 0; }
+    if(n == 1) { return 1; }
+    return fibonacci(n - 1) + fibonacci(n - 2);
+}

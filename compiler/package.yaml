@@ -21,6 +21,7 @@ dependencies:
   - text
   - transformers
   - typed-process
+  - unordered-containers
 
 library:
   source-dirs: src

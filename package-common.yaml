@@ -23,7 +23,10 @@
   - ApplicativeDo
   - BangPatterns
   - DefaultSignatures
+  - DeriveFoldable
+  - DeriveFunctor
   - DeriveGeneric
+  - DeriveTraversable
   - FlexibleContexts
   - FlexibleInstances
   - FunctionalDependencies

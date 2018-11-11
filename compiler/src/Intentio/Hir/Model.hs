@@ -50,7 +50,7 @@ data Module a = Module
   , _moduleBodies     :: IM.IntMap (Body a)
   , _moduleBodyIds    :: [BodyId]
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (Module a)
 instance FromJSON a => FromJSON (Module a)
@@ -71,7 +71,7 @@ data Item a = Item
   , _itemName       :: Maybe ItemName
   , _itemKind       :: ItemKind a
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (Item a)
 instance FromJSON a => FromJSON (Item a)
@@ -85,7 +85,7 @@ instance (Eq a, Show a) => C.Item (Item a) where
 data ItemKind a
   = ImportItem ModuleName ItemName
   | FnItem BodyId
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (ItemKind a)
 instance FromJSON a => FromJSON (ItemKind a)
@@ -97,7 +97,7 @@ data Body a = Body
   , _bodyVarIds  :: [VarId]
   , _bodyValue   :: Expr a
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (Body a)
 instance FromJSON a => FromJSON (Body a)
@@ -110,7 +110,7 @@ data Var a = Var
   , _varId    :: VarId
   , _varIdent :: Ident a
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (Var a)
 instance FromJSON a => FromJSON (Var a)
@@ -119,14 +119,14 @@ instance HasSourcePos (Var a) where
   _sourcePos = _sourcePos . _varIdent
 
 newtype Param a = Param { _paramVarId :: VarId }
-  deriving (Show, Eq, Generic, ToJSON, FromJSON)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable, ToJSON, FromJSON)
 
 data Expr a = Expr
   { _exprAnn       :: a
   , _exprSourcePos :: SourcePos
   , _exprKind      :: ExprKind a
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (Expr a)
 instance FromJSON a => FromJSON (Expr a)
@@ -145,7 +145,7 @@ data ExprKind a
   | IfExpr (Expr a) (Expr a) (Maybe (Expr a))
   | AssignExpr VarId (Expr a)
   | ReturnExpr (Expr a)
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (ExprKind a)
 instance FromJSON a => FromJSON (ExprKind a)
@@ -155,7 +155,7 @@ data Ident a = Ident
   , _identSourcePos :: SourcePos
   , _identName      :: Text
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (Ident a)
 instance FromJSON a => FromJSON (Ident a)
@@ -168,7 +168,7 @@ data Lit a = Lit
   , _litSourcePos :: SourcePos
   , _litKind      :: LitKind
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (Lit a)
 instance FromJSON a => FromJSON (Lit a)
@@ -178,7 +178,7 @@ instance HasSourcePos (Lit a) where
 
 data LitKind
   = IntegerLit Integer
-  | FloatLit Double
+  | FloatLit Scientific
   | StringLit Text
   | RegexLit Text
   | NoneLit
@@ -192,7 +192,7 @@ data Block a = Block
   , _blockSourcePos :: SourcePos
   , _blockExprs     :: [Expr a]
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (Block a)
 instance FromJSON a => FromJSON (Block a)
@@ -205,7 +205,7 @@ data Path a = Path
   , _pathSourcePos :: SourcePos
   , _pathKind      :: PathKind a
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (Path a)
 instance FromJSON a => FromJSON (Path a)
@@ -216,7 +216,7 @@ instance HasSourcePos (Path a) where
 data PathKind a
   = Local VarId
   | Global ItemId
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (PathKind a)
 instance FromJSON a => FromJSON (PathKind a)
@@ -226,7 +226,7 @@ data UnOp a = UnOp
   , _unOpSourcePos :: SourcePos
   , _unOpKind      :: UnOpKind
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (UnOp a)
 instance FromJSON a => FromJSON (UnOp a)
@@ -247,7 +247,7 @@ data BinOp a = BinOp
   , _binOpSourcePos :: SourcePos
   , _binOpKind      :: BinOpKind
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (BinOp a)
 instance FromJSON a => FromJSON (BinOp a)

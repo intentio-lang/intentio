@@ -294,7 +294,7 @@ integer = (lexeme . try) grammar >>= mktt TInteger <?> "integer literal"
     z      <- char '0'
     k      <- char' c
     (t, v) <- p
-    return (z `cons` k `cons` t, v)
+    return (z <| k <| t, v)
 
 -- | Parse any valid floating-point literal.
 float :: Parser (Token, Scientific)
@@ -314,7 +314,7 @@ float = (lexeme . try) grammar >>= mktt TFloat <?> "floating-point literal"
   pDot = do
     d        <- char '.'
     (vt, vv) <- decimalNum
-    return (d `cons` vt, vv)
+    return (d <| vt, vv)
 
   optExp   = option ("", 0) exponent
 
@@ -391,7 +391,7 @@ irawstring :: Parser (Text, Text)
 irawstring = do
   r      <- char 'r'
   (t, v) <- rawstring' 0
-  return (r `cons` t, v)
+  return (r <| t, v)
  where
   rawstring' :: Int -> Parser (Text, Text)
   rawstring' n = pQuot n <|> pHash n
@@ -403,7 +403,7 @@ irawstring = do
     l      <- char c
     (t, v) <- p
     r      <- char c
-    return ((l `cons` t) `snoc` r, v)
+    return ((l <| t) |> r, v)
 
   rawstring'' :: Int -> Parser (Text, Text)
   rawstring'' n = many rwsany <&> toS <&> \t -> (t, t)

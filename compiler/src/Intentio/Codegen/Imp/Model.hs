@@ -57,7 +57,7 @@ data Body a = Body
   , _bodyVarIds :: [VarId]
   , _bodyBlock  :: Block a
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (Body a)
 instance FromJSON a => FromJSON (Body a)
@@ -66,7 +66,7 @@ data Block a = Block
   { _blockAnn   :: a
   , _blockStmts :: [Stmt a]
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (Block a)
 instance FromJSON a => FromJSON (Block a)
@@ -75,7 +75,7 @@ data Stmt a = Stmt
   { _stmtAnn  :: a
   , _stmtKind :: StmtKind a
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (Stmt a)
 instance FromJSON a => FromJSON (Stmt a)
@@ -85,7 +85,7 @@ data StmtKind a
   | WhileStmt VarId (Block a)
   | IfStmt VarId (Block a)
   | ReturnStmt VarId
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (StmtKind a)
 instance FromJSON a => FromJSON (StmtKind a)
@@ -94,7 +94,7 @@ data Expr a = Expr
   { _exprAnn  :: a
   , _exprKind :: ExprKind a
   }
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (Expr a)
 instance FromJSON a => FromJSON (Expr a)
@@ -106,7 +106,7 @@ data ExprKind a
   | BinExpr BinOpKind VarId
   | CallGlobalExpr ItemId [VarId]
   | CallLocalExpr VarId [VarId]
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (ExprKind a)
 instance FromJSON a => FromJSON (ExprKind a)

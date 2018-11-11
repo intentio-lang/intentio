@@ -33,14 +33,14 @@ import qualified Intentio.Hir                  as H
 
 type Emit r = ReaderT r CompilePure
 
-type ModuleEmit  = Emit ModuleContext
-type ItemEmit    = Emit ItemContext
-type BodyEmit    = Emit BodyContext
+type ModuleEmit = Emit ModuleContext
+type ItemEmit = Emit ItemContext
+type BodyEmit = Emit BodyContext
 type ImpBodyEmit = Emit ImpBodyContext
 
-type ModuleContext  = H.Module ()
-type ItemContext    = (H.Module (), H.Item ())
-type BodyContext    = (H.Module (), H.Item (), H.Body ())
+type ModuleContext = H.Module ()
+type ItemContext = (H.Module (), H.Item ())
+type BodyContext = (H.Module (), H.Item (), H.Body ())
 type ImpBodyContext = (H.Module (), H.Item (), I.Body ())
 
 runModuleEmit :: ModuleEmit a -> H.Module () -> CompilePure a

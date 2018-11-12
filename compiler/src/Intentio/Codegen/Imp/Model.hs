@@ -99,6 +99,9 @@ instance FromJSON a => FromJSON (Expr a)
 data ExprKind a
   = PathExpr (Path a)
   | LitExpr (Lit a)
+  | SuccExpr VarId
+  | FailExpr VarId
+  | NotExpr VarId
   | UnExpr UnOpKind VarId
   | BinExpr BinOpKind VarId VarId
   | CallGlobalExpr ItemId [VarId]

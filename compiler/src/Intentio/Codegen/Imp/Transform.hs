@@ -93,13 +93,13 @@ impExpr expr' = case expr' ^. H.exprKind of
 
   H.BlockExpr b -> lift $ pushIceFor expr' "Imp: BlockExpr not implemented."
 
-  H.SuccExpr  e -> lift $ pushIceFor expr' "Imp: SuccExpr not implemented."
+  H.SuccExpr  e -> impExpr e >>= pushExpr . I.SuccExpr
 
-  H.FailExpr  e -> lift $ pushIceFor expr' "Imp: FailExpr not implemented."
+  H.FailExpr  e -> impExpr e >>= pushExpr . I.FailExpr
 
   H.UnExpr o' e -> case o' ^. H.unOpKind of
     H.UnNeg -> go I.UnNeg
-    H.UnNot -> lift $ pushIceFor o' "Imp: 'not' not implemented."
+    H.UnNot -> impExpr e >>= pushExpr . I.NotExpr
     where go o = impExpr e >>= pushExpr . I.UnExpr o
 
   H.BinExpr o' l r -> case o' ^. H.binOpKind of

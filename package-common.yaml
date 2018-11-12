@@ -39,6 +39,7 @@
   - NoImplicitPrelude
   - OverloadedStrings
   - PartialTypeSignatures
+  - PatternSynonyms
   - RankNTypes
   - RecordWildCards
   - ScopedTypeVariables

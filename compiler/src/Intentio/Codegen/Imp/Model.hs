@@ -38,10 +38,6 @@ import           Intentio.Hir                  as X
                                                 , _FloatLit
                                                 , _StringLit
                                                 , _NoneLit
-                                                , Path(..)
-                                                , pathAnn
-                                                , pathKind
-                                                , PathKind(..)
                                                 , _ToVar
                                                 , _ToItem
                                                 )
@@ -80,7 +76,7 @@ data StmtKind a
   = ExprStmt VarId (Expr a)
   | AssignStmt VarId VarId
   | WhileStmt VarId (Block a)
-  | IfStmt VarId (Block a)
+  | IfStmt VarId (Block a) (Block a)
   | ReturnStmt VarId
   deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
@@ -97,15 +93,16 @@ instance ToJSON a => ToJSON (Expr a)
 instance FromJSON a => FromJSON (Expr a)
 
 data ExprKind a
-  = PathExpr (Path a)
+  = VarExpr VarId
+  | BoxItemExpr ModuleName ItemName
   | LitExpr (Lit a)
   | SuccExpr VarId
   | FailExpr VarId
   | NotExpr VarId
   | UnExpr UnOpKind VarId
   | BinExpr BinOpKind VarId VarId
-  | CallGlobalExpr ItemId [VarId]
-  | CallLocalExpr VarId [VarId]
+  | CallStaticExpr ModuleName ItemName [VarId]
+  | CallDynamicExpr VarId [VarId]
   deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (ExprKind a)

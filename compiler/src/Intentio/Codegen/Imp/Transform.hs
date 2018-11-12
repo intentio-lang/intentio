@@ -43,17 +43,17 @@ withBlock f = do
   stmts <- currentStmts <<.= prevStmts
   return $ I.Block () (reverse stmts)
 
-pushStmt' :: I.Stmt () -> ImpM ()
-pushStmt' s = currentStmts %= cons s
-
 pushStmt :: I.StmtKind () -> ImpM ()
-pushStmt = pushStmt' . I.Stmt ()
+pushStmt s = currentStmts %= cons (I.Stmt () s)
 
-pushExpr' :: I.ExprKind () -> I.VarId -> ImpM I.VarId
-pushExpr' e v = pushStmt (I.ExprStmt v (I.Expr () e)) $> v
+pushExpr' :: I.VarId -> I.ExprKind () -> ImpM ()
+pushExpr' v e = pushStmt (I.ExprStmt v (I.Expr () e))
 
 pushExpr :: I.ExprKind () -> ImpM I.VarId
-pushExpr e = allocVar >>= pushExpr' e
+pushExpr e = do
+  v <- allocVar
+  pushExpr' v e
+  return v
 
 allocVar :: ImpM I.VarId
 allocVar = do
@@ -63,6 +63,11 @@ allocVar = do
   let _varName      = cTmpVarName _varId
   impVars %= cons I.Var { .. }
   return _varId
+
+pattern DirectPath :: H.PathKind a -> H.Expr a
+-- brittany-disable-next-binding
+pattern DirectPath pk <- (preview (H.exprKind . H._PathExpr . H.pathKind)
+                          -> Just pk)
 
 --------------------------------------------------------------------------------
 -- Imp transformation code
@@ -87,20 +92,22 @@ impBlock = withBlock . mapM_ impExpr . view H.blockExprs
 
 impExpr :: H.Expr () -> ImpM I.VarId
 impExpr expr' = case expr' ^. H.exprKind of
-  H.PathExpr  p -> pushExpr $ I.PathExpr p
+  H.PathExpr p' -> case p' ^. H.pathKind of
+    H.ToVar v    -> return v
+    H.ToItem _ _ -> lift $ pushIceFor p' "Imp: Boxing items not implemented."
 
   H.LitExpr   l -> pushExpr $ I.LitExpr l
 
-  H.BlockExpr b -> lift $ pushIceFor expr' "Imp: BlockExpr not implemented."
+  H.BlockExpr _ -> lift $ pushIceFor expr' "Imp: BlockExpr not implemented."
 
-  H.SuccExpr  e -> impExpr e >>= pushExpr . I.SuccExpr
+  H.SuccExpr  e -> I.SuccExpr <$> impExpr e >>= pushExpr
 
-  H.FailExpr  e -> impExpr e >>= pushExpr . I.FailExpr
+  H.FailExpr  e -> I.FailExpr <$> impExpr e >>= pushExpr
 
   H.UnExpr o' e -> case o' ^. H.unOpKind of
     H.UnNeg -> go I.UnNeg
-    H.UnNot -> impExpr e >>= pushExpr . I.NotExpr
-    where go o = impExpr e >>= pushExpr . I.UnExpr o
+    H.UnNot -> I.NotExpr <$> impExpr e >>= pushExpr
+    where go o = I.UnExpr o <$> impExpr e >>= pushExpr
 
   H.BinExpr o' l r -> case o' ^. H.binOpKind of
     H.BinAdd  -> go I.BinAdd
@@ -118,22 +125,28 @@ impExpr expr' = case expr' ^. H.exprKind of
     H.BinXor  -> go I.BinXor
     H.BinAnd  -> lift $ pushIceFor o' "Imp: 'and' not implemented."
     H.BinOr   -> lift $ pushIceFor o' "Imp: 'or' not implemented."
-   where
-    go o = do
-      vl <- impExpr l
-      vr <- impExpr r
-      pushExpr $ I.BinExpr o vl vr
+    where go o = I.BinExpr o <$> impExpr l <*> impExpr r >>= pushExpr
 
-  H.CallExpr callee args ->
-    lift $ pushIceFor expr' "Imp: CallExpr not implemented."
+  -- Optimization: calls directly to items do not require item boxing.
+  H.CallExpr (DirectPath (H.ToItem mName iName)) args -> do
+    r <- allocVar
+    let proc [] vs = pushExpr' r $ I.CallStaticExpr mName iName (reverse vs)
+        proc (a : as) vs = do
+          v  <- impExpr a
+          ib <- withBlock $ proc as (v : vs)
+          eb <- withBlock . pushStmt $ I.AssignStmt r v
+          pushStmt $ I.IfStmt v ib eb
+    proc args []
+    return r
 
-  H.WhileExpr cond block ->
-    lift $ pushIceFor expr' "Imp: WhileExpr not implemented."
+  H.CallExpr _ _ ->
+    lift $ pushIceFor expr' "Imp: dynamic CallExpr not implemented."
 
-  H.IfExpr cond ifExpr elseExpr ->
-    lift $ pushIceFor expr' "Imp: IfExpr not implemented."
+  H.WhileExpr _ _  -> lift $ pushIceFor expr' "Imp: WhileExpr not implemented."
 
-  H.AssignExpr v e -> impExpr e >>= pushStmt . I.AssignStmt v >> return v
+  H.IfExpr _ _ _   -> lift $ pushIceFor expr' "Imp: IfExpr not implemented."
+
+  H.AssignExpr v e -> I.AssignStmt v <$> impExpr e >>= pushStmt >> return v
 
   H.ReturnExpr e   -> do
     v <- impExpr e

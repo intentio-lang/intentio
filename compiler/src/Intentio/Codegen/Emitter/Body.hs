@@ -52,7 +52,7 @@ emitStmt stmt = case stmt ^. I.stmtKind of
   I.ExprStmt   v e -> emitExprStmt v e
   I.AssignStmt d s -> emitAssignStmt d s
   I.WhileStmt  v w -> emitWhileStmt v w
-  I.IfStmt     v w -> emitIfStmt v w
+  I.IfStmt c i e   -> emitIfStmt c i e
   I.ReturnStmt v   -> emitReturnStmt v
 
 emitExprStmt :: I.VarId -> I.Expr () -> W ()
@@ -70,7 +70,7 @@ emitAssignStmt dst src = do
 emitWhileStmt :: I.VarId -> I.Block () -> W ()
 emitWhileStmt = fail "Codegen for while statements is not implemented"
 
-emitIfStmt :: I.VarId -> I.Block () -> W ()
+emitIfStmt :: I.VarId -> I.Block () -> I.Block () -> W ()
 emitIfStmt = fail "Codegen for if statements is not implemented"
 
 emitReturnStmt :: I.VarId -> W ()

@@ -135,4 +135,7 @@ impExpr expr' = case expr' ^. H.exprKind of
 
   H.AssignExpr v e -> impExpr e >>= pushStmt . I.AssignStmt v >> return v
 
-  H.ReturnExpr e   -> lift $ pushIceFor expr' "Imp: ReturnExpr not implemented."
+  H.ReturnExpr e   -> do
+    v <- impExpr e
+    pushStmt $ I.ReturnStmt v
+    return v

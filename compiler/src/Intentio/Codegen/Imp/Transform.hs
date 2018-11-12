@@ -64,6 +64,9 @@ allocVar = do
   impVars %= cons I.Var { .. }
   return _varId
 
+emptyBlock :: I.Block ()
+emptyBlock = I.Block () []
+
 pattern DirectPath :: H.PathKind a -> H.Expr a
 -- brittany-disable-next-binding
 pattern DirectPath pk <- (preview (H.exprKind . H._PathExpr . H.pathKind)
@@ -142,9 +145,18 @@ impExpr expr' = case expr' ^. H.exprKind of
   H.CallExpr _ _ ->
     lift $ pushIceFor expr' "Imp: dynamic CallExpr not implemented."
 
-  H.WhileExpr _ _  -> lift $ pushIceFor expr' "Imp: WhileExpr not implemented."
+  H.WhileExpr _ _ -> lift $ pushIceFor expr' "Imp: WhileExpr not implemented."
 
-  H.IfExpr _ _ _   -> lift $ pushIceFor expr' "Imp: IfExpr not implemented."
+  H.IfExpr cond ifBlock elseBlockOpt -> do
+    r  <- allocVar
+    vc <- impExpr cond
+    ib <- withBlock $ impExpr ifBlock >>= pushStmt . I.AssignStmt r
+    eb <- case elseBlockOpt of
+      Just elseBlock ->
+        withBlock $ impExpr elseBlock >>= pushStmt . I.AssignStmt r
+      Nothing -> return emptyBlock
+    pushStmt $ I.IfStmt vc ib eb
+    return r
 
   H.AssignExpr v e -> I.AssignStmt v <$> impExpr e >>= pushStmt >> return v
 

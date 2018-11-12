@@ -77,7 +77,8 @@ instance ToJSON a => ToJSON (Stmt a)
 instance FromJSON a => FromJSON (Stmt a)
 
 data StmtKind a
-  = AssignStmt VarId (Expr a)
+  = ExprStmt VarId (Expr a)
+  | AssignStmt VarId VarId
   | WhileStmt VarId (Block a)
   | IfStmt VarId (Block a)
   | ReturnStmt VarId
@@ -99,7 +100,7 @@ data ExprKind a
   = PathExpr (Path a)
   | LitExpr (Lit a)
   | UnExpr UnOpKind VarId
-  | BinExpr BinOpKind VarId
+  | BinExpr BinOpKind VarId VarId
   | CallGlobalExpr ItemId [VarId]
   | CallLocalExpr VarId [VarId]
   deriving (Show, Eq, Generic, Functor, Foldable, Traversable)

@@ -6,6 +6,7 @@ module Intentio.Codegen.SymbolNames
   , cItemName
   , cImportedItemName
   , cVarName
+  , cTmpVarName
   )
 where
 
@@ -50,3 +51,6 @@ cItemName' modul item = mangle [modul ^. _Wrapped, item ^. _Wrapped]
 
 cVarName :: (Eq a, Show a) => H.Var a -> String
 cVarName var = var ^. H.varName & sanitize & toS
+
+cTmpVarName :: H.VarId -> Text
+cTmpVarName i = '%' <| show (i ^. H.unVarId)

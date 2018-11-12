@@ -49,16 +49,23 @@ emitBlock = mapM_ emitStmt . view I.blockStmts
 
 emitStmt :: I.Stmt () -> W ()
 emitStmt stmt = case stmt ^. I.stmtKind of
-  I.AssignStmt v e -> emitAssignStmt v e
+  I.ExprStmt   v e -> emitExprStmt v e
+  I.AssignStmt d s -> emitAssignStmt d s
   I.WhileStmt  v w -> emitWhileStmt v w
   I.IfStmt     v w -> emitIfStmt v w
   I.ReturnStmt v   -> emitReturnStmt v
 
-emitAssignStmt :: I.VarId -> I.Expr () -> W ()
-emitAssignStmt varId expr = do
+emitExprStmt :: I.VarId -> I.Expr () -> W ()
+emitExprStmt varId expr = do
   i <- emitVarIdById varId
   e <- emitExpr expr
   tellWT [citem| $id:i = $exp:e; |]
+
+emitAssignStmt :: I.VarId -> I.VarId -> W ()
+emitAssignStmt dst src = do
+  d <- emitVarIdById dst
+  s <- emitVarIdById src
+  tellWT [citem| $id:d = $id:s; |]
 
 emitWhileStmt :: I.VarId -> I.Block () -> W ()
 emitWhileStmt = fail "Codegen for while statements is not implemented"

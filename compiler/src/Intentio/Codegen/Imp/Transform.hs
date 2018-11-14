@@ -17,9 +17,9 @@ import qualified Intentio.Hir                  as H
 -- Imp monad
 
 data ImpState = ImpState
-  { _currentStmts  :: [I.Stmt ()]
-  , _impVars       :: [I.Var ()]
-  , _impVarCounter :: I.VarId
+  { _currentStmts   :: [I.Stmt ()]
+  , _impVars        :: [I.Var ()]
+  , _firstFreeVarId :: I.VarId
   }
 
 type ImpM a = StateT ImpState CompilePure a
@@ -32,9 +32,9 @@ makeLenses ''ImpState
 --------------------------------------------------------------------------------
 -- Imp monad utilities
 
-emptyImpState :: ImpState
-emptyImpState =
-  ImpState { _currentStmts = [], _impVars = [], _impVarCounter = toEnum 0 }
+emptyImpState :: I.VarId -> ImpState
+emptyImpState _firstFreeVarId =
+  ImpState { _currentStmts = [], _impVars = [], _firstFreeVarId }
 
 withBlock :: ImpM a -> ImpM (I.Block ())
 withBlock f = do
@@ -57,7 +57,9 @@ pushExpr e = do
 
 allocVar :: ImpM I.VarId
 allocVar = do
-  _varId <- impVarCounter <<%= succ
+  _varId <- preuses (impVars . _head . I.varId) succ >>= \case
+    Just i  -> return i
+    Nothing -> use firstFreeVarId
   let _varAnn       = ()
   let _varSourcePos = () ^. sourcePos
   let _varName      = cTmpVarName _varId
@@ -77,14 +79,20 @@ pattern DirectPath pk <- (preview (H.exprKind . H._PathExpr . H.pathKind)
 
 impTransform :: H.Body () -> CompilePure (I.Body ())
 impTransform b = do
-  (_bodyBlock, s) <- runStateT (impExprToBlock $ b ^. H.bodyValue) emptyImpState
+  let st = emptyImpState getFirstFreeVarId
+  (_bodyBlock, s) <- runStateT (impExprToBlock $ b ^. H.bodyValue) st
   let _bodyAnn    = ()
   let _bodyParams = b ^. H.bodyParams
-  let _bodyVars = foldl' (\m v -> m & at (v ^. I.varId . I.unVarId) ?~ v)
-                         (b ^. H.bodyVars)
-                         (s ^. impVars)
-  let _bodyVarIds = (b ^. H.bodyVarIds) <> (s ^. impVars <&> view I.varId)
+  let _bodyVars = foldl' addVar (b ^. H.bodyVars) (s ^. impVars)
+  let _bodyVarIds =
+        (b ^. H.bodyVarIds) <> (s ^. impVars <&> view I.varId & reverse)
   return I.Body { .. }
+ where
+  addVar m v = m & at (v ^. I.varId . I.unVarId) ?~ v
+
+  getFirstFreeVarId = case b ^. H.bodyVarIds of
+    [] -> I.VarId 0
+    vs -> succ . maximum $ vs
 
 impExprToBlock :: H.Expr () -> ImpM (I.Block ())
 impExprToBlock = withBlock . impExpr

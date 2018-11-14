@@ -70,7 +70,11 @@ emitWhileStmt :: I.VarId -> I.Block () -> ImpBodyEmit C.BlockItem
 emitWhileStmt = fail "Codegen for while statements is not implemented"
 
 emitIfStmt :: I.VarId -> I.Block () -> I.Block () -> ImpBodyEmit C.BlockItem
-emitIfStmt = fail "Codegen for if statements is not implemented"
+emitIfStmt cond ifBlock elseBlock = do
+  c  <- emitVarIdById cond
+  ib <- emitBlock ifBlock
+  eb <- emitBlock elseBlock
+  return [citem| if( $id:c ) { $items:ib } else { $items:eb } |]
 
 emitReturnStmt :: I.VarId -> ImpBodyEmit C.BlockItem
 emitReturnStmt varId = do

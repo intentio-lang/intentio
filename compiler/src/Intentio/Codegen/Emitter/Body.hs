@@ -16,10 +16,7 @@ import           Language.C.Quote.C             ( cexp
                                                 )
 
 import           Intentio.Codegen.Emitter.Monad ( ImpBodyEmit
-                                                , WT
                                                 , askImpBody
-                                                , execWT
-                                                , tellWT
                                                 )
 import           Intentio.Codegen.Emitter.Util  ( tyIeoResult
                                                 , getImpVarById
@@ -29,29 +26,27 @@ import           Intentio.Codegen.SymbolNames   ( cItemName'
                                                 )
 import qualified Intentio.Codegen.Imp          as I
 
-type W a = WT C.BlockItem ImpBodyEmit a
-
 emitImpBody :: ImpBodyEmit [C.BlockItem]
-emitImpBody = execWT (emitVars >> emitBodyBlock)
+emitImpBody = (<>) <$> emitVars <*> emitBodyBlock
 
-emitVars :: W ()
+emitVars :: ImpBodyEmit [C.BlockItem]
 emitVars = do
   body <- askImpBody
   let allVarIds      = body ^. I.bodyVarIds
   let paramVarIds    = body ^. I.bodyParams <&> view I.paramVarId
   let nonParamVarIds = allVarIds List.\\ paramVarIds
-  forM_ nonParamVarIds $ getImpVarById >=> emitVar
+  forM nonParamVarIds $ fmap emitVar . getImpVarById
 
-emitVar :: I.Var () -> W ()
-emitVar var = tellWT [citem| $ty:tyIeoResult $id:v; |] where v = cVarName var
+emitVar :: I.Var () -> C.BlockItem
+emitVar var = [citem| $ty:tyIeoResult $id:v; |] where v = cVarName var
 
-emitBodyBlock :: W ()
+emitBodyBlock :: ImpBodyEmit [C.BlockItem]
 emitBodyBlock = askImpBody <&> view I.bodyBlock >>= emitBlock
 
-emitBlock :: I.Block () -> W ()
-emitBlock = mapM_ emitStmt . view I.blockStmts
+emitBlock :: I.Block () -> ImpBodyEmit [C.BlockItem]
+emitBlock = mapM emitStmt . view I.blockStmts
 
-emitStmt :: I.Stmt () -> W ()
+emitStmt :: I.Stmt () -> ImpBodyEmit C.BlockItem
 emitStmt stmt = case stmt ^. I.stmtKind of
   I.ExprStmt   v e -> emitExprStmt v e
   I.AssignStmt d s -> emitAssignStmt d s
@@ -59,36 +54,36 @@ emitStmt stmt = case stmt ^. I.stmtKind of
   I.IfStmt c i e   -> emitIfStmt c i e
   I.ReturnStmt v   -> emitReturnStmt v
 
-emitExprStmt :: I.VarId -> I.Expr () -> W ()
+emitExprStmt :: I.VarId -> I.Expr () -> ImpBodyEmit C.BlockItem
 emitExprStmt varId expr = do
   i <- emitVarIdById varId
   e <- emitExpr expr
-  tellWT [citem| $id:i = $exp:e; |]
+  return [citem| $id:i = $exp:e; |]
 
-emitAssignStmt :: I.VarId -> I.VarId -> W ()
+emitAssignStmt :: I.VarId -> I.VarId -> ImpBodyEmit C.BlockItem
 emitAssignStmt dst src = do
   d <- emitVarIdById dst
   s <- emitVarIdById src
-  tellWT [citem| $id:d = $id:s; |]
+  return [citem| $id:d = $id:s; |]
 
-emitWhileStmt :: I.VarId -> I.Block () -> W ()
+emitWhileStmt :: I.VarId -> I.Block () -> ImpBodyEmit C.BlockItem
 emitWhileStmt = fail "Codegen for while statements is not implemented"
 
-emitIfStmt :: I.VarId -> I.Block () -> I.Block () -> W ()
+emitIfStmt :: I.VarId -> I.Block () -> I.Block () -> ImpBodyEmit C.BlockItem
 emitIfStmt = fail "Codegen for if statements is not implemented"
 
-emitReturnStmt :: I.VarId -> W ()
+emitReturnStmt :: I.VarId -> ImpBodyEmit C.BlockItem
 emitReturnStmt varId = do
   i <- emitVarIdById varId
-  tellWT [citem| return $id:i; |]
+  return [citem| return $id:i; |]
 
-emitVarIdById :: I.VarId -> W C.Id
+emitVarIdById :: I.VarId -> ImpBodyEmit C.Id
 emitVarIdById = getImpVarById >=> emitVarId
 
-emitVarId :: I.Var () -> W C.Id
+emitVarId :: I.Var () -> ImpBodyEmit C.Id
 emitVarId var = return $ C.Id i noLoc where i = var ^. I.varName & toS
 
-emitExpr :: I.Expr () -> W C.Exp
+emitExpr :: I.Expr () -> ImpBodyEmit C.Exp
 emitExpr expr = case expr ^. I.exprKind of
   I.VarExpr v -> do
     i <- emitVarIdById v
@@ -143,7 +138,7 @@ emitExpr expr = case expr ^. I.exprKind of
 
   I.CallDynamicExpr _ _ -> fail "Codegen: dynamic CallExpr not implemented."
 
-emitLitExpr :: I.Lit () -> W C.Exp
+emitLitExpr :: I.Lit () -> ImpBodyEmit C.Exp
 emitLitExpr lit = case lit ^. I.litKind of
   I.NoneLit      -> return [cexp| ieo_none |]
   I.IntegerLit x -> return [cexp| ieo_int_new( $llint:x ) |]

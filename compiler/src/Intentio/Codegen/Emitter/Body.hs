@@ -7,6 +7,7 @@ where
 
 import           Intentio.Prelude
 
+import qualified Data.ByteString               as BS
 import qualified Data.List                     as List
 import           Data.Loc                       ( noLoc )
 import           Data.Scientific                ( toBoundedRealFloat )
@@ -74,7 +75,7 @@ emitIfStmt cond ifBlock elseBlock = do
   c  <- emitVarIdById cond
   ib <- emitBlock ifBlock
   eb <- emitBlock elseBlock
-  return [citem| if( $id:c ) { $items:ib } else { $items:eb } |]
+  return [citem| if (($id:c).succ) { $items:ib } else { $items:eb } |]
 
 emitReturnStmt :: I.VarId -> ImpBodyEmit C.BlockItem
 emitReturnStmt varId = do
@@ -98,24 +99,24 @@ emitExpr expr = case expr ^. I.exprKind of
   I.LitExpr  lit    -> emitLitExpr lit
 
   I.SuccExpr v      -> do
-    i <- emitVarIdById v
-    return [cexp| ($ty:tyIeoResult){ .succ = true, .term = ($id:i).term } |]
+    i <- idTerm <$> emitVarIdById v
+    return [cexp| ($ty:tyIeoResult){ .succ = true, .term = $exp:i } |]
 
   I.FailExpr v -> do
-    i <- emitVarIdById v
-    return [cexp| ($ty:tyIeoResult){ .succ = false, .term = ($id:i).term } |]
+    i <- idTerm <$> emitVarIdById v
+    return [cexp| ($ty:tyIeoResult){ .succ = false, .term = $exp:i } |]
 
   I.NotExpr v -> do
     i <- emitVarIdById v
-    let s = [cexp| !($id:i).succ |]
-    let t = [cexp| ($id:i).term |]
+    let s = idSucc i
+    let t = idTerm i
     return [cexp| ($ty:tyIeoResult){ .succ = $exp:s, .term = $exp:t } |]
 
   I.UnExpr o v -> do
     let (f :: String) = case o of
           I.UnNeg -> "ieo_neg"
-    i <- emitVarIdById v
-    return [cexp| $id:f ( $id:i ) |]
+    i <- idTerm <$> emitVarIdById v
+    return [cexp| $id:f ( $exp:i ) |]
 
   I.BinExpr o l r -> do
     let (f :: String) = case o of
@@ -131,13 +132,13 @@ emitExpr expr = case expr ^. I.exprKind of
           I.BinSEq  -> "ieo_seq"
           I.BinSNeq -> "ieo_sneq"
           I.BinSub  -> "ieo_sub"
-    li <- emitVarIdById l
-    ri <- emitVarIdById r
-    return [cexp| $id:f ( ($id:li).succ , $id:ri ) |]
+    li <- idTerm <$> emitVarIdById l
+    ri <- idTerm <$> emitVarIdById r
+    return [cexp| $id:f ( $exp:li , $exp:ri ) |]
 
   I.CallStaticExpr mName iName args -> do
     let f = flip C.Var noLoc $ C.Id (cItemName' mName iName) noLoc
-    cargs <- fmap (flip C.Var noLoc) <$> mapM emitVarIdById args
+    cargs <- fmap idTerm <$> mapM emitVarIdById args
     return $ C.FnCall f cargs noLoc
 
   I.CallDynamicExpr _ _ -> fail "Codegen: dynamic CallExpr not implemented."
@@ -153,5 +154,13 @@ emitLitExpr lit = case lit ^. I.litKind of
         <> show x
         <> "' is to big for safe code generation."
     Right f -> return [cexp| ieo_float_new( $ldouble:f ) |]
-  I.StringLit x -> return [cexp| ieo_string_new( $string:s ) |]
-    where s = toS x
+  I.StringLit x -> return [cexp| ieo_string_new( $string:s , $llint:n ) |]
+   where
+    s = toS x
+    n = BS.length (toS x)
+
+idSucc :: C.Id -> C.Exp
+idSucc i = [cexp| ($id:i).succ |]
+
+idTerm :: C.Id -> C.Exp
+idTerm i = [cexp| ($id:i).term |]

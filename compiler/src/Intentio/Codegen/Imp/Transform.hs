@@ -126,8 +126,26 @@ impExpr expr' = case expr' ^. H.exprKind of
     H.BinSNeq -> go I.BinSNeq
     H.BinSub  -> go I.BinSub
     H.BinXor  -> go I.BinXor
-    H.BinAnd  -> lift $ pushIceFor o' "Imp: 'and' not implemented."
-    H.BinOr   -> lift $ pushIceFor o' "Imp: 'or' not implemented."
+
+    H.BinAnd  -> do
+      rs <- allocVar
+      a  <- impExpr l
+      ib <- withBlock $ do
+        b <- impExpr r
+        pushStmt $ I.AssignStmt rs b
+      eb <- withBlock . pushStmt $ I.AssignStmt rs a
+      pushStmt $ I.IfStmt a ib eb
+      return rs
+
+    H.BinOr -> do
+      rs <- allocVar
+      a  <- impExpr l
+      ib <- withBlock . pushStmt $ I.AssignStmt rs a
+      eb <- withBlock $ do
+        b <- impExpr r
+        pushStmt $ I.AssignStmt rs b
+      pushStmt $ I.IfStmt a ib eb
+      return rs
     where go o = I.BinExpr o <$> impExpr l <*> impExpr r >>= pushExpr
 
   -- Optimization: calls directly to items do not require item boxing.

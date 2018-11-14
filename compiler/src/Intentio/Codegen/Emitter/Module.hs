@@ -21,7 +21,6 @@ import           Intentio.Codegen.Emitter.Item  ( emitItemHeader
                                                 , emitItemSource
                                                 )
 import           Intentio.Codegen.Emitter.Monad ( ModuleEmit
-                                                , ItemEmit
                                                 , askModule
                                                 , runModuleEmit
                                                 , runItemEmit
@@ -42,25 +41,21 @@ emitModuleSource :: H.Module () -> CompilePure (CModuleDef CModuleSource)
 emitModuleSource = runModuleEmit emitModuleSource'
 
 emitModuleHeader' :: ModuleEmit (CModuleDef CModuleHeader)
-emitModuleHeader' = emitModule emitItemHeader
+emitModuleHeader' = emitModule
 
 emitModuleSource' :: ModuleEmit (CModuleDef CModuleSource)
-emitModuleSource' = emitModule emitItemSource
+emitModuleSource' = emitModule
 
 emitModule
   :: forall t
-   . (GetCModuleFileName t, ImportEmitter t)
-  => ItemEmit [C.Definition]
-  -> ModuleEmit (CModuleDef t)
-emitModule itemEmitter = do
+   . (GetCModuleFileName t, ModuleEmitter t)
+  => ModuleEmit (CModuleDef t)
+emitModule = do
   _cModuleDefSourcePos    <- view H.moduleSourcePos
   _cModuleDefIntentioName <- view H.moduleName
   _cModuleDefFileName     <- cModuleFileName @t <$> view H.moduleName
   imports                 <- emitImports @t
-  defs                    <-
-    view H.moduleItemIds
-    >>= mapM (getItemById >=> runItemEmit itemEmitter)
-    <&> concat
+  defs                    <- emitItems @t
 
   let headerText =
         toS $ buildHeaderComment _cModuleDefFileName _cModuleDefIntentioName
@@ -74,13 +69,18 @@ emitModule itemEmitter = do
 
   return CModuleDef { .. }
 
-class ImportEmitter t where
+class ModuleEmitter t where
   emitImports :: ModuleEmit [C.Definition]
+  emitItems :: ModuleEmit [C.Definition]
 
-instance ImportEmitter CModuleHeader where
+instance ModuleEmitter CModuleHeader where
   emitImports = pure []
 
-instance ImportEmitter CModuleSource where
+  emitItems = view H.moduleItemIds
+    >>= mapM (getItemById >=> runItemEmit emitItemHeader)
+    <&> concat
+
+instance ModuleEmitter CModuleSource where
   emitImports =
     concatMap (\t -> [cunit| $esc:t |])
       .   toList
@@ -88,6 +88,12 @@ instance ImportEmitter CModuleSource where
       .   view H.moduleImports
       <$> askModule
     where inc n = "#include \"" <> cModuleFileName @CModuleHeader n <> "\""
+
+  emitItems = do
+    items <- view H.moduleItemIds >>= mapM getItemById
+    hs <- forM items $ runItemEmit emitItemHeader
+    ss <- forM items $ runItemEmit emitItemSource
+    return $ concat (hs <> ss)
 
 -- brittany-disable-next-binding
 buildHeaderComment :: FilePath -> H.ModuleName -> Text

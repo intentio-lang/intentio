@@ -85,7 +85,7 @@ emitVarIdById :: I.VarId -> ImpBodyEmit C.Id
 emitVarIdById = getImpVarById >=> emitVarId
 
 emitVarId :: I.Var () -> ImpBodyEmit C.Id
-emitVarId var = return $ C.Id i noLoc where i = var ^. I.varName & toS
+emitVarId var = return $ C.Id i noLoc where i = cVarName var
 
 emitExpr :: I.Expr () -> ImpBodyEmit C.Exp
 emitExpr expr = case expr ^. I.exprKind of
@@ -133,7 +133,7 @@ emitExpr expr = case expr ^. I.exprKind of
           I.BinSub  -> "ieo_sub"
     li <- emitVarIdById l
     ri <- emitVarIdById r
-    return [cexp| $id:f ( $id:li , $id:ri ) |]
+    return [cexp| $id:f ( ($id:li).succ , $id:ri ) |]
 
   I.CallStaticExpr mName iName args -> do
     let f = flip C.Var noLoc $ C.Id (cItemName' mName iName) noLoc

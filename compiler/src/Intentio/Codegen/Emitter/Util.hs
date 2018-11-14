@@ -2,6 +2,7 @@
 
 module Intentio.Codegen.Emitter.Util
   ( tyIeoTerm
+  , tyIeoTermPtr
   , tyIeoResult
   , getItemById
   , getBodyById
@@ -27,6 +28,9 @@ import qualified Intentio.Hir                  as H
 
 tyIeoTerm :: C.Type
 tyIeoTerm = [cty| typename IeoTerm |]
+
+tyIeoTermPtr :: C.Type
+tyIeoTermPtr = [cty| typename IeoTerm * |]
 
 tyIeoResult :: C.Type
 tyIeoResult = [cty| typename IeoResult |]

@@ -21,7 +21,7 @@ import           Intentio.Codegen.Emitter.Monad ( ItemEmit
                                                 , askItem
                                                 , askBody
                                                 )
-import           Intentio.Codegen.Emitter.Util  ( tyIeoTerm
+import           Intentio.Codegen.Emitter.Util  ( tyIeoTermPtr
                                                 , tyIeoResult
                                                 , getBodyById
                                                 , getMangledItemName
@@ -63,7 +63,7 @@ emitFnParams = (view H.bodyParams <$> askBody) >>= mapM emitFnParam
 emitFnParam :: H.Param () -> BodyEmit C.Param
 emitFnParam param = do
   v <- cVarName <$> getParamVar param
-  return [cparam| $ty:tyIeoTerm $id:v |]
+  return [cparam| $ty:tyIeoTermPtr $id:v |]
 
 emitFnSource :: H.BodyId -> ItemEmit [C.Definition]
 emitFnSource bodyId = do

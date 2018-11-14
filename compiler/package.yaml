@@ -18,6 +18,7 @@ dependencies:
   - megaparsec
   - mtl
   - neat-interpolation
+  - scientific
   - srcloc
   - text
   - transformers

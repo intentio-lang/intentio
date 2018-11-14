@@ -125,7 +125,6 @@ impExpr expr' = case expr' ^. H.exprKind of
     H.BinSEq  -> go I.BinSEq
     H.BinSNeq -> go I.BinSNeq
     H.BinSub  -> go I.BinSub
-    H.BinXor  -> go I.BinXor
 
     H.BinAnd  -> do
       rs <- allocVar
@@ -146,6 +145,8 @@ impExpr expr' = case expr' ^. H.exprKind of
         pushStmt $ I.AssignStmt rs b
       pushStmt $ I.IfStmt a ib eb
       return rs
+
+    H.BinXor -> lift $ pushIceFor o' "Imp: 'xor' not implemented."
     where go o = I.BinExpr o <$> impExpr l <*> impExpr r >>= pushExpr
 
   -- Optimization: calls directly to items do not require item boxing.

@@ -53,7 +53,7 @@ getImpVarById varId = do
     Nothing -> fail $ "Bad Imp: missing variable #" <> show varId
 
 getMangledItemName :: MonadModuleEmit m => H.Item () -> m String
-getMangledItemName item = toS . flip cItemName item <$> askModule
+getMangledItemName item = flip cItemName item <$> askModule
 
 getParamVar :: MonadBodyEmit m => H.Param () -> m (H.Var ())
 getParamVar param = do

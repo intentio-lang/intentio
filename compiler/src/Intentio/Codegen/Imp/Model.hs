@@ -127,7 +127,6 @@ data BinOpKind
   | BinSEq
   | BinSNeq
   | BinSub
-  | BinXor
   deriving (Show, Eq, Generic)
 
 instance ToJSON BinOpKind

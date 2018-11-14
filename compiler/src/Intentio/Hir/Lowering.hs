@@ -108,7 +108,7 @@ collectImports = do
   let visit (ResolvedItem m i) | m == cm   = mempty
                                | otherwise = fromList [(m, i)]
       visit _ = mempty
-  foldMapOf resolution visit <$> use currentModule
+  foldMap (visit . view resolution) <$> use currentModule
 
 lowerItems :: LowerM ([H.ItemId], IM.IntMap (H.Item ()))
 lowerItems = do

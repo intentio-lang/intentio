@@ -19,8 +19,11 @@ import           Data.Algorithm.Diff            ( Diff(..)
 import           Data.Algorithm.DiffOutput      ( ppDiff )
 import qualified Data.String                   as Str
 import qualified Data.Text                     as T
+import           System.Directory               ( getTemporaryDirectory )
 import           System.FilePath                ( takeDirectory )
-import           System.IO.Temp                 ( withSystemTempDirectory )
+import           System.IO.Temp                 ( createTempDirectory
+                                                , withSystemTempDirectory
+                                                )
 import qualified System.Process.Typed          as P
 
 import           TestRunner.Loader              ( LoaderError
@@ -42,6 +45,7 @@ import           TestRunner.Model               ( TestCase
 import           TestRunner.Opts                ( Opts
                                                 , compilerPath
                                                 , runEntrypointPath
+                                                , noCleanup
                                                 )
 
 data TestError
@@ -117,7 +121,16 @@ loadTestSpec' testCase =
 
 runTestSpec :: Opts -> TestCase -> TestSpec -> RunSpecMT ()
 runTestSpec opts testCase spec = void $ do
-  withSystemTempDirectory "intentio-test" $ \tmpdir -> do
+  if opts ^. noCleanup
+    then do
+      t1 <- lift getTemporaryDirectory
+      t2 <- lift $ createTempDirectory t1 dirName
+      f t2
+    else withSystemTempDirectory dirName f
+ where
+  dirName = "intentio-test"
+
+  f tmpdir = do
     execStateT (mapM_ runCommand (spec ^. commands))
                (emptyCommandState opts tmpdir testCase)
 

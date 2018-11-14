@@ -22,11 +22,10 @@ import           Intentio.Codegen.Emitter.Types ( CModuleHeader
                                                 )
 import           Intentio.Codegen.SymbolNames.Mangling
                                                 ( mangle
-                                                , sanitize
                                                 )
 
 cModuleFileNameBase :: ModuleName -> FilePath
-cModuleFileNameBase (ModuleName modName) = toS $ sanitize modName
+cModuleFileNameBase (ModuleName modName) = toS $ mangle [modName]
 
 class GetCModuleFileName t where
   cModuleFileName :: ModuleName -> FilePath
@@ -47,7 +46,7 @@ cItemName' :: H.ModuleName -> H.ItemName -> String
 cItemName' modul item = toS $ mangle [modul ^. _Wrapped, item ^. _Wrapped]
 
 cVarName :: (Eq a, Show a) => H.Var a -> String
-cVarName var = var ^. H.varName & sanitize & toS
+cVarName var = toS . mangle $ [var ^. H.varName]
 
 cTmpVarName :: H.VarId -> Text
 cTmpVarName i = '%' <| show (i ^. H.unVarId)

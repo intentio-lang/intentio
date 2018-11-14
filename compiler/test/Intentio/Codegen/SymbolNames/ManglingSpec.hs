@@ -13,18 +13,14 @@ import           Test.QuickCheck
 import           Intentio.Codegen.SymbolNames.Mangling
 
 isGasSymbolChar :: Char -> Bool
-isGasSymbolChar c | isAsciiLower c           = True
-                  | isAsciiUpper c           = True
-                  | isDigit c                = True
-                  | c `elem` ['.', '_', '$'] = True
-                  | otherwise                = False
+isGasSymbolChar c | isAsciiLower c = True
+                  | isAsciiUpper c = True
+                  | isDigit c      = True
+                  | c == '_'       = True
+                  | otherwise      = False
 
 spec :: Spec
 spec = parallel $ do
   describe "mangle" $ do
-    it "should always return names matching [a-zA-Z0-9._$]" . property $ \s ->
+    it "should always return names matching [a-zA-Z0-9_]" . property $ \s ->
       T.all isGasSymbolChar . mangle . fmap toS $ (s :: [String])
-
-  describe "sanitize" $ do
-    it "should always return names matching [a-zA-Z0-9._$]" . property $ \s ->
-      T.all isGasSymbolChar . sanitize . toS $ (s :: String)

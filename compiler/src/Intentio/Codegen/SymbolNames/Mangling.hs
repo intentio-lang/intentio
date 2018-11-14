@@ -1,6 +1,5 @@
 module Intentio.Codegen.SymbolNames.Mangling
   ( mangle
-  , sanitize
   )
 where
 

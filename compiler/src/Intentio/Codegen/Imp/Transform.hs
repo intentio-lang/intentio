@@ -87,11 +87,7 @@ impTransform b = do
   return I.Body { .. }
 
 impExprToBlock :: H.Expr () -> ImpM (I.Block ())
-impExprToBlock H.Expr { _exprKind = H.BlockExpr b } = impBlock b
-impExprToBlock expr = withBlock $ impExpr expr
-
-impBlock :: H.Block () -> ImpM (I.Block ())
-impBlock = withBlock . mapM_ impExpr . view H.blockExprs
+impExprToBlock = withBlock . impExpr
 
 impExpr :: H.Expr () -> ImpM I.VarId
 impExpr expr' = case expr' ^. H.exprKind of
@@ -101,11 +97,15 @@ impExpr expr' = case expr' ^. H.exprKind of
 
   H.LitExpr   l -> pushExpr $ I.LitExpr l
 
-  H.BlockExpr _ -> lift $ pushIceFor expr' "Imp: BlockExpr not implemented."
+  H.BlockExpr b -> proc $ b ^. H.blockExprs
+   where
+    proc []       = allocVar
+    proc [e     ] = impExpr e
+    proc (e : es) = impExpr e >> proc es
 
-  H.SuccExpr  e -> I.SuccExpr <$> impExpr e >>= pushExpr
+  H.SuccExpr e  -> I.SuccExpr <$> impExpr e >>= pushExpr
 
-  H.FailExpr  e -> I.FailExpr <$> impExpr e >>= pushExpr
+  H.FailExpr e  -> I.FailExpr <$> impExpr e >>= pushExpr
 
   H.UnExpr o' e -> case o' ^. H.unOpKind of
     H.UnNeg -> go I.UnNeg

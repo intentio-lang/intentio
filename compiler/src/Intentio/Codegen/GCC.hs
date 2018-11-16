@@ -68,7 +68,11 @@ runGCC asm = do
   case asm ^. assemblyType of
     Library -> runARProc outFile (["rcs", outFile] <> objFiles)
     Program ->
-      runGCCProc outFile (sharedGCCArgs <> ["-o", outFile] <> objFiles)
+      runGCCProc outFile
+        $  sharedGCCArgs
+        <> ["-o", outFile]
+        <> objFiles
+        <> ["-lintentiort"]
  where
   getFilesByExt ext =
     asm ^. assemblyModules <&> view cFilePath & toList & filter

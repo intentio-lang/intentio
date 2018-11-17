@@ -26,18 +26,18 @@ import           Intentio.Codegen.SymbolNames   ( cItemName'
 import qualified Intentio.Codegen.Imp          as I
 
 emitImpBody :: ImpBodyEmit [C.BlockItem]
-emitImpBody = (<>) <$> emitVars <*> emitBodyBlock
+emitImpBody = (<>) <$> emitVarDefs <*> emitBodyBlock
 
-emitVars :: ImpBodyEmit [C.BlockItem]
-emitVars = do
+emitVarDefs :: ImpBodyEmit [C.BlockItem]
+emitVarDefs = do
   body <- askImpBody
   let allVarIds      = body ^. I.bodyVarIds
   let paramVarIds    = body ^. I.bodyParams <&> view I.paramVarId
   let nonParamVarIds = allVarIds List.\\ paramVarIds
-  forM nonParamVarIds $ fmap emitVar . getImpVarById
+  forM nonParamVarIds $ fmap emitVarDef . getImpVarById
 
-emitVar :: I.Var () -> C.BlockItem
-emitVar var = [citem| typename IeoResult $id:v = $exp:d; |]
+emitVarDef :: I.Var () -> C.BlockItem
+emitVarDef var = [citem| typename IeoResult $id:v = $exp:d; |]
  where
   v = cVarName var
   d =
@@ -59,14 +59,14 @@ emitStmt stmt = case stmt ^. I.stmtKind of
 
 emitExprStmt :: I.VarId -> I.Expr () -> ImpBodyEmit C.BlockItem
 emitExprStmt varId expr = do
-  i <- emitVarIdById varId
+  i <- emitVarById varId
   e <- emitExpr expr
   return [citem| $id:i = $exp:e; |]
 
 emitAssignStmt :: I.VarId -> I.VarId -> ImpBodyEmit C.BlockItem
 emitAssignStmt dst src = do
-  d <- emitVarIdById dst
-  s <- emitVarIdById src
+  d <- emitVarById dst
+  s <- emitVarById src
   return [citem| $id:d = $id:s; |]
 
 emitWhileStmt :: I.VarId -> I.Block () -> ImpBodyEmit C.BlockItem
@@ -74,26 +74,26 @@ emitWhileStmt = fail "Codegen for while statements is not implemented"
 
 emitIfStmt :: I.VarId -> I.Block () -> I.Block () -> ImpBodyEmit C.BlockItem
 emitIfStmt cond ifBlock elseBlock = do
-  c  <- emitVarIdById cond
+  c  <- emitVarById cond
   ib <- emitBlock ifBlock
   eb <- emitBlock elseBlock
   return [citem| if (($id:c).succ) { $items:ib } else { $items:eb } |]
 
 emitReturnStmt :: I.VarId -> ImpBodyEmit C.BlockItem
 emitReturnStmt varId = do
-  i <- emitVarIdById varId
+  i <- emitVarById varId
   return [citem| return $id:i; |]
 
-emitVarIdById :: I.VarId -> ImpBodyEmit C.Id
-emitVarIdById = getImpVarById >=> emitVarId
+emitVarById :: I.VarId -> ImpBodyEmit C.Id
+emitVarById = getImpVarById >=> emitVar
 
-emitVarId :: I.Var () -> ImpBodyEmit C.Id
-emitVarId var = return $ C.Id i noLoc where i = cVarName var
+emitVar :: I.Var () -> ImpBodyEmit C.Id
+emitVar var = return $ C.Id i noLoc where i = cVarName var
 
 emitExpr :: I.Expr () -> ImpBodyEmit C.Exp
 emitExpr expr = case expr ^. I.exprKind of
   I.VarExpr v -> do
-    i <- emitVarIdById v
+    i <- emitVarById v
     return $ C.Var i noLoc
 
   I.BoxItemExpr _ _ -> fail "Codegen: Boxing items not implemented."
@@ -101,15 +101,15 @@ emitExpr expr = case expr ^. I.exprKind of
   I.LitExpr  lit    -> emitLitExpr lit
 
   I.SuccExpr v      -> do
-    i <- idTerm <$> emitVarIdById v
+    i <- idTerm <$> emitVarById v
     return [cexp| (typename IeoResult){ .succ = true, .term = $exp:i } |]
 
   I.FailExpr v -> do
-    i <- idTerm <$> emitVarIdById v
+    i <- idTerm <$> emitVarById v
     return [cexp| (typename IeoResult){ .succ = false, .term = $exp:i } |]
 
   I.NotExpr v -> do
-    i <- emitVarIdById v
+    i <- emitVarById v
     let s = idSucc i
     let t = idTerm i
     return [cexp| (typename IeoResult){ .succ = $exp:s, .term = $exp:t } |]
@@ -117,7 +117,7 @@ emitExpr expr = case expr ^. I.exprKind of
   I.UnExpr o v -> do
     let (f :: String) = case o of
           I.UnNeg -> "ieo_neg"
-    i <- idTerm <$> emitVarIdById v
+    i <- idTerm <$> emitVarById v
     return [cexp| $id:f ( $exp:i ) |]
 
   I.BinExpr o l r -> do
@@ -134,13 +134,13 @@ emitExpr expr = case expr ^. I.exprKind of
           I.BinSEq  -> "ieo_seq"
           I.BinSNeq -> "ieo_sneq"
           I.BinSub  -> "ieo_sub"
-    li <- idTerm <$> emitVarIdById l
-    ri <- idTerm <$> emitVarIdById r
+    li <- idTerm <$> emitVarById l
+    ri <- idTerm <$> emitVarById r
     return [cexp| $id:f ( $exp:li , $exp:ri ) |]
 
   I.CallStaticExpr mName iName args -> do
     let f = flip C.Var noLoc $ C.Id (cItemName' mName iName) noLoc
-    cargs <- fmap idTerm <$> mapM emitVarIdById args
+    cargs <- fmap idTerm <$> mapM emitVarById args
     return $ C.FnCall f cargs noLoc
 
   I.CallDynamicExpr _ _ -> fail "Codegen: dynamic CallExpr not implemented."

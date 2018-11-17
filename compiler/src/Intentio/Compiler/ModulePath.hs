@@ -8,7 +8,9 @@ where
 
 import           Intentio.Prelude
 
-import           System.Directory               ( doesFileExist )
+import           System.Directory               ( doesFileExist
+                                                , makeAbsolute
+                                                )
 import           System.FilePath                ( (</>) )
 
 import           Intentio.Compiler              ( Assembly
@@ -32,7 +34,7 @@ resolveModuleFile (SourceFile sf) = do
  where
   go []       = pushErrorFor (SourceFile sf) $ "Cannot find module: " <> toS sf
   go (p : ps) = lift (doesFileExist p) >>= \case
-    True  -> return (SourceFile p)
+    True  -> liftIO $ SourceFile <$> makeAbsolute p
     False -> go ps
 
 

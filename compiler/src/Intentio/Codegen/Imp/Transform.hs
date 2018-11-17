@@ -80,7 +80,7 @@ pattern DirectPath pk <- (preview (H.exprKind . H._PathExpr . H.pathKind)
 impTransform :: H.Body () -> CompilePure (I.Body ())
 impTransform b = do
   let st = emptyImpState getFirstFreeVarId
-  (_bodyBlock, s) <- runStateT (impExprToBlock $ b ^. H.bodyValue) st
+  (_bodyBlock, s) <- runStateT (impBodyValue $ b ^. H.bodyValue) st
   let _bodyAnn    = ()
   let _bodyParams = b ^. H.bodyParams
   let _bodyVars = foldl' addVar (b ^. H.bodyVars) (s ^. impVars)
@@ -94,8 +94,10 @@ impTransform b = do
     [] -> I.VarId 0
     vs -> succ . maximum $ vs
 
-impExprToBlock :: H.Expr () -> ImpM (I.Block ())
-impExprToBlock = withBlock . impExpr
+impBodyValue :: H.Expr () -> ImpM (I.Block ())
+impBodyValue expr = withBlock $ do
+  r <- impExpr expr
+  pushStmt $ I.ReturnStmt r
 
 impExpr :: H.Expr () -> ImpM I.VarId
 impExpr expr' = case expr' ^. H.exprKind of

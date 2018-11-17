@@ -56,7 +56,10 @@ pushExpr e = do
   return v
 
 allocVar :: ImpM I.VarId
-allocVar = do
+allocVar = allocVar' False
+
+allocVar' :: Bool -> ImpM I.VarId
+allocVar' _varSucc = do
   _varId <- preuses (impVars . _head . I.varId) succ >>= \case
     Just i  -> return i
     Nothing -> use firstFreeVarId
@@ -83,7 +86,7 @@ impTransform b = do
   (_bodyBlock, s) <- runStateT (impBodyValue $ b ^. H.bodyValue) st
   let _bodyAnn    = ()
   let _bodyParams = b ^. H.bodyParams
-  let _bodyVars = foldl' addVar (b ^. H.bodyVars) (s ^. impVars)
+  let _bodyVars = foldl' addVar (b ^. H.bodyVars <&> impVar) (s ^. impVars)
   let _bodyVarIds =
         (b ^. H.bodyVarIds) <> (s ^. impVars <&> view I.varId & reverse)
   return I.Body { .. }
@@ -93,6 +96,9 @@ impTransform b = do
   getFirstFreeVarId = case b ^. H.bodyVarIds of
     [] -> I.VarId 0
     vs -> succ . maximum $ vs
+
+impVar :: H.Var () -> I.Var ()
+impVar H.Var { _varAnn, _varId, _varName } = I.Var { _varSucc = False, .. }
 
 impBodyValue :: H.Expr () -> ImpM (I.Block ())
 impBodyValue expr = withBlock $ do
@@ -109,7 +115,7 @@ impExpr expr' = case expr' ^. H.exprKind of
 
   H.BlockExpr b -> proc $ b ^. H.blockExprs
    where
-    proc []       = allocVar
+    proc []       = allocVar' True
     proc [e     ] = impExpr e
     proc (e : es) = impExpr e >> proc es
 

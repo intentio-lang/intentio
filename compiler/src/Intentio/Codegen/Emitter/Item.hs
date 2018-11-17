@@ -25,7 +25,7 @@ import           Intentio.Codegen.Emitter.Util  ( getBodyById
                                                 , getMangledItemName
                                                 , getParamVar
                                                 )
-import           Intentio.Codegen.SymbolNames   ( cVarName )
+import           Intentio.Codegen.SymbolNames   ( cVarName' )
 import qualified Intentio.Codegen.Imp          as I
 import qualified Intentio.Hir                  as H
 
@@ -60,7 +60,7 @@ emitFnParams = (view H.bodyParams <$> askBody) >>= mapM emitFnParam
 
 emitFnParam :: H.Param () -> BodyEmit C.Param
 emitFnParam param = do
-  v <- cVarName <$> getParamVar param
+  v <- cVarName' . view H.varName <$> getParamVar param
   return [cparam| typename IeoTerm * $id:v |]
 
 emitFnSource :: H.BodyId -> ItemEmit [C.Definition]

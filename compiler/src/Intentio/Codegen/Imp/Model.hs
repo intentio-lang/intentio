@@ -25,10 +25,6 @@ import           Intentio.Hir                  as X
                                                 , unVarId
                                                 , Param(..)
                                                 , paramVarId
-                                                , Var(..)
-                                                , varAnn
-                                                , varId
-                                                , varName
                                                 , Lit(..)
                                                 , litAnn
                                                 , litSourcePos
@@ -53,6 +49,17 @@ data Body a = Body
 
 instance ToJSON a => ToJSON (Body a)
 instance FromJSON a => FromJSON (Body a)
+
+data Var a = Var
+  { _varAnn       :: a
+  , _varId        :: VarId
+  , _varName      :: Text
+  , _varSucc      :: Bool
+  }
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
+
+instance ToJSON a => ToJSON (Var a)
+instance FromJSON a => FromJSON (Var a)
 
 data Block a = Block
   { _blockAnn   :: a
@@ -133,6 +140,7 @@ instance ToJSON BinOpKind
 instance FromJSON BinOpKind
 
 makeLenses ''Body
+makeLenses ''Var
 makeLenses ''Stmt
 makePrisms ''StmtKind
 makeLenses ''Expr
@@ -143,6 +151,9 @@ makePrisms ''BinOpKind
 
 instance Annotated Body where
   ann = bodyAnn
+
+instance Annotated Var where
+  ann = varAnn
 
 instance Annotated Block where
   ann = blockAnn

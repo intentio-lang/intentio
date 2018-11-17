@@ -37,7 +37,11 @@ emitVars = do
   forM nonParamVarIds $ fmap emitVar . getImpVarById
 
 emitVar :: I.Var () -> C.BlockItem
-emitVar var = [citem| typename IeoResult $id:v; |] where v = cVarName var
+emitVar var = [citem| typename IeoResult $id:v = $exp:d; |]
+ where
+  v = cVarName var
+  d =
+    if var ^. I.varSucc then [cexp| ieo_none() |] else [cexp| ieo_none_fail() |]
 
 emitBodyBlock :: ImpBodyEmit [C.BlockItem]
 emitBodyBlock = askImpBody <&> view I.bodyBlock >>= emitBlock

@@ -6,23 +6,23 @@ module Intentio.Codegen.SymbolNames
   , cItemName
   , cItemName'
   , cVarName
+  , cVarName'
   , cTmpVarName
   )
 where
 
 import           Intentio.Prelude
 
+import           Intentio.Codegen.Emitter.Types ( CModuleHeader
+                                                , CModuleSource
+                                                )
+import qualified Intentio.Codegen.Imp.Model    as I
+import           Intentio.Codegen.SymbolNames.Mangling
+                                                ( mangle )
 import           Intentio.Compiler              ( ModuleName(..)
                                                 , moduleName
                                                 )
 import qualified Intentio.Hir                  as H
-
-import           Intentio.Codegen.Emitter.Types ( CModuleHeader
-                                                , CModuleSource
-                                                )
-import           Intentio.Codegen.SymbolNames.Mangling
-                                                ( mangle
-                                                )
 
 cModuleFileNameBase :: ModuleName -> FilePath
 cModuleFileNameBase (ModuleName modName) = toS $ mangle [modName]
@@ -45,8 +45,11 @@ cItemName modul item = cItemName' (modul ^. moduleName) iname
 cItemName' :: H.ModuleName -> H.ItemName -> String
 cItemName' modul item = toS $ mangle [modul ^. _Wrapped, item ^. _Wrapped]
 
-cVarName :: (Eq a, Show a) => H.Var a -> String
-cVarName var = toS . mangle $ [var ^. H.varName]
+cVarName :: I.Var a -> String
+cVarName = cVarName' . view I.varName
 
-cTmpVarName :: H.VarId -> Text
-cTmpVarName i = '%' <| show (i ^. H.unVarId)
+cVarName' :: Text -> String
+cVarName' = toS . mangle . (: [])
+
+cTmpVarName :: I.VarId -> Text
+cTmpVarName i = '%' <| show (i ^. I.unVarId)

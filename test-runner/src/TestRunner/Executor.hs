@@ -20,7 +20,9 @@ import           Data.Algorithm.DiffOutput      ( ppDiff )
 import qualified Data.String                   as Str
 import qualified Data.Text                     as T
 import           System.Directory               ( getTemporaryDirectory )
-import           System.FilePath                ( takeDirectory )
+import           System.FilePath                ( (</>)
+                                                , takeDirectory
+                                                )
 import           System.IO.Temp                 ( createTempDirectory
                                                 , withSystemTempDirectory
                                                 )
@@ -76,8 +78,8 @@ type CommandMT = StateT CommandState RunSpecMT
 makeLenses ''TestResult
 makeLenses ''CommandState
 
-outputBinaryPath :: FilePath
-outputBinaryPath = "testbin.out"
+outputBinaryName :: FilePath
+outputBinaryName = "testbin.out"
 
 testCaseCwd :: TestCase -> FilePath
 testCaseCwd testCase = testCase ^. testCasePath & takeDirectory
@@ -141,10 +143,11 @@ emptyCommandState _stateOpts _stateTmpDir _stateTestCase =
 runCommand :: TestCommand -> CommandMT ()
 runCommand (CompileCommand spec) = do
   myCompilerPath <- use (stateOpts . compilerPath)
-  myTmpdir       <- use stateTmpDir
+  myTmpDir       <- use stateTmpDir
   myCwd          <- testCaseCwd <$> use stateTestCase
+  let outputBinaryPath = myTmpDir </> outputBinaryName
   let myCompilerArgs =
-        ["--workdir", myTmpdir, "-o", outputBinaryPath]
+        ["--workdir", myTmpDir, "-o", outputBinaryPath]
           <> (spec ^. compileCommandArgs . argv <&> toS)
   (exitCode, compilerStdout, compilerStderr) <-
     P.readProcess . P.setWorkingDir myCwd $ P.proc myCompilerPath myCompilerArgs

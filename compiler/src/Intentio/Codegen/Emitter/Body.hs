@@ -21,6 +21,7 @@ import           Intentio.Codegen.Emitter.Monad ( ImpBodyEmit
                                                 )
 import           Intentio.Codegen.Emitter.Util  ( getImpVarById )
 import           Intentio.Codegen.SymbolNames   ( cItemName'
+                                                , cParamName
                                                 , cVarName
                                                 )
 import qualified Intentio.Codegen.Imp          as I
@@ -34,14 +35,20 @@ emitVarDefs = do
   let allVarIds      = body ^. I.bodyVarIds
   let paramVarIds    = body ^. I.bodyParams <&> view I.paramVarId
   let nonParamVarIds = allVarIds List.\\ paramVarIds
-  forM nonParamVarIds $ fmap emitVarDef . getImpVarById
-
-emitVarDef :: I.Var () -> C.BlockItem
-emitVarDef var = [citem| typename IeoResult $id:v = $exp:d; |]
+  (<>)
+    <$> mapM (fmap (emitVarDef paramDef) . getImpVarById)      paramVarIds
+    <*> mapM (fmap (emitVarDef uninitialized) . getImpVarById) nonParamVarIds
  where
-  v = cVarName var
-  d =
-    if var ^. I.varSucc then [cexp| ieo_none() |] else [cexp| ieo_none_fail() |]
+  emitVarDef def var = [citem| typename IeoResult $id:v = $exp:d; |]
+   where
+    v = cVarName var
+    d = def var
+
+  paramDef var = [cexp| (typename IeoResult){ .succ = true, .term = $id:p } |]
+    where p = cParamName var
+
+  uninitialized (view I.varSucc -> True) = [cexp| ieo_none() |]
+  uninitialized _                        = [cexp| ieo_none_fail() |]
 
 emitBodyBlock :: ImpBodyEmit [C.BlockItem]
 emitBodyBlock = askImpBody <&> view I.bodyBlock >>= emitBlock

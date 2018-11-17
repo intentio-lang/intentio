@@ -5,6 +5,8 @@ module Intentio.Codegen.SymbolNames
   , cModuleFileNameBase
   , cItemName
   , cItemName'
+  , cParamName
+  , cParamName'
   , cVarName
   , cVarName'
   , cTmpVarName
@@ -41,6 +43,12 @@ cItemName modul item = cItemName' (modul ^. moduleName) iname
  where
   iname   = fromMaybe unnamed (item ^. H.itemName)
   unnamed = H.ItemName $ "$" <> (item ^. H.itemId . H.unItemId & show)
+
+cParamName :: I.Var a -> String
+cParamName = cParamName' . view I.varName
+
+cParamName' :: Text -> String
+cParamName' t = "_P" <> cVarName' t
 
 cItemName' :: H.ModuleName -> H.ItemName -> String
 cItemName' modul item = toS $ mangle [modul ^. _Wrapped, item ^. _Wrapped]

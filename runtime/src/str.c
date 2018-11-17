@@ -69,7 +69,7 @@ add_func(const IeoTerm *self, const IeoTerm *other)
   IeoTerm *result;
   IEO_TRY_UNWRAP(result, ieo_string_new("", lhs->size + rhs->size));
 
-  IeoStringValue *res = ieo_term_value(result);
+  const IeoStringValue *res = ieo_term_value(result);
   memcpy((void *)res->data, lhs->data, lhs->size);
   memcpy((void *)(res->data + lhs->size), rhs->data, rhs->size);
 

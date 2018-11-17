@@ -19,9 +19,7 @@ import           Language.C.Quote.C             ( cexp
 import           Intentio.Codegen.Emitter.Monad ( ImpBodyEmit
                                                 , askImpBody
                                                 )
-import           Intentio.Codegen.Emitter.Util  ( tyIeoResult
-                                                , getImpVarById
-                                                )
+import           Intentio.Codegen.Emitter.Util  ( getImpVarById )
 import           Intentio.Codegen.SymbolNames   ( cItemName'
                                                 , cVarName
                                                 )
@@ -39,7 +37,7 @@ emitVars = do
   forM nonParamVarIds $ fmap emitVar . getImpVarById
 
 emitVar :: I.Var () -> C.BlockItem
-emitVar var = [citem| $ty:tyIeoResult $id:v; |] where v = cVarName var
+emitVar var = [citem| typename IeoResult $id:v; |] where v = cVarName var
 
 emitBodyBlock :: ImpBodyEmit [C.BlockItem]
 emitBodyBlock = askImpBody <&> view I.bodyBlock >>= emitBlock
@@ -100,17 +98,17 @@ emitExpr expr = case expr ^. I.exprKind of
 
   I.SuccExpr v      -> do
     i <- idTerm <$> emitVarIdById v
-    return [cexp| ($ty:tyIeoResult){ .succ = true, .term = $exp:i } |]
+    return [cexp| (typename IeoResult){ .succ = true, .term = $exp:i } |]
 
   I.FailExpr v -> do
     i <- idTerm <$> emitVarIdById v
-    return [cexp| ($ty:tyIeoResult){ .succ = false, .term = $exp:i } |]
+    return [cexp| (typename IeoResult){ .succ = false, .term = $exp:i } |]
 
   I.NotExpr v -> do
     i <- emitVarIdById v
     let s = idSucc i
     let t = idTerm i
-    return [cexp| ($ty:tyIeoResult){ .succ = $exp:s, .term = $exp:t } |]
+    return [cexp| (typename IeoResult){ .succ = $exp:s, .term = $exp:t } |]
 
   I.UnExpr o v -> do
     let (f :: String) = case o of

@@ -21,9 +21,7 @@ import           Intentio.Codegen.Emitter.Monad ( ItemEmit
                                                 , askItem
                                                 , askBody
                                                 )
-import           Intentio.Codegen.Emitter.Util  ( tyIeoTermPtr
-                                                , tyIeoResult
-                                                , getBodyById
+import           Intentio.Codegen.Emitter.Util  ( getBodyById
                                                 , getMangledItemName
                                                 , getParamVar
                                                 )
@@ -51,11 +49,11 @@ emitItemSource = do
 
 emitFnHeader :: H.BodyId -> ItemEmit [C.Definition]
 emitFnHeader bodyId = do
-  item    <- askItem
-  body    <- getBodyById bodyId
-  cname   <- getMangledItemName item
-  cparams <- runBodyEmit emitFnParams body
-  return [cunit| $ty:tyIeoResult $id:cname ($params:cparams) ; |]
+  item <- askItem
+  body <- getBodyById bodyId
+  f    <- getMangledItemName item
+  pars <- runBodyEmit emitFnParams body
+  return [cunit| typename IeoResult $id:f ($params:pars) ; |]
 
 emitFnParams :: BodyEmit [C.Param]
 emitFnParams = (view H.bodyParams <$> askBody) >>= mapM emitFnParam
@@ -63,14 +61,14 @@ emitFnParams = (view H.bodyParams <$> askBody) >>= mapM emitFnParam
 emitFnParam :: H.Param () -> BodyEmit C.Param
 emitFnParam param = do
   v <- cVarName <$> getParamVar param
-  return [cparam| $ty:tyIeoTermPtr $id:v |]
+  return [cparam| typename IeoTerm * $id:v |]
 
 emitFnSource :: H.BodyId -> ItemEmit [C.Definition]
 emitFnSource bodyId = do
   item    <- askItem
-  cname   <- getMangledItemName item
+  f       <- getMangledItemName item
   body    <- getBodyById bodyId
   impBody <- lift $ I.impTransform body
-  cparams <- runBodyEmit emitFnParams body
+  pars    <- runBodyEmit emitFnParams body
   cbody   <- runImpBodyEmit emitImpBody impBody
-  return [cunit| $ty:tyIeoResult $id:cname ($params:cparams) { $items:cbody } |]
+  return [cunit| typename IeoResult $id:f ($params:pars) { $items:cbody } |]

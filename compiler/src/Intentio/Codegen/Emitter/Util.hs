@@ -1,10 +1,5 @@
-{-# LANGUAGE QuasiQuotes #-}
-
 module Intentio.Codegen.Emitter.Util
-  ( tyIeoTerm
-  , tyIeoTermPtr
-  , tyIeoResult
-  , getItemById
+  ( getItemById
   , getBodyById
   , getImpVarById
   , getMangledItemName
@@ -15,9 +10,6 @@ where
 
 import           Intentio.Prelude
 
-import qualified Language.C.Quote              as C
-import           Language.C.Quote.C             ( cty )
-
 import           Intentio.Codegen.Emitter.Monad ( MonadModuleEmit(..)
                                                 , MonadBodyEmit(..)
                                                 , MonadImpBodyEmit(..)
@@ -25,15 +17,6 @@ import           Intentio.Codegen.Emitter.Monad ( MonadModuleEmit(..)
 import qualified Intentio.Codegen.Imp          as I
 import           Intentio.Codegen.SymbolNames   ( cItemName )
 import qualified Intentio.Hir                  as H
-
-tyIeoTerm :: C.Type
-tyIeoTerm = [cty| typename IeoTerm |]
-
-tyIeoTermPtr :: C.Type
-tyIeoTermPtr = [cty| typename IeoTerm * |]
-
-tyIeoResult :: C.Type
-tyIeoResult = [cty| typename IeoResult |]
 
 getItemById :: MonadModuleEmit m => H.ItemId -> m (H.Item ())
 getItemById itemId = do

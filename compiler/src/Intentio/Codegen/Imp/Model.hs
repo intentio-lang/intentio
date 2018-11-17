@@ -25,10 +25,6 @@ import           Intentio.Hir                  as X
                                                 , unVarId
                                                 , Param(..)
                                                 , paramVarId
-                                                , Var(..)
-                                                , varAnn
-                                                , varId
-                                                , varName
                                                 , Lit(..)
                                                 , litAnn
                                                 , litSourcePos
@@ -38,10 +34,6 @@ import           Intentio.Hir                  as X
                                                 , _FloatLit
                                                 , _StringLit
                                                 , _NoneLit
-                                                , Path(..)
-                                                , pathAnn
-                                                , pathKind
-                                                , PathKind(..)
                                                 , _ToVar
                                                 , _ToItem
                                                 )
@@ -57,6 +49,17 @@ data Body a = Body
 
 instance ToJSON a => ToJSON (Body a)
 instance FromJSON a => FromJSON (Body a)
+
+data Var a = Var
+  { _varAnn       :: a
+  , _varId        :: VarId
+  , _varName      :: Text
+  , _varSucc      :: Bool
+  }
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
+
+instance ToJSON a => ToJSON (Var a)
+instance FromJSON a => FromJSON (Var a)
 
 data Block a = Block
   { _blockAnn   :: a
@@ -77,9 +80,10 @@ instance ToJSON a => ToJSON (Stmt a)
 instance FromJSON a => FromJSON (Stmt a)
 
 data StmtKind a
-  = AssignStmt VarId (Expr a)
+  = ExprStmt VarId (Expr a)
+  | AssignStmt VarId VarId
   | WhileStmt VarId (Block a)
-  | IfStmt VarId (Block a)
+  | IfStmt VarId (Block a) (Block a)
   | ReturnStmt VarId
   deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
@@ -96,12 +100,16 @@ instance ToJSON a => ToJSON (Expr a)
 instance FromJSON a => FromJSON (Expr a)
 
 data ExprKind a
-  = PathExpr (Path a)
+  = VarExpr VarId
+  | BoxItemExpr ModuleName ItemName
   | LitExpr (Lit a)
+  | SuccExpr VarId
+  | FailExpr VarId
+  | NotExpr VarId
   | UnExpr UnOpKind VarId
-  | BinExpr BinOpKind VarId
-  | CallGlobalExpr ItemId [VarId]
-  | CallLocalExpr VarId [VarId]
+  | BinExpr BinOpKind VarId VarId
+  | CallStaticExpr ModuleName ItemName [VarId]
+  | CallDynamicExpr VarId [VarId]
   deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (ExprKind a)
@@ -126,13 +134,13 @@ data BinOpKind
   | BinSEq
   | BinSNeq
   | BinSub
-  | BinXor
   deriving (Show, Eq, Generic)
 
 instance ToJSON BinOpKind
 instance FromJSON BinOpKind
 
 makeLenses ''Body
+makeLenses ''Var
 makeLenses ''Stmt
 makePrisms ''StmtKind
 makeLenses ''Expr
@@ -143,6 +151,9 @@ makePrisms ''BinOpKind
 
 instance Annotated Body where
   ann = bodyAnn
+
+instance Annotated Var where
+  ann = varAnn
 
 instance Annotated Block where
   ann = blockAnn

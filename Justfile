@@ -27,7 +27,7 @@ test-haskell : build-haskell
 
 # Run Intentio Reference Test Suite
 test-suite : build
-  stack exec test-runner -- --root ./test --compiler ./bin/test-intentioc.sh
+  stack exec test-runner -- --no-cleanup --root ./test --compiler ./bin/test-intentioc.sh
 
 # Watch for changes in Haskell code
 watch-haskell STACK_CMD='test' :

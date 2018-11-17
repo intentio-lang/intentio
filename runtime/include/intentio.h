@@ -23,6 +23,9 @@ IeoResult
 ieo_none(void);
 
 IeoResult
+ieo_none_fail(void);
+
+IeoResult
 ieo_int_new(int64_t val);
 
 IeoResult

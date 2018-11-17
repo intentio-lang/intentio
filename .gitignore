@@ -12,3 +12,6 @@ cmake-build-*/
 # so also ignore common intentioc garbage.
 .intentio-work/
 a.out
+
+# Ignore artifacts created while running test suite
+testbin.out

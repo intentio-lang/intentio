@@ -19,8 +19,13 @@ import           Data.Algorithm.Diff            ( Diff(..)
 import           Data.Algorithm.DiffOutput      ( ppDiff )
 import qualified Data.String                   as Str
 import qualified Data.Text                     as T
-import           System.FilePath                ( takeDirectory )
-import           System.IO.Temp                 ( withSystemTempDirectory )
+import           System.Directory               ( getTemporaryDirectory )
+import           System.FilePath                ( (</>)
+                                                , takeDirectory
+                                                )
+import           System.IO.Temp                 ( createTempDirectory
+                                                , withSystemTempDirectory
+                                                )
 import qualified System.Process.Typed          as P
 
 import           TestRunner.Loader              ( LoaderError
@@ -42,6 +47,7 @@ import           TestRunner.Model               ( TestCase
 import           TestRunner.Opts                ( Opts
                                                 , compilerPath
                                                 , runEntrypointPath
+                                                , noCleanup
                                                 )
 
 data TestError
@@ -72,8 +78,8 @@ type CommandMT = StateT CommandState RunSpecMT
 makeLenses ''TestResult
 makeLenses ''CommandState
 
-outputBinaryPath :: FilePath
-outputBinaryPath = "testbin.out"
+outputBinaryName :: FilePath
+outputBinaryName = "testbin.out"
 
 testCaseCwd :: TestCase -> FilePath
 testCaseCwd testCase = testCase ^. testCasePath & takeDirectory
@@ -117,7 +123,16 @@ loadTestSpec' testCase =
 
 runTestSpec :: Opts -> TestCase -> TestSpec -> RunSpecMT ()
 runTestSpec opts testCase spec = void $ do
-  withSystemTempDirectory "intentio-test" $ \tmpdir -> do
+  if opts ^. noCleanup
+    then do
+      t1 <- lift getTemporaryDirectory
+      t2 <- lift $ createTempDirectory t1 dirName
+      f t2
+    else withSystemTempDirectory dirName f
+ where
+  dirName = "intentio-test"
+
+  f tmpdir = do
     execStateT (mapM_ runCommand (spec ^. commands))
                (emptyCommandState opts tmpdir testCase)
 
@@ -128,10 +143,11 @@ emptyCommandState _stateOpts _stateTmpDir _stateTestCase =
 runCommand :: TestCommand -> CommandMT ()
 runCommand (CompileCommand spec) = do
   myCompilerPath <- use (stateOpts . compilerPath)
-  myTmpdir       <- use stateTmpDir
+  myTmpDir       <- use stateTmpDir
   myCwd          <- testCaseCwd <$> use stateTestCase
+  let outputBinaryPath = myTmpDir </> outputBinaryName
   let myCompilerArgs =
-        ["--workdir", myTmpdir, "-o", outputBinaryPath]
+        ["--workdir", myTmpDir, "-o", outputBinaryPath]
           <> (spec ^. compileCommandArgs . argv <&> toS)
   (exitCode, compilerStdout, compilerStderr) <-
     P.readProcess . P.setWorkingDir myCwd $ P.proc myCompilerPath myCompilerArgs

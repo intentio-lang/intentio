@@ -1,9 +1,5 @@
-{-# LANGUAGE QuasiQuotes #-}
-
 module Intentio.Codegen.Emitter.Util
-  ( tyIeoTerm
-  , tyIeoResult
-  , getItemById
+  ( getItemById
   , getBodyById
   , getImpVarById
   , getMangledItemName
@@ -14,9 +10,6 @@ where
 
 import           Intentio.Prelude
 
-import qualified Language.C.Quote              as C
-import           Language.C.Quote.C             ( cty )
-
 import           Intentio.Codegen.Emitter.Monad ( MonadModuleEmit(..)
                                                 , MonadBodyEmit(..)
                                                 , MonadImpBodyEmit(..)
@@ -24,12 +17,6 @@ import           Intentio.Codegen.Emitter.Monad ( MonadModuleEmit(..)
 import qualified Intentio.Codegen.Imp          as I
 import           Intentio.Codegen.SymbolNames   ( cItemName )
 import qualified Intentio.Hir                  as H
-
-tyIeoTerm :: C.Type
-tyIeoTerm = [cty| typename IeoTerm |]
-
-tyIeoResult :: C.Type
-tyIeoResult = [cty| typename IeoResult |]
 
 getItemById :: MonadModuleEmit m => H.ItemId -> m (H.Item ())
 getItemById itemId = do
@@ -53,7 +40,7 @@ getImpVarById varId = do
     Nothing -> fail $ "Bad Imp: missing variable #" <> show varId
 
 getMangledItemName :: MonadModuleEmit m => H.Item () -> m String
-getMangledItemName item = toS . flip cItemName item <$> askModule
+getMangledItemName item = flip cItemName item <$> askModule
 
 getParamVar :: MonadBodyEmit m => H.Param () -> m (H.Var ())
 getParamVar param = do

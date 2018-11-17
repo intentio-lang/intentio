@@ -15,17 +15,10 @@ module Intentio.Codegen.Emitter.Monad
   , MonadItemEmit(..)
   , MonadBodyEmit(..)
   , MonadImpBodyEmit(..)
-  , WT
-  , execWT
-  , tellWT
-  , tellsWT
-  , subWT
   )
 where
 
 import           Intentio.Prelude
-
-import qualified Data.List                     as List
 
 import qualified Intentio.Codegen.Imp          as I
 import           Intentio.Compiler              ( CompilePure )
@@ -121,38 +114,4 @@ instance MonadBodyEmit BodyEmit where
 
 instance MonadImpBodyEmit ImpBodyEmit where
   askImpBody = view _3
-  {-# INLINE askImpBody #-}
-
-type WT w m a = StateT [[w]] m a
-
-execWT :: Monad m => WT w m a -> m [w]
-execWT = fmap (reverse . List.head) . flip execStateT [[]]
-{-# INLINE execWT #-}
-
-tellWT :: Monad m => w -> WT w m ()
-tellWT w' = modify $ \(w : ws) -> (w' : w) : ws
-{-# INLINE tellWT #-}
-
-tellsWT :: Monad m => [w] -> WT w m ()
-tellsWT = mapM_ tellWT
-{-# INLINE tellsWT #-}
-
-subWT :: Monad m => WT w m a -> WT w m [w]
-subWT f = modify ([] :) >> f >> state (\(w : ws) -> (w, ws))
-{-# INLINE subWT #-}
-
-instance MonadModuleEmit m => MonadModuleEmit (StateT w m) where
-  askModule = lift askModule
-  {-# INLINE askModule #-}
-
-instance MonadItemEmit m => MonadItemEmit (StateT w m) where
-  askItem = lift askItem
-  {-# INLINE askItem #-}
-
-instance MonadBodyEmit m => MonadBodyEmit (StateT w m) where
-  askBody = lift askBody
-  {-# INLINE askBody #-}
-
-instance MonadImpBodyEmit m => MonadImpBodyEmit (StateT w m) where
-  askImpBody = lift askImpBody
   {-# INLINE askImpBody #-}

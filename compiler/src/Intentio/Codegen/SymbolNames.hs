@@ -4,28 +4,30 @@ module Intentio.Codegen.SymbolNames
   ( GetCModuleFileName(..)
   , cModuleFileNameBase
   , cItemName
-  , cImportedItemName
+  , cItemName'
+  , cParamName
+  , cParamName'
   , cVarName
+  , cVarName'
+  , cTmpVarName
   )
 where
 
 import           Intentio.Prelude
 
+import           Intentio.Codegen.Emitter.Types ( CModuleHeader
+                                                , CModuleSource
+                                                )
+import qualified Intentio.Codegen.Imp.Model    as I
+import           Intentio.Codegen.SymbolNames.Mangling
+                                                ( mangle )
 import           Intentio.Compiler              ( ModuleName(..)
                                                 , moduleName
                                                 )
 import qualified Intentio.Hir                  as H
 
-import           Intentio.Codegen.Emitter.Types ( CModuleHeader
-                                                , CModuleSource
-                                                )
-import           Intentio.Codegen.SymbolNames.Mangling
-                                                ( mangle
-                                                , sanitize
-                                                )
-
 cModuleFileNameBase :: ModuleName -> FilePath
-cModuleFileNameBase (ModuleName modName) = toS $ sanitize modName
+cModuleFileNameBase (ModuleName modName) = toS $ mangle [modName]
 
 class GetCModuleFileName t where
   cModuleFileName :: ModuleName -> FilePath
@@ -36,17 +38,26 @@ instance GetCModuleFileName CModuleSource where
 instance GetCModuleFileName CModuleHeader where
   cModuleFileName m = cModuleFileNameBase m <> ".h"
 
-cItemName :: (Eq a, Show a) => H.Module a -> H.Item a -> Text
+cItemName :: (Eq a, Show a) => H.Module a -> H.Item a -> String
 cItemName modul item = cItemName' (modul ^. moduleName) iname
  where
   iname   = fromMaybe unnamed (item ^. H.itemName)
   unnamed = H.ItemName $ "$" <> (item ^. H.itemId . H.unItemId & show)
 
-cImportedItemName :: H.ModuleName -> H.ItemName -> Text
-cImportedItemName = cItemName'
+cParamName :: I.Var a -> String
+cParamName = cParamName' . view I.varName
 
-cItemName' :: H.ModuleName -> H.ItemName -> Text
-cItemName' modul item = mangle [modul ^. _Wrapped, item ^. _Wrapped]
+cParamName' :: Text -> String
+cParamName' t = "_P" <> cVarName' t
 
-cVarName :: (Eq a, Show a) => H.Var a -> String
-cVarName var = var ^. H.varName & sanitize & toS
+cItemName' :: H.ModuleName -> H.ItemName -> String
+cItemName' modul item = toS $ mangle [modul ^. _Wrapped, item ^. _Wrapped]
+
+cVarName :: I.Var a -> String
+cVarName = cVarName' . view I.varName
+
+cVarName' :: Text -> String
+cVarName' = toS . mangle . (: [])
+
+cTmpVarName :: I.VarId -> Text
+cTmpVarName i = '%' <| show (i ^. I.unVarId)

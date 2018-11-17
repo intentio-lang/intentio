@@ -12,6 +12,9 @@ typedef struct IeoNone
 IEO_CONST IeoResult
 ieo_none(void);
 
+IEO_CONST IeoResult
+ieo_none_fail(void);
+
 IEO_CONST IeoTerm *
 ieo_none_unwrap(void);
 

@@ -22,6 +22,12 @@ ieo_none(void)
   return IEO_SUCCT(IEO_STP(ieo_none_singleton));
 }
 
+IEO_CONST IeoResult
+ieo_none_fail(void)
+{
+  return IEO_FAILT(IEO_STP(ieo_none_singleton));
+}
+
 IEO_CONST IeoTerm *
 ieo_none_unwrap(void)
 {

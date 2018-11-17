@@ -53,8 +53,8 @@ emitCAssembly = fmap addMain . concatMapModulesM emit
     Just origMain ->
       let main = buildMain origMain
       in  asm
-          & (assemblyModules . at (main ^. moduleName) ?~ main)
-          & (assemblyMainModuleName ?~ main ^. moduleName)
+            & (assemblyModules . at (main ^. moduleName) ?~ main)
+            & (assemblyMainModuleName ?~ main ^. moduleName)
 
   buildMain origMain = CModuleDef
     { _cModuleDefSourcePos    = () ^. sourcePos

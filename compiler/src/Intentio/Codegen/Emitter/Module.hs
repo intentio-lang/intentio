@@ -77,9 +77,10 @@ class ModuleEmitter t where
 instance ModuleEmitter CModuleHeader where
   emitImports = pure []
 
-  emitItems = view H.moduleItemIds
-    >>= mapM (getItemById >=> runItemEmit emitItemHeader)
-    <&> concat
+  emitItems =
+    view H.moduleItemIds
+      >>= mapM (getItemById >=> runItemEmit emitItemHeader)
+      <&> concat
 
 instance ModuleEmitter CModuleSource where
   emitImports =
@@ -92,8 +93,8 @@ instance ModuleEmitter CModuleSource where
 
   emitItems = do
     items <- view H.moduleItemIds >>= mapM getItemById
-    hs <- forM items $ runItemEmit emitItemHeader
-    ss <- forM items $ runItemEmit emitItemSource
+    hs    <- forM items $ runItemEmit emitItemHeader
+    ss    <- forM items $ runItemEmit emitItemSource
     return $ concat (hs <> ss)
 
 -- brittany-disable-next-binding

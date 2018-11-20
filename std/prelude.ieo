@@ -5,14 +5,17 @@ export (
   str,
 )
 
-fun println(s) { ieo_std_println(s) }
-extern "intentio" fun ieo_std_println(s)
+fun println(s) { ieo_println(s) }
+extern "intentio" fun ieo_println(s)
 
-fun scanln() { ieo_std_scanln() }
-extern "intentio" fun ieo_std_scanln()
+fun scanln() { ieo_scanln() }
+extern "intentio" fun ieo_scanln()
 
-fun int(x) { ieo_std_int(x) }
-extern "intentio" fun ieo_std_int(x)
+fun float(x) { ieo_float(x) }
+extern "intentio" fun ieo_float(x)
 
-fun str(x) { ieo_std_str(x) }
-extern "intentio" fun ieo_std_str(x)
+fun int(x) { ieo_int(x) }
+extern "intentio" fun ieo_int(x)
+
+fun str(x) { ieo_str(x) }
+extern "intentio" fun ieo_str(x)

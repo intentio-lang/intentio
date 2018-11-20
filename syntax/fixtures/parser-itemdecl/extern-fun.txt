@@ -1,0 +1,5 @@
+extern "intentio" fun foo(a, b)
+
+extern "intentio" fun id(x,)
+
+extern "intentio" fun f()

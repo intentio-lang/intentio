@@ -17,13 +17,16 @@ import qualified Intentio.Compiler             as C
 import           Intentio.Compiler             as X
                                                 ( ModuleName(..)
                                                 , ItemName(..)
+                                                , unModuleName
+                                                , unItemName
                                                 )
 import           Intentio.Diagnostics           ( SourcePos(..)
                                                 , HasSourcePos(..)
                                                 )
 import           Intentio.Util.NodeId           ( NodeId )
 import           Language.Intentio.AST         as X
-                                                ( UnOp(..)
+                                                ( CallConv(..)
+                                                , UnOp(..)
                                                 , UnOpKind(..)
                                                 , BinOp(..)
                                                 , BinOpKind(..)
@@ -50,6 +53,7 @@ import           Language.Intentio.AST         as X
                                                 , _BinSNeq
                                                 , _BinSub
                                                 , _BinXor
+                                                , _IntentioCallConv
                                                 )
 
 --------------------------------------------------------------------------------
@@ -122,8 +126,9 @@ instance HasSourcePos (Item a) where
 instance (Eq a, Show a) => C.Item (Item a) where
   _itemName = Intentio.Hir.Model._itemName
 
-newtype ItemKind a
+data ItemKind a
   = FnItem BodyId
+  | ExternFnItem CallConv BodyId
   deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (ItemKind a)

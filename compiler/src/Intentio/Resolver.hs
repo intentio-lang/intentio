@@ -338,8 +338,9 @@ resolveExportDecl ed = do
 
 resolveItemDecl :: ItemDecl RS -> ResolveM (ItemDecl RS)
 resolveItemDecl it = case it ^. itemDeclKind of
-  ImportItemDecl d -> go resolveImportDecl ImportItemDecl d
-  FunItemDecl    d -> go resolveFunDecl FunItemDecl d
+  ImportItemDecl    d -> go resolveImportDecl ImportItemDecl d
+  FunItemDecl       d -> go resolveFunDecl FunItemDecl d
+  ExternFunItemDecl d -> go resolveExternFunDecl ExternFunItemDecl d
  where
   go
     :: (Annotated a)
@@ -414,10 +415,19 @@ resolveFunDecl fn = do
   define fn funName $ ToItem mName itName
   return $ fn & funDeclName . resolution .~ ResolvedItem mName itName
 
+resolveExternFunDecl :: ExternFunDecl RS -> ResolveM (ExternFunDecl RS)
+resolveExternFunDecl fn = do
+  mName <- use $ currentModule . moduleName
+  let funName = fn ^. externFunDeclName
+  let itName  = funName ^. unScopeId & ItemName
+  define fn funName $ ToItem mName itName
+  return $ fn & externFunDeclName . resolution .~ ResolvedItem mName itName
+
 resolveItemDeclBodies :: ItemDecl RS -> ResolveM (ItemDecl RS)
 resolveItemDeclBodies it = case it ^. itemDeclKind of
-  FunItemDecl d -> go resolveFunDeclBodies FunItemDecl d
-  _             -> return it
+  FunItemDecl       d -> go resolveFunDeclBodies FunItemDecl d
+  ExternFunItemDecl d -> go resolveExternFunDeclBodies ExternFunItemDecl d
+  _                   -> return it
  where
   go
     :: (Annotated a)
@@ -434,6 +444,13 @@ resolveFunDeclBodies fn = do
     $   fn
     &   (funDeclParams %%~ mapM resolveFunParam)
     >>= (funDeclBody . funBodyBlock %%~ resolveBlock)
+
+resolveExternFunDeclBodies :: ExternFunDecl RS -> ResolveM (ExternFunDecl RS)
+resolveExternFunDeclBodies fn = do
+  let funName = fn ^. externFunDeclName
+  withScope (mkScopeN @ValueName ItemScope funName)
+    $ fn
+    & (externFunDeclParams %%~ mapM resolveFunParam)
 
 resolveFunParam :: FunParam RS -> ResolveM (FunParam RS)
 resolveFunParam p = do

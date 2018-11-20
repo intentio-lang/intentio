@@ -17,14 +17,16 @@ import           Language.C.Quote.C             ( cexp
                                                 )
 
 import           Intentio.Codegen.Emitter.Monad ( ImpBodyEmit
+                                                , askAssembly
                                                 , askImpBody
                                                 )
 import           Intentio.Codegen.Emitter.Util  ( getImpVarById )
-import           Intentio.Codegen.SymbolNames   ( cItemName'
+import           Intentio.Codegen.SymbolNames   ( cItemName
                                                 , cParamName
                                                 , cVarName
                                                 )
 import qualified Intentio.Codegen.Imp          as I
+import           Intentio.Compiler              ( resolveItem )
 
 emitImpBody :: ImpBodyEmit [C.BlockItem]
 emitImpBody = (<>) <$> emitVarDefs <*> emitBodyBlock
@@ -146,7 +148,8 @@ emitExpr expr = case expr ^. I.exprKind of
     return [cexp| $id:f ( $exp:li , $exp:ri ) |]
 
   I.CallStaticExpr mName iName args -> do
-    let f = flip C.Var noLoc $ C.Id (cItemName' mName iName) noLoc
+    (modul, item) <- askAssembly >>= lift . resolveItem mName iName
+    let f = flip C.Var noLoc $ C.Id (cItemName modul item) noLoc
     cargs <- fmap idTerm <$> mapM emitVarById args
     return $ C.FnCall f cargs noLoc
 

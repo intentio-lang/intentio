@@ -163,6 +163,7 @@ tok TKwElse       = tokKw TKwElse
 tok TKwEnum       = tokKw TKwEnum
 tok TKwEval       = tokKw TKwEval
 tok TKwExport     = tokKw TKwExport
+tok TKwExtern     = tokKw TKwExtern
 tok TKwFail       = tokKw TKwFail
 tok TKwFun        = tokKw TKwFun
 tok TKwIf         = tokKw TKwIf
@@ -485,7 +486,7 @@ exportDecl =
 -- Item declarations
 
 itemDecl :: Parser (ItemDecl ())
-itemDecl = importItem <|> funItem
+itemDecl = importItem <|> externFunItem <|> funItem
 
 importItem :: Parser (ItemDecl ())
 importItem = item' (ImportItemDecl <$> importDecl) <?> "import declaration"
@@ -530,8 +531,32 @@ funDecl = p <?> "function declaration"
     _funDeclParams <- params
     _funDeclBody   <- FunBody <$> block
     return FunDecl { .. }
-  params = parens $ sepEndBy param comma
-  param  = FunParam <$> scopeId
+
+externFunItem :: Parser (ItemDecl ())
+externFunItem =
+  item' (ExternFunItemDecl <$> externFunDecl) <?> "extern function item"
+
+externFunDecl :: Parser (ExternFunDecl ())
+externFunDecl = p <?> "extern function declaration"
+ where
+  p = do
+    let _externFunDeclAnn = ()
+    _externFunDeclSourcePos <- srcPos
+    _externFunDeclCallConv  <- externCallConv
+    tok TKwFun
+    _externFunDeclName   <- scopeId
+    _externFunDeclParams <- params
+    return ExternFunDecl { .. }
+
+params :: Parser [FunParam ()]
+params = parens $ sepEndBy param comma
+
+param :: Parser (FunParam ())
+param = FunParam <$> scopeId
+
+externCallConv :: Parser CallConv
+externCallConv =
+  tok TKwExtern *> ((lexeme . try $ string "\"intentio\"") $> IntentioCallConv)
 
 --------------------------------------------------------------------------------
 -- Statements
@@ -694,6 +719,7 @@ keywords = BM.fromList
   , ("enum"    , TKwEnum)
   , ("eval"    , TKwEval)
   , ("export"  , TKwExport)
+  , ("extern"  , TKwExtern)
   , ("fail"    , TKwFail)
   , ("fun"     , TKwFun)
   , ("if"      , TKwIf)

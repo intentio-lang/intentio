@@ -20,7 +20,7 @@ import           Intentio.Codegen.Emitter.Module
                                                 , buildHeaderComment
                                                 )
 import           Intentio.Codegen.Emitter.Printer
-import           Intentio.Codegen.SymbolNames   ( cItemName'
+import           Intentio.Codegen.SymbolNames   ( cItemName
                                                 , cModuleFileName
                                                 )
 import           Intentio.Codegen.Emitter.Types
@@ -32,6 +32,8 @@ import           Intentio.Compiler              ( Assembly
                                                 , assemblyModules
                                                 , concatMapModulesM
                                                 , moduleName
+                                                , lookupMainModule
+                                                , moduleResolveItem
                                                 )
 import           Intentio.Diagnostics           ( sourcePos )
 import qualified Intentio.Hir                  as H
@@ -41,31 +43,31 @@ mainFileName = "intentio_main.c"
 
 emitCAssembly
   :: Assembly (H.Module ()) -> CompilePure (Assembly (CModuleDef Void))
-emitCAssembly = fmap addMain . concatMapModulesM emit
+emitCAssembly asmH = do
+  asmC <- concatMapModulesM emit asmH
+  case lookupMainModule asmH of
+    Nothing    -> return asmC
+    Just mainH -> do
+      mainFnH <- moduleResolveItem (ItemName "main") mainH
+      let mainC = CModuleDef
+            { _cModuleDefSourcePos    = mainH ^. sourcePos
+            , _cModuleDefIntentioName = ModuleName "%intentio_main"
+            , _cModuleDefFileName     = mainFileName
+            , _cModuleDefDefinitions  = mainUnit mainH mainFnH
+            }
+      return
+        $ asmC
+        & (assemblyModules . at (mainC ^. moduleName) ?~ mainC)
+        & (assemblyMainModuleName ?~ mainC ^. moduleName)
  where
-  emit modul = do
-    header <- cModuleEraseType <$> emitModuleHeader modul
-    source <- cModuleEraseType <$> emitModuleSource modul
+  emit modH = do
+    header <- cModuleEraseType <$> emitModuleHeader asmH modH
+    source <- cModuleEraseType <$> emitModuleSource asmH modH
     return [header, source]
 
-  addMain asm = case asm ^. assemblyMainModuleName of
-    Nothing -> asm
-    Just origMain ->
-      let main = buildMain origMain
-      in  asm
-            & (assemblyModules . at (main ^. moduleName) ?~ main)
-            & (assemblyMainModuleName ?~ main ^. moduleName)
-
-  buildMain origMain = CModuleDef
-    { _cModuleDefSourcePos    = () ^. sourcePos
-    , _cModuleDefIntentioName = ModuleName "%intentio_main"
-    , _cModuleDefFileName     = mainFileName
-    , _cModuleDefDefinitions  = mainUnit origMain
-    }
-
 -- brittany-disable-next-binding
-mainUnit :: ModuleName -> [C.Definition]
-mainUnit mName = [cunit|
+mainUnit :: H.Module () -> H.Item () -> [C.Definition]
+mainUnit modul item = [cunit|
     $esc:headerText
 
     $esc:("#include <stdlib.h>")
@@ -84,7 +86,7 @@ mainUnit mName = [cunit|
     }
   |]
   where
-    headerText     = buildHeaderComment mainFileName mName
-    mainModHeader  = cModuleFileName @CModuleHeader mName
+    headerText     = buildHeaderComment mainFileName (modul ^. moduleName)
+    mainModHeader  = cModuleFileName @CModuleHeader (modul ^. moduleName)
     includeMainMod = "#include \"" <> mainModHeader <> "\""
-    mainFn         = cItemName' mName (ItemName "main")
+    mainFn         = cItemName modul item

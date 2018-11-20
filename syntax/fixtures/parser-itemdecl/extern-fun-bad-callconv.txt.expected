@@ -1,0 +1,7 @@
+[ERROR]
+test.ieo:1:8:
+  |
+1 | extern "C" fun f()
+  |        ^^^^^^^^^^
+unexpected ""C" fun f("
+expecting ""intentio""

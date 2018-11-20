@@ -4,7 +4,6 @@ module Intentio.Codegen.SymbolNames
   ( GetCModuleFileName(..)
   , cModuleFileNameBase
   , cItemName
-  , cItemName'
   , cParamName
   , cParamName'
   , cVarName
@@ -23,6 +22,7 @@ import           Intentio.Codegen.SymbolNames.Mangling
                                                 ( mangle )
 import           Intentio.Compiler              ( ModuleName(..)
                                                 , moduleName
+                                                , unItemName
                                                 )
 import qualified Intentio.Hir                  as H
 
@@ -38,8 +38,13 @@ instance GetCModuleFileName CModuleSource where
 instance GetCModuleFileName CModuleHeader where
   cModuleFileName m = cModuleFileNameBase m <> ".h"
 
+isItemNameMangled :: H.Item a -> Bool
+isItemNameMangled = hasn't (H.itemKind . H._ExternFnItem)
+
 cItemName :: (Eq a, Show a) => H.Module a -> H.Item a -> String
-cItemName modul item = cItemName' (modul ^. moduleName) iname
+cItemName modul item
+  | isItemNameMangled item = cItemName' (modul ^. moduleName) iname
+  | otherwise              = item ^. H.itemName ^?! _Just ^. unItemName & toS
  where
   iname   = fromMaybe unnamed (item ^. H.itemName)
   unnamed = H.ItemName $ "$" <> (item ^. H.itemId . H.unItemId & show)

@@ -27,6 +27,7 @@ data TokenType
   | TKwEnum
   | TKwEval
   | TKwExport
+  | TKwExtern
   | TKwFun
   | TKwFail
   | TKwIf

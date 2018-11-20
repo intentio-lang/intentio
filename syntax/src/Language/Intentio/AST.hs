@@ -126,10 +126,13 @@ instance (Eq a, Show a) => A.Item (ItemDecl a) where
   _itemName ItemDecl { _itemDeclKind = ImportItemDecl _ } = Nothing
   _itemName ItemDecl { _itemDeclKind = FunItemDecl f } =
     Just . convert $ _funDeclName f
+  _itemName ItemDecl { _itemDeclKind = ExternFunItemDecl f } =
+    Just . convert $ _externFunDeclName f
 
 data ItemDeclKind a
   = ImportItemDecl (ImportDecl a)
   | FunItemDecl (FunDecl a)
+  | ExternFunItemDecl (ExternFunDecl a)
   deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
 
 instance ToJSON a => ToJSON (ItemDeclKind a)
@@ -186,6 +189,27 @@ instance HasSourcePos (FunDecl a) where
 
 instance ToJSON a => ToJSON (FunDecl a)
 instance FromJSON a => FromJSON (FunDecl a)
+
+data CallConv = IntentioCallConv
+  deriving (Show, Eq, Generic)
+
+instance ToJSON CallConv
+instance FromJSON CallConv
+
+data ExternFunDecl a = ExternFunDecl
+  { _externFunDeclAnn       :: a
+  , _externFunDeclSourcePos :: SourcePos
+  , _externFunDeclCallConv  :: CallConv
+  , _externFunDeclName      :: ScopeId a
+  , _externFunDeclParams    :: [FunParam a]
+  }
+  deriving (Show, Eq, Generic, Functor, Foldable, Traversable)
+
+instance HasSourcePos (ExternFunDecl a) where
+  _sourcePos = _externFunDeclSourcePos
+
+instance ToJSON a => ToJSON (ExternFunDecl a)
+instance FromJSON a => FromJSON (ExternFunDecl a)
 
 newtype FunParam a = FunParam { _funParamId :: ScopeId a }
   deriving (Show, Eq, Generic, HasSourcePos, ToJSON, FromJSON, Functor, Foldable, Traversable)
@@ -352,6 +376,8 @@ makeLenses ''ExportDecl
 makeLenses ''ImportDecl
 makePrisms ''ImportDeclKind
 makeLenses ''FunDecl
+makePrisms ''CallConv
+makeLenses ''ExternFunDecl
 makeLenses ''FunParam
 makeLenses ''FunBody
 makeLenses ''Stmt
@@ -389,6 +415,9 @@ instance Annotated ItemDecl where
 
 instance Annotated FunDecl where
   ann = funDeclAnn
+
+instance Annotated ExternFunDecl where
+  ann = externFunDeclAnn
 
 instance Annotated Stmt where
   ann = stmtAnn

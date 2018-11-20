@@ -36,13 +36,15 @@ emitItemHeader :: ItemEmit [C.Definition]
 emitItemHeader = do
   item <- askItem
   case item ^. H.itemKind of
-    H.FnItem bodyId -> emitFnHeader bodyId
+    H.FnItem bodyId                -> emitFnHeader bodyId
+    H.ExternFnItem callConv params -> emitExternFn callConv params
 
 emitItemSource :: ItemEmit [C.Definition]
 emitItemSource = do
   item <- askItem
   case item ^. H.itemKind of
-    H.FnItem bodyId -> emitFnSource bodyId
+    H.FnItem bodyId    -> emitFnSource bodyId
+    H.ExternFnItem _ _ -> return []
 
 --------------------------------------------------------------------------------
 -- Function item emitter
@@ -72,3 +74,14 @@ emitFnSource bodyId = do
   pars    <- runBodyEmit emitFnParams body
   cbody   <- runImpBodyEmit emitImpBody impBody
   return [cunit| typename IeoResult $id:f ($params:pars) { $items:cbody } |]
+
+--------------------------------------------------------------------------------
+-- Extern function item emitter
+
+emitExternFn :: H.CallConv -> H.BodyId -> ItemEmit [C.Definition]
+emitExternFn H.IntentioCallConv bodyId = do
+  item <- askItem
+  body <- getBodyById bodyId
+  pars <- runBodyEmit emitFnParams body
+  let f :: String = item ^. H.itemName ^?! _Just ^. H.unItemName & toS
+  return [cunit| typename IeoResult $id:f ($params:pars); |]

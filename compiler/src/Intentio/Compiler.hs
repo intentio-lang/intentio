@@ -7,8 +7,10 @@
 module Intentio.Compiler
   ( module Intentio.Compiler.Monad
   , module Language.Intentio.Assembly
+  , module Intentio.Compiler.AssemblyMonad
   )
 where
 
 import           Intentio.Compiler.Monad
 import           Language.Intentio.Assembly
+import           Intentio.Compiler.AssemblyMonad

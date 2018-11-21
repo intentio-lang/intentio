@@ -16,6 +16,10 @@ module Language.Intentio.Assembly
   , mkModuleMap
   , AssemblyConstructError(..)
   , prettyAssemblyConstructError
+   -- ** Resolving modules & items
+  , lookupModule
+  , lookupMainModule
+  , lookupItem
    -- ** Operations on assemblies
   , mapModules
   , mapModulesM
@@ -31,6 +35,7 @@ module Language.Intentio.Assembly
   , Module(..)
   , moduleName
   , moduleItems
+  , moduleLookupItem
 
    -- * Item type class
   , ItemName(..)
@@ -159,6 +164,19 @@ mkAssembly _assemblyType _assemblyName _assemblyOutputPath modlist = MkAssembly
 mkModuleMap :: Module m => NonEmpty m -> Map ModuleName m
 mkModuleMap = M.fromList . fmap (\m -> (_moduleName m, m)) . toList
 
+lookupModule :: Module a => ModuleName -> Assembly a -> Maybe a
+lookupModule n a = a ^. assemblyModules . at n
+
+lookupMainModule :: Module a => Assembly a -> Maybe a
+lookupMainModule a = a ^. assemblyMainModuleName >>= flip lookupModule a
+
+lookupItem
+  :: Module a => ModuleName -> ItemName -> Assembly a -> Maybe (a, ItemTy a)
+lookupItem m i a = do
+  modul <- lookupModule m a
+  item  <- modul ^. moduleLookupItem i
+  return (modul, item)
+
 mapModules :: (Module a, Module b) => (a -> b) -> Assembly a -> Assembly b
 mapModules f srcAsm =
   let srcMl = srcAsm ^. assemblyModules & toList
@@ -218,18 +236,35 @@ class (Eq a, Show a, HasSourcePos a, Item (ItemTy a)) => Module a where
   -- Items should be in same order as in input source code.
   _moduleItems :: a -> [ItemTy a]
 
+  -- | Lookup item by name.
+  --
+  -- This operation may be usually asymptotically faster than `O(n)`.
+  _moduleLookupItem :: ItemName -> a -> Maybe (ItemTy a)
+  _moduleLookupItem n = find (\i -> _itemName i == Just n) . _moduleItems
+  {-# INLINABLE _moduleLookupItem #-}
+
 moduleName
   :: (Profunctor p, Contravariant f, Module a) => Optic' p f a ModuleName
 moduleName = to _moduleName
+{-# INLINE moduleName #-}
 
 moduleItems
   :: (Profunctor p, Contravariant f, Module a) => Optic' p f a [ItemTy a]
 moduleItems = to _moduleItems
+{-# INLINE moduleItems #-}
+
+moduleLookupItem
+  :: (Profunctor p, Contravariant f, Module a)
+  => ItemName
+  -> Optic' p f a (Maybe (ItemTy a))
+moduleLookupItem iName = to $ _moduleLookupItem iName
+{-# INLINE moduleLookupItem #-}
 
 instance Module Void where
   type ItemTy Void = Void
-  _moduleName  = unreachable
-  _moduleItems = unreachable
+  _moduleName       = unreachable
+  _moduleItems      = unreachable
+  _moduleLookupItem = unreachable
 
 --------------------------------------------------------------------------------
 -- Item class
@@ -241,6 +276,7 @@ class (Eq a, Show a, HasSourcePos a) => Item a where
 itemName
   :: (Profunctor p, Contravariant f, Item a) => Optic' p f a (Maybe ItemName)
 itemName = to _itemName
+{-# INLINE itemName #-}
 
 instance Item Void where
   _itemName = unreachable

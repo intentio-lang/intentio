@@ -1,0 +1,121 @@
+[
+  {
+    "_itemDeclAnn": [],
+    "_itemDeclKind": {
+      "contents": {
+        "_externFunDeclAnn": [],
+        "_externFunDeclCallConv": [],
+        "_externFunDeclName": {
+          "_scopeIdAnn": [],
+          "_scopeIdSourcePos": [
+            "test.ieo",
+            0,
+            22
+          ],
+          "_unScopeId": "foo"
+        },
+        "_externFunDeclParams": [
+          {
+            "_scopeIdAnn": [],
+            "_scopeIdSourcePos": [
+              "test.ieo",
+              0,
+              26
+            ],
+            "_unScopeId": "a"
+          },
+          {
+            "_scopeIdAnn": [],
+            "_scopeIdSourcePos": [
+              "test.ieo",
+              0,
+              29
+            ],
+            "_unScopeId": "b"
+          }
+        ],
+        "_externFunDeclSourcePos": [
+          "test.ieo",
+          0,
+          0
+        ]
+      },
+      "tag": "ExternFunItemDecl"
+    },
+    "_itemDeclSourcePos": [
+      "test.ieo",
+      0,
+      0
+    ]
+  },
+  {
+    "_itemDeclAnn": [],
+    "_itemDeclKind": {
+      "contents": {
+        "_externFunDeclAnn": [],
+        "_externFunDeclCallConv": [],
+        "_externFunDeclName": {
+          "_scopeIdAnn": [],
+          "_scopeIdSourcePos": [
+            "test.ieo",
+            2,
+            22
+          ],
+          "_unScopeId": "id"
+        },
+        "_externFunDeclParams": [
+          {
+            "_scopeIdAnn": [],
+            "_scopeIdSourcePos": [
+              "test.ieo",
+              2,
+              25
+            ],
+            "_unScopeId": "x"
+          }
+        ],
+        "_externFunDeclSourcePos": [
+          "test.ieo",
+          2,
+          0
+        ]
+      },
+      "tag": "ExternFunItemDecl"
+    },
+    "_itemDeclSourcePos": [
+      "test.ieo",
+      2,
+      0
+    ]
+  },
+  {
+    "_itemDeclAnn": [],
+    "_itemDeclKind": {
+      "contents": {
+        "_externFunDeclAnn": [],
+        "_externFunDeclCallConv": [],
+        "_externFunDeclName": {
+          "_scopeIdAnn": [],
+          "_scopeIdSourcePos": [
+            "test.ieo",
+            4,
+            22
+          ],
+          "_unScopeId": "f"
+        },
+        "_externFunDeclParams": [],
+        "_externFunDeclSourcePos": [
+          "test.ieo",
+          4,
+          0
+        ]
+      },
+      "tag": "ExternFunItemDecl"
+    },
+    "_itemDeclSourcePos": [
+      "test.ieo",
+      4,
+      0
+    ]
+  }
+]

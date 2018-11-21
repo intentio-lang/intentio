@@ -21,7 +21,9 @@ where
 import           Intentio.Prelude
 
 import qualified Intentio.Codegen.Imp          as I
-import           Intentio.Compiler              ( CompilePure )
+import           Intentio.Compiler              ( Assembly
+                                                , CompilePure
+                                                )
 import qualified Intentio.Hir                  as H
 
 type Emit r = ReaderT r CompilePure
@@ -31,13 +33,15 @@ type ItemEmit = Emit ItemContext
 type BodyEmit = Emit BodyContext
 type ImpBodyEmit = Emit ImpBodyContext
 
-type ModuleContext = H.Module ()
-type ItemContext = (H.Module (), H.Item ())
-type BodyContext = (H.Module (), H.Item (), H.Body ())
-type ImpBodyContext = (H.Module (), H.Item (), I.Body ())
+type ModuleContext = (Assembly (H.Module ()), H.Module ())
+type ItemContext = (Assembly (H.Module ()), H.Module (), H.Item ())
+type BodyContext = (Assembly (H.Module ()), H.Module (), H.Item (), H.Body ())
+type ImpBodyContext
+  = (Assembly (H.Module ()), H.Module (), H.Item (), I.Body ())
 
-runModuleEmit :: ModuleEmit a -> H.Module () -> CompilePure a
-runModuleEmit = runReaderT
+runModuleEmit
+  :: ModuleEmit a -> Assembly (H.Module ()) -> H.Module () -> CompilePure a
+runModuleEmit f a m = runReaderT f (a, m)
 {-# INLINE runModuleEmit #-}
 
 runItemEmit :: ItemEmit a -> H.Item () -> ModuleEmit a
@@ -52,24 +56,26 @@ runImpBodyEmit :: ImpBodyEmit a -> I.Body () -> ItemEmit a
 runImpBodyEmit = flip withImpBody
 {-# INLINE runImpBodyEmit #-}
 
-withModule :: H.Module () -> ModuleEmit a -> CompilePure a
-withModule = flip runModuleEmit
+withModule
+  :: Assembly (H.Module ()) -> H.Module () -> ModuleEmit a -> CompilePure a
+withModule a m f = runModuleEmit f a m
 {-# INLINE withModule #-}
 
 withItem :: H.Item () -> ItemEmit a -> ModuleEmit a
-withItem i = withReaderT (, i)
+withItem i = withReaderT $ \(a, m) -> (a, m, i)
 {-# INLINE withItem #-}
 
 withBody :: H.Body () -> BodyEmit a -> ItemEmit a
-withBody b = withReaderT $ \(m, i) -> (m, i, b)
+withBody b = withReaderT $ \(a, m, i) -> (a, m, i, b)
 {-# INLINE withBody #-}
 
 withImpBody :: I.Body () -> ImpBodyEmit a -> ItemEmit a
-withImpBody b = withReaderT $ \(m, i) -> (m, i, b)
+withImpBody b = withReaderT $ \(a, m, i) -> (a, m, i, b)
 {-# INLINE withImpBody #-}
 
 class Monad m => MonadModuleEmit (m :: * -> *) where
-  askModule :: m (H.Module ())
+  askAssembly :: m (Assembly (H.Module ()))
+  askModule   :: m (H.Module ())
 
 class MonadModuleEmit m => MonadItemEmit (m :: * -> *) where
   askItem :: m (H.Item ())
@@ -81,37 +87,41 @@ class MonadItemEmit m => MonadImpBodyEmit (m :: * -> *) where
   askImpBody :: m (I.Body ())
 
 instance MonadModuleEmit ModuleEmit where
-  askModule = ask
+  askAssembly = view _1
+  askModule   = view _2
   {-# INLINE askModule #-}
 
 instance MonadModuleEmit ItemEmit where
-  askModule = view _1
+  askAssembly = view _1
+  askModule   = view _2
   {-# INLINE askModule #-}
 
 instance MonadModuleEmit BodyEmit where
-  askModule = view _1
+  askAssembly = view _1
+  askModule   = view _2
   {-# INLINE askModule #-}
 
 instance MonadModuleEmit ImpBodyEmit where
-  askModule = view _1
+  askAssembly = view _1
+  askModule   = view _2
   {-# INLINE askModule #-}
 
 instance MonadItemEmit ItemEmit where
-  askItem = view _2
+  askItem = view _3
   {-# INLINE askItem #-}
 
 instance MonadItemEmit BodyEmit where
-  askItem = view _2
+  askItem = view _3
   {-# INLINE askItem #-}
 
 instance MonadItemEmit ImpBodyEmit where
-  askItem = view _2
+  askItem = view _3
   {-# INLINE askItem #-}
 
 instance MonadBodyEmit BodyEmit where
-  askBody = view _3
+  askBody = view _4
   {-# INLINE askBody #-}
 
 instance MonadImpBodyEmit ImpBodyEmit where
-  askImpBody = view _3
+  askImpBody = view _4
   {-# INLINE askImpBody #-}

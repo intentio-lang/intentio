@@ -121,8 +121,9 @@ lowerItems = do
 
 lowerItem :: A.ItemDecl RS -> LowerM [H.Item ()]
 lowerItem item = case item ^. A.itemDeclKind of
-  A.ImportItemDecl _ -> return [] -- Handled by 'collectImports'
-  A.FunItemDecl    d -> pure <$> lowerFunDecl d
+  A.ImportItemDecl    _ -> return [] -- Handled by 'collectImports'
+  A.FunItemDecl       d -> pure <$> lowerFunDecl d
+  A.ExternFunItemDecl d -> pure <$> lowerExternFunDecl d
 
 lowerFunDecl :: A.FunDecl RS -> LowerM (H.Item ())
 lowerFunDecl af = do
@@ -133,6 +134,18 @@ lowerFunDecl af = do
   let _itemId        = convert $ af ^. nodeId
   let _itemName      = Just iName
   let _itemKind      = H.FnItem bid
+  return H.Item { .. }
+
+lowerExternFunDecl :: A.ExternFunDecl RS -> LowerM (H.Item ())
+lowerExternFunDecl af = do
+  let iName    = ItemName $ af ^. A.externFunDeclName . A.unScopeId
+  let callConv = af ^. A.externFunDeclCallConv
+  bid <- allocBodyId iName
+  let _itemAnn       = ()
+  let _itemSourcePos = af ^. sourcePos
+  let _itemId        = convert $ af ^. nodeId
+  let _itemName      = Just iName
+  let _itemKind      = H.ExternFnItem callConv bid
   return H.Item { .. }
 
 lowerBodies :: LowerM ([H.BodyId], IM.IntMap (H.Body ()))
@@ -146,8 +159,9 @@ lowerBodies = do
 
 lowerBody :: A.ItemDecl RS -> LowerM [H.Body ()]
 lowerBody item = case item ^. A.itemDeclKind of
-  A.ImportItemDecl _ -> return []
-  A.FunItemDecl    d -> pure <$> lowerFunDeclBody item d
+  A.ImportItemDecl    _ -> return []
+  A.FunItemDecl       d -> pure <$> lowerFunDeclBody item d
+  A.ExternFunItemDecl d -> pure <$> lowerExternFunDeclBody item d
 
 lowerFunDeclBody :: A.ItemDecl RS -> A.FunDecl RS -> LowerM (H.Body ())
 lowerFunDeclBody aItem af = do
@@ -162,6 +176,17 @@ lowerFunDeclBody aItem af = do
   let _bodyVarIds = varIdsP <> varIdsB
   let _bodyVars   = varsP <> varsB
 
+  return H.Body { .. }
+
+lowerExternFunDeclBody
+  :: A.ItemDecl RS -> A.ExternFunDecl RS -> LowerM (H.Body ())
+lowerExternFunDeclBody aItem af = do
+  let _bodyAnn = ()
+  _bodyId <- lookupBodyId aItem
+  let (_bodyVarIds, _bodyVars, _bodyParams) =
+        lowerParams $ af ^. A.externFunDeclParams
+  let emptyBlock = H.Block () (() ^. sourcePos) []
+  let _bodyValue = H.Expr () (() ^. sourcePos) $ H.BlockExpr emptyBlock
   return H.Body { .. }
 
 lowerParams

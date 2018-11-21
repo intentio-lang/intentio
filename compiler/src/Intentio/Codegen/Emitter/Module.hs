@@ -32,13 +32,21 @@ import           Intentio.Codegen.Emitter.Types ( CModuleHeader
                                                 )
 import           Intentio.Codegen.Emitter.Util  ( getItemById )
 import           Intentio.Codegen.SymbolNames   ( GetCModuleFileName(..) )
-import           Intentio.Compiler              ( CompilePure )
+import           Intentio.Compiler              ( Assembly
+                                                , CompilePure
+                                                )
 import qualified Intentio.Hir                  as H
 
-emitModuleHeader :: H.Module () -> CompilePure (CModuleDef CModuleHeader)
+emitModuleHeader
+  :: Assembly (H.Module ())
+  -> H.Module ()
+  -> CompilePure (CModuleDef CModuleHeader)
 emitModuleHeader = runModuleEmit emitModuleHeader'
 
-emitModuleSource :: H.Module () -> CompilePure (CModuleDef CModuleSource)
+emitModuleSource
+  :: Assembly (H.Module ())
+  -> H.Module ()
+  -> CompilePure (CModuleDef CModuleSource)
 emitModuleSource = runModuleEmit emitModuleSource'
 
 emitModuleHeader' :: ModuleEmit (CModuleDef CModuleHeader)
@@ -52,9 +60,9 @@ emitModule
    . (GetCModuleFileName t, ModuleEmitter t)
   => ModuleEmit (CModuleDef t)
 emitModule = do
-  _cModuleDefSourcePos    <- view H.moduleSourcePos
-  _cModuleDefIntentioName <- view H.moduleName
-  _cModuleDefFileName     <- cModuleFileName @t <$> view H.moduleName
+  _cModuleDefSourcePos    <- view H.moduleSourcePos <$> askModule
+  _cModuleDefIntentioName <- view H.moduleName <$> askModule
+  _cModuleDefFileName <- cModuleFileName @t . view H.moduleName <$> askModule
   imports                 <- emitImports @t
   defs                    <- emitItems @t
 
@@ -76,9 +84,9 @@ class ModuleEmitter t where
 
 instance ModuleEmitter CModuleHeader where
   emitImports = pure []
-
   emitItems =
-    view H.moduleItemIds
+    askModule
+      <&> view H.moduleItemIds
       >>= mapM (getItemById >=> runItemEmit emitItemHeader)
       <&> concat
 
@@ -92,7 +100,7 @@ instance ModuleEmitter CModuleSource where
     where inc n = "#include \"" <> cModuleFileName @CModuleHeader n <> "\""
 
   emitItems = do
-    items <- view H.moduleItemIds >>= mapM getItemById
+    items <- askModule <&> view H.moduleItemIds >>= mapM getItemById
     hs    <- forM items $ runItemEmit emitItemHeader
     ss    <- forM items $ runItemEmit emitItemSource
     return $ concat (hs <> ss)

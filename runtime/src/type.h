@@ -10,10 +10,10 @@ typedef struct IeoTerm IeoTerm;
 typedef struct IeoResult IeoResult;
 typedef struct IeoString IeoString;
 
-typedef IeoResult(IeoOpUnary)(IEO_NOTNULL const IeoTerm *self);
+typedef IeoResult(IeoOpUnary)(IEO_NOTNULL IeoTerm *self);
 
-typedef IeoResult(IeoOpBinary)(IEO_NOTNULL const IeoTerm *self,
-                               IEO_NOTNULL const IeoTerm *rhs);
+typedef IeoResult(IeoOpBinary)(IEO_NOTNULL IeoTerm *self,
+                               IEO_NOTNULL IeoTerm *rhs);
 
 typedef struct IeoType
 {

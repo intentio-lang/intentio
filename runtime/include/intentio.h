@@ -41,46 +41,67 @@ ieo_regex_new(const char *val);
 // Operators
 
 IeoResult
-ieo_neg(const IeoTerm *self);
+ieo_neg(IeoTerm *self);
 
 IeoResult
-ieo_add(const IeoTerm *lhs, const IeoTerm *rhs);
+ieo_add(IeoTerm *lhs, IeoTerm *rhs);
 
 IeoResult
-ieo_div(const IeoTerm *lhs, const IeoTerm *rhs);
+ieo_div(IeoTerm *lhs, IeoTerm *rhs);
 
 IeoResult
-ieo_mul(const IeoTerm *lhs, const IeoTerm *rhs);
+ieo_mul(IeoTerm *lhs, IeoTerm *rhs);
 
 IeoResult
-ieo_sub(const IeoTerm *lhs, const IeoTerm *rhs);
+ieo_sub(IeoTerm *lhs, IeoTerm *rhs);
 
 IeoResult
-ieo_eq(const IeoTerm *lhs, const IeoTerm *rhs);
+ieo_eq(IeoTerm *lhs, IeoTerm *rhs);
 
 IeoResult
-ieo_gt(const IeoTerm *lhs, const IeoTerm *rhs);
+ieo_gt(IeoTerm *lhs, IeoTerm *rhs);
 
 IeoResult
-ieo_gteq(const IeoTerm *lhs, const IeoTerm *rhs);
+ieo_gteq(IeoTerm *lhs, IeoTerm *rhs);
 
 IeoResult
-ieo_lt(const IeoTerm *lhs, const IeoTerm *rhs);
+ieo_lt(IeoTerm *lhs, IeoTerm *rhs);
 
 IeoResult
-ieo_lteq(const IeoTerm *lhs, const IeoTerm *rhs);
+ieo_lteq(IeoTerm *lhs, IeoTerm *rhs);
 
 IeoResult
-ieo_neq(const IeoTerm *lhs, const IeoTerm *rhs);
+ieo_neq(IeoTerm *lhs, IeoTerm *rhs);
 
 IeoResult
-ieo_compare(const IeoTerm *lhs, const IeoTerm *rhs);
+ieo_compare(IeoTerm *lhs, IeoTerm *rhs);
 
 IeoResult
-ieo_seq(const IeoTerm *lhs, const IeoTerm *rhs);
+ieo_seq(IeoTerm *lhs, IeoTerm *rhs);
 
 IeoResult
-ieo_sneq(const IeoTerm *lhs, const IeoTerm *rhs);
+ieo_sneq(IeoTerm *lhs, IeoTerm *rhs);
+
+//----------------------------------------------------------------------------
+// Type conversions
+
+IeoResult
+ieo_float(IeoTerm *x);
+
+IeoResult
+ieo_int(IeoTerm *x);
+
+IeoResult
+ieo_str(IeoTerm *x);
+
+//----------------------------------------------------------------------------
+// I/O functions
+
+IeoResult
+ieo_println(IeoTerm *x);
+
+IeoResult
+ieo_scanln();
 
 //----------------------------------------------------------------------------
 // Runtime metadata functions

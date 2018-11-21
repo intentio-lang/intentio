@@ -32,8 +32,8 @@
 
 #define COMMUTATIVE(LHS, RHS, BLOCK)                                           \
   do {                                                                         \
-    const IeoTerm *lhs_ = (LHS);                                               \
-    const IeoTerm *rhs_ = (RHS);                                               \
+    IeoTerm *lhs_ = (LHS);                                               \
+    IeoTerm *rhs_ = (RHS);                                               \
     do {                                                                       \
       (LHS) = lhs_;                                                            \
       (RHS) = rhs_;                                                            \
@@ -54,7 +54,7 @@
   do {                                                                         \
     FIND_BINARY(compare, LHS)                                                  \
     {                                                                          \
-      const IeoTerm *cmp_;                                                     \
+      IeoTerm *cmp_;                                                     \
       IEO_TRY_UNWRAP(cmp_, CALL_BINARY(compare, LHS, RHS));                    \
       IEO_TRY_ERR_(ieo_is_int(cmp_), IEO_STP(COMPARE_RETURNED_NON_INT));       \
       int64_t it = ieo_int_value(cmp_);                                        \
@@ -63,7 +63,7 @@
     }                                                                          \
     FIND_BINARY(compare, RHS)                                                  \
     {                                                                          \
-      const IeoTerm *cmp_;                                                     \
+      IeoTerm *cmp_;                                                     \
       IEO_TRY_UNWRAP(cmp_, CALL_BINARY(compare, RHS, LHS));                    \
       IEO_TRY_ERR_(ieo_is_int(cmp_), IEO_STP(COMPARE_RETURNED_NON_INT));       \
       int64_t it = -ieo_int_value(cmp_);                                       \
@@ -76,7 +76,7 @@ IEO_STATIC_STRING(COMPARE_RETURNED_NON_INT,
                   "expected __compare__ to return an Int");
 
 IeoResult
-ieo_neg(IEO_NOTNULL const IeoTerm *self)
+ieo_neg(IEO_NOTNULL IeoTerm *self)
 {
   IEO_ASSERT(self);
 
@@ -85,7 +85,7 @@ ieo_neg(IEO_NOTNULL const IeoTerm *self)
 }
 
 IeoResult
-ieo_add(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
+ieo_add(IEO_NOTNULL IeoTerm *lhs, IEO_NOTNULL IeoTerm *rhs)
 {
   IEO_ASSERT(lhs);
   IEO_ASSERT(rhs);
@@ -95,7 +95,7 @@ ieo_add(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 }
 
 IeoResult
-ieo_div(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
+ieo_div(IEO_NOTNULL IeoTerm *lhs, IEO_NOTNULL IeoTerm *rhs)
 {
   IEO_ASSERT(lhs);
   IEO_ASSERT(rhs);
@@ -105,7 +105,7 @@ ieo_div(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 }
 
 IeoResult
-ieo_mul(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
+ieo_mul(IEO_NOTNULL IeoTerm *lhs, IEO_NOTNULL IeoTerm *rhs)
 {
   IEO_ASSERT(lhs);
   IEO_ASSERT(rhs);
@@ -115,7 +115,7 @@ ieo_mul(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 }
 
 IeoResult
-ieo_sub(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
+ieo_sub(IEO_NOTNULL IeoTerm *lhs, IEO_NOTNULL IeoTerm *rhs)
 {
   IEO_ASSERT(lhs);
   IEO_ASSERT(rhs);
@@ -125,7 +125,7 @@ ieo_sub(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 }
 
 IeoResult
-ieo_eq(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
+ieo_eq(IEO_NOTNULL IeoTerm *lhs, IEO_NOTNULL IeoTerm *rhs)
 {
   IEO_ASSERT(lhs);
   IEO_ASSERT(rhs);
@@ -139,7 +139,7 @@ ieo_eq(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 }
 
 IeoResult
-ieo_gt(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
+ieo_gt(IEO_NOTNULL IeoTerm *lhs, IEO_NOTNULL IeoTerm *rhs)
 {
   IEO_ASSERT(lhs);
   IEO_ASSERT(rhs);
@@ -154,7 +154,7 @@ ieo_gt(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 }
 
 IeoResult
-ieo_gteq(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
+ieo_gteq(IEO_NOTNULL IeoTerm *lhs, IEO_NOTNULL IeoTerm *rhs)
 {
   IEO_ASSERT(lhs);
   IEO_ASSERT(rhs);
@@ -170,7 +170,7 @@ ieo_gteq(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 }
 
 IeoResult
-ieo_lt(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
+ieo_lt(IEO_NOTNULL IeoTerm *lhs, IEO_NOTNULL IeoTerm *rhs)
 {
   IEO_ASSERT(lhs);
   IEO_ASSERT(rhs);
@@ -185,7 +185,7 @@ ieo_lt(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 }
 
 IeoResult
-ieo_lteq(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
+ieo_lteq(IEO_NOTNULL IeoTerm *lhs, IEO_NOTNULL IeoTerm *rhs)
 {
   IEO_ASSERT(lhs);
   IEO_ASSERT(rhs);
@@ -201,7 +201,7 @@ ieo_lteq(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 }
 
 IeoResult
-ieo_neq(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
+ieo_neq(IEO_NOTNULL IeoTerm *lhs, IEO_NOTNULL IeoTerm *rhs)
 {
   IEO_ASSERT(lhs);
   IEO_ASSERT(rhs);
@@ -215,19 +215,19 @@ ieo_neq(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 }
 
 IeoResult
-ieo_seq(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
+ieo_seq(IEO_NOTNULL IeoTerm *lhs, IEO_NOTNULL IeoTerm *rhs)
 {
   return SAME_TYPE(lhs, rhs) ? ieo_eq(lhs, rhs) : IEO_BOOL(false);
 }
 
 IeoResult
-ieo_sneq(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
+ieo_sneq(IEO_NOTNULL IeoTerm *lhs, IEO_NOTNULL IeoTerm *rhs)
 {
   return SAME_TYPE(lhs, rhs) ? IEO_BOOL(true) : ieo_neq(lhs, rhs);
 }
 
 IeoResult
-ieo_compare(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
+ieo_compare(IEO_NOTNULL IeoTerm *lhs, IEO_NOTNULL IeoTerm *rhs)
 {
   IEO_ASSERT(lhs);
   IEO_ASSERT(rhs);
@@ -239,7 +239,7 @@ ieo_compare(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
   FIND_DELEGATE_BINARY(compare, lhs, rhs);
   FIND_BINARY(compare, rhs)
   {
-    const IeoTerm *cmp;
+    IeoTerm *cmp;
     IEO_TRY_UNWRAP(cmp, CALL_BINARY(compare, rhs, lhs));
     return ieo_neg(cmp);
   }

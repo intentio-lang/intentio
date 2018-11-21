@@ -44,7 +44,7 @@ ieo_string_new(const char *str, size_t strsz)
 }
 
 IEO_PURE IeoResult
-ieo_is_string(IEO_NOTNULL const IeoTerm *term)
+ieo_is_string(IEO_NOTNULL IeoTerm *term)
 {
   IEO_ASSERT(term);
   IEO_ASSERT(term->head.ty);
@@ -52,13 +52,16 @@ ieo_is_string(IEO_NOTNULL const IeoTerm *term)
 }
 
 extern inline IEO_PURE size_t
-ieo_string_size(IEO_NOTNULL const IeoTerm *p);
+ieo_string_size(IEO_NOTNULL IeoTerm *p);
 
 extern inline IEO_PURE const char *
-ieo_string_data(IEO_NOTNULL const IeoTerm *p);
+ieo_string_data(IEO_NOTNULL IeoTerm *p);
+
+extern inline IEO_PURE const char *
+ieo_string_c_str(IEO_NOTNULL IeoTerm *p);
 
 static IEO_PURE IeoResult
-add_func(const IeoTerm *self, const IeoTerm *other)
+add_func(IeoTerm *self, IeoTerm *other)
 {
   IEO_ASSERT(IEO_OK(ieo_is_string(self)));
   IEO_TYPECK(other, string);
@@ -77,7 +80,7 @@ add_func(const IeoTerm *self, const IeoTerm *other)
 }
 
 static IEO_PURE IeoResult
-eq_impl(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
+eq_impl(IEO_NOTNULL IeoTerm *lhs, IEO_NOTNULL IeoTerm *rhs)
 {
   IEO_ASSERT(IEO_OK(ieo_is_string(lhs)));
   IEO_ASSERT(IEO_OK(ieo_is_string(rhs)));
@@ -101,14 +104,14 @@ eq_impl(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
 }
 
 static IEO_PURE IeoResult
-eq_func(const IeoTerm *self, const IeoTerm *rhs)
+eq_func(IeoTerm *self, IeoTerm *rhs)
 {
   IEO_ASSERT(IEO_OK(ieo_is_string(self)));
   return !IEO_OK(ieo_is_string(rhs)) ? IEO_BOOL(false) : eq_impl(self, rhs);
 }
 
 static IEO_PURE IeoResult
-neq_func(const IeoTerm *self, const IeoTerm *rhs)
+neq_func(IeoTerm *self, IeoTerm *rhs)
 {
   IEO_ASSERT(IEO_OK(ieo_is_string(self)));
   return IEO_OK(ieo_is_string(rhs)) ? IEO_NOT(eq_impl(self, rhs))
@@ -116,7 +119,7 @@ neq_func(const IeoTerm *self, const IeoTerm *rhs)
 }
 
 static IEO_PURE IeoResult
-compare_func(IEO_NOTNULL const IeoTerm *lhs, IEO_NOTNULL const IeoTerm *rhs)
+compare_func(IEO_NOTNULL IeoTerm *lhs, IEO_NOTNULL IeoTerm *rhs)
 {
   IEO_ASSERT(IEO_OK(ieo_is_string(lhs)));
   IEO_ASSERT(IEO_OK(ieo_is_string(rhs)));

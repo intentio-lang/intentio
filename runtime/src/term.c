@@ -1,22 +1,22 @@
 #include "term.h"
 
 extern inline IEO_PURE const IeoType *
-ieo_term_ty(IEO_NOTNULL const IeoTerm *p);
+ieo_term_ty(IEO_NOTNULL IeoTerm *p);
 
 extern inline IEO_PURE IeoType *
-ieo_term_ty_mut(IEO_NOTNULL const IeoTerm *p);
+ieo_term_ty_mut(IEO_NOTNULL IeoTerm *p);
 
 extern inline IEO_PURE IeoRefCount
-ieo_term_refcount(IEO_NOTNULL const IeoTerm *p);
+ieo_term_refcount(IEO_NOTNULL IeoTerm *p);
 
 extern inline IEO_PURE const void *
-ieo_term_value(IEO_NOTNULL const IeoTerm *p);
+ieo_term_value(IEO_NOTNULL IeoTerm *p);
 
 extern inline IEO_PURE void *
 ieo_term_value_mut(IEO_NOTNULL IeoTerm *p);
 
 extern inline IEO_PURE IeoTermFlags
-ieo_term_flags(IEO_NOTNULL const IeoTerm *p);
+ieo_term_flags(IEO_NOTNULL IeoTerm *p);
 
 extern inline IEO_CONST IeoResult
 ieo_not_impl_(IeoResult r);

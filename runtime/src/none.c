@@ -35,7 +35,7 @@ ieo_none_unwrap(void)
 }
 
 IEO_PURE IeoResult
-ieo_is_none(IEO_NOTNULL const IeoTerm *term)
+ieo_is_none(IEO_NOTNULL IeoTerm *term)
 {
   IEO_ASSERT(term != NULL);
   IEO_ASSERT(term->head.ty != NULL);
@@ -43,14 +43,14 @@ ieo_is_none(IEO_NOTNULL const IeoTerm *term)
 }
 
 static IEO_PURE IeoResult
-unary_math_func(const IeoTerm *self)
+unary_math_func(IeoTerm *self)
 {
   IEO_ASSERT(IEO_OK(ieo_is_none(self)));
   return ieo_none();
 }
 
 static IEO_PURE IeoResult
-binary_math_func(const IeoTerm *self, const IeoTerm *other)
+binary_math_func(IeoTerm *self, IeoTerm *other)
 {
   IEO_ASSERT(IEO_OK(ieo_is_none(self)));
   IEO_TYPECK(other, none);
@@ -58,19 +58,19 @@ binary_math_func(const IeoTerm *self, const IeoTerm *other)
 }
 
 static IEO_PURE IeoResult
-eq_func(const IeoTerm *self, const IeoTerm *other)
+eq_func(IeoTerm *self, IeoTerm *other)
 {
   return IEO_BOOL(IEO_OK(ieo_is_none(self)) && IEO_OK(ieo_is_none(other)));
 }
 
 static IEO_PURE IeoResult
-neq_func(const IeoTerm *self, const IeoTerm *other)
+neq_func(IeoTerm *self, IeoTerm *other)
 {
   return IEO_BOOL(IEO_ERR(ieo_is_none(self)) || IEO_ERR(ieo_is_none(other)));
 }
 
 static IEO_PURE IeoResult
-compare_func(const IeoTerm *self, const IeoTerm *other)
+compare_func(IeoTerm *self, IeoTerm *other)
 {
   IEO_ASSERT(IEO_OK(ieo_is_none(self)));
   IEO_ASSERT(IEO_OK(ieo_is_none(other)));

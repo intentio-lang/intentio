@@ -59,11 +59,11 @@ fmt : brittany clang-format
 
 # Format Haskell code
 brittany :
-	rg --files | rg .hs$ | xargs brittany --write-mode inplace --output-on-errors
+	rg --files | rg '\.hs$' | xargs brittany --write-mode inplace --output-on-errors
 
 # Format C code
 clang-format :
-  rg --files | rg '(h|hpp|c|cpp)$' | xargs clang-format -i
+  rg --files | rg '\.(h|hpp|c|cpp)$' | xargs clang-format -i
 
 # (Re)create CMake development directory
 init-cmake :

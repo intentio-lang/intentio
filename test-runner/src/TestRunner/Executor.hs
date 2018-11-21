@@ -201,5 +201,6 @@ matchOutput actualBS (Just (LinesIOSpec expectedLinesT)) f =
   let expectedLinesS = toS <$> expectedLinesT
       actualLinesS   = Str.lines (toS actualBS)
   in  case getGroupedDiff expectedLinesS actualLinesS of
-        [] -> return ()
-        d  -> throwError $ f d
+        []         -> return ()
+        [Both _ _] -> return ()
+        d          -> throwError $ f d

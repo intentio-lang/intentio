@@ -84,4 +84,4 @@ emitExternFn H.IntentioCallConv bodyId = do
   body <- getBodyById bodyId
   pars <- runBodyEmit emitFnParams body
   let f :: String = item ^. H.itemName ^?! _Just ^. H.unItemName & toS
-  return [cunit| typename IeoResult $id:f ($params:pars); |]
+  return [cunit| extern typename IeoResult $id:f ($params:pars); |]

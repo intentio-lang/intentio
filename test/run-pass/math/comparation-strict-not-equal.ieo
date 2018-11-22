@@ -7,6 +7,6 @@ fun main() {
   a = 2;
   b = 2.0;
   c = 2;
-  if(a !== b) { println("succ"); };
+  if(a !== b) { println("succ"); } else { println("fail"); };
   if(a !== c) { println("succ"); } else { println("fail"); };
 }

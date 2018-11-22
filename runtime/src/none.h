@@ -19,4 +19,4 @@ IEO_CONST IeoTerm *
 ieo_none_unwrap(void);
 
 IEO_PURE IeoResult
-ieo_is_none(IEO_NOTNULL const IeoTerm *term);
+ieo_is_none(IEO_NOTNULL IeoTerm *term);

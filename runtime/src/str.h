@@ -9,8 +9,8 @@
   IEO_STATIC_STRING(NAME##_str_, STR);                                         \
   IeoTerm *NAME = IEO_STP(NAME##_str_);
 
-#define IEO_STATIC_STRING_DECL(STR)                                            \
-  {                                                                            \
+#define IEO_STATIC_STRING_DECL(STR)                                              \
+  {                                                                              \
     .head =                                                                    \
       {                                                                        \
         .ty = &ieo_std_type_string,                                            \
@@ -23,7 +23,7 @@
     .value = {                                                                 \
       .size = (sizeof(STR) / sizeof(char) - 1),                                \
       .data = (const char *)(STR)                                              \
-    }                                                                          \
+    } \
   }
 
 #define IEO_STRING_ALLOC(STR)                                                  \
@@ -55,10 +55,10 @@ IeoResult
 ieo_string_new(const char *str, size_t strsz);
 
 IEO_PURE IeoResult
-ieo_is_string(IEO_NOTNULL const IeoTerm *term);
+ieo_is_string(IEO_NOTNULL IeoTerm *term);
 
 inline IEO_PURE size_t
-ieo_string_size(IEO_NOTNULL const IeoTerm *p)
+ieo_string_size(IEO_NOTNULL IeoTerm *p)
 {
   IEO_ASSERT(p);
   IEO_ASSERT(IEO_OK(ieo_is_string(p)));
@@ -66,9 +66,21 @@ ieo_string_size(IEO_NOTNULL const IeoTerm *p)
 }
 
 inline IEO_PURE const char *
-ieo_string_data(IEO_NOTNULL const IeoTerm *p)
+ieo_string_data(IEO_NOTNULL IeoTerm *p)
 {
   IEO_ASSERT(p);
   IEO_ASSERT(IEO_OK(ieo_is_string(p)));
   return ((IeoString *)p)->value.data;
 }
+
+/**
+ * Return C string (null-terminated) of given Intentio string term.
+ */
+inline IEO_PURE const char *
+ieo_string_c_str(IEO_NOTNULL IeoTerm *p)
+{
+  return ieo_string_data(p);
+}
+
+IeoResult
+ieo_str(IEO_NOTNULL IeoTerm *x);

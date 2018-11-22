@@ -6,6 +6,7 @@ add_library(
     src/alltypes.c src/alltypes.h
     src/float.c src/float.h
     src/int.c src/int.h
+    src/io.c src/io.h
     src/memory.c src/memory.h
     src/none.c src/none.h
     src/ops.c src/ops.h
@@ -14,6 +15,7 @@ add_library(
     src/str.c src/str.h
     src/term.c src/term.h
     src/type.c src/type.h
+    src/typeconv.c
     src/util.h
     src/util/attrs.h
     src/util/ieo_assert.h

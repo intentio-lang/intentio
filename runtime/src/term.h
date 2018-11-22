@@ -131,7 +131,7 @@ ieo_not_impl_(IeoResult r)
  * Get pointer to term type.
  */
 inline IEO_PURE const IeoType *
-ieo_term_ty(IEO_NOTNULL const IeoTerm *p)
+ieo_term_ty(IEO_NOTNULL IeoTerm *p)
 {
   IEO_ASSERT(p);
   IEO_ASSERT(p->head.ty);
@@ -143,7 +143,7 @@ ieo_term_ty(IEO_NOTNULL const IeoTerm *p)
  * @warning Use this only when needed.
  */
 inline IEO_PURE IeoType *
-ieo_term_ty_mut(IEO_NOTNULL const IeoTerm *p)
+ieo_term_ty_mut(IEO_NOTNULL IeoTerm *p)
 {
   IEO_ASSERT(p);
   IEO_ASSERT(p->head.ty);
@@ -154,7 +154,7 @@ ieo_term_ty_mut(IEO_NOTNULL const IeoTerm *p)
  * Get current reference count of given term object.
  */
 inline IeoRefCount
-ieo_term_refcount(IEO_NOTNULL const IeoTerm *p)
+ieo_term_refcount(IEO_NOTNULL IeoTerm *p)
 {
   IEO_ASSERT(p);
   return atomic_load(&p->head.refcount);
@@ -164,7 +164,7 @@ ieo_term_refcount(IEO_NOTNULL const IeoTerm *p)
  * Get term flags.
  */
 inline IEO_PURE IeoTermFlags
-ieo_term_flags(IEO_NOTNULL const IeoTerm *p)
+ieo_term_flags(IEO_NOTNULL IeoTerm *p)
 {
   IEO_ASSERT(p);
   return p->head.flags;
@@ -174,7 +174,7 @@ ieo_term_flags(IEO_NOTNULL const IeoTerm *p)
  * Get pointer to value memory of given term.
  */
 inline IEO_PURE IEO_NOTNULL const void *
-ieo_term_value(IEO_NOTNULL const IeoTerm *p)
+ieo_term_value(IEO_NOTNULL IeoTerm *p)
 {
   IEO_ASSERT(p);
   return (void *)p->value;

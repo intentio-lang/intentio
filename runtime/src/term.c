@@ -19,7 +19,13 @@ extern inline IEO_PURE IeoTermFlags
 ieo_term_flags(IEO_NOTNULL IeoTerm *p);
 
 extern inline IEO_CONST IeoResult
-ieo_not_impl_(IeoResult r);
+ieo_succ(IeoTerm *t);
+
+extern inline IEO_CONST IeoResult
+ieo_fail(IeoTerm *t);
+
+extern inline IEO_CONST IeoResult
+ieo_not(IeoResult r);
 
 IeoTerm *
 ieo_term_alloc(IeoType *ty)

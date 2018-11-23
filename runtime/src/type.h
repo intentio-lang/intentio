@@ -8,7 +8,6 @@
 
 typedef struct IeoTerm IeoTerm;
 typedef struct IeoResult IeoResult;
-typedef struct IeoString IeoString;
 
 typedef IeoResult(IeoOpUnary)(IEO_NOTNULL IeoTerm *self);
 
@@ -21,7 +20,7 @@ typedef struct IeoType
    * Type name. Preferably the term should be static if declared by
    * native code.
    */
-  IEO_NOTNULL IeoString *type_name;
+  IEO_NOTNULL IeoTerm *type_name;
 
   /**
    * Size of term data, including header, in bytes.
@@ -145,6 +144,28 @@ typedef struct IeoType
    * @return IeoInt*
    */
   IeoOpBinary *compare_func;
+
+  /** @} */
+
+  /**
+   * @defgroup IeoTypeConversionMethods Conversion to basic types
+   * @{
+   */
+
+  /**
+   * Convert term to `Float`.
+   */
+  IeoOpUnary *to_float_func;
+
+  /**
+   * Convert term to `Int`.
+   */
+  IeoOpUnary *to_int_func;
+
+  /**
+   * Convert term to `Str`.
+   */
+  IeoOpUnary *to_str_func;
 
   /** @} */
 

@@ -26,7 +26,7 @@ IeoResult
 ieo_none_fail(void);
 
 IeoResult
-ieo_int_new(int64_t val);
+ieo_int_new(intmax_t val);
 
 IeoResult
 ieo_float_new(long double val);

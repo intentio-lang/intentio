@@ -50,7 +50,7 @@
       fail_msg(MSG ": got string `%s`", ieo_string_c_str((TERM)));             \
     } else {                                                                   \
       fail_msg(MSG ": got term of type %s",                                    \
-               ieo_string_c_str(ieo_term_ty((TERM))->type_name));          \
+               ieo_string_c_str(ieo_term_ty((TERM))->type_name));              \
     }                                                                          \
   } while (0);
 

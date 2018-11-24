@@ -32,8 +32,8 @@
 
 #define COMMUTATIVE(LHS, RHS, BLOCK)                                           \
   do {                                                                         \
-    IeoTerm *lhs_ = (LHS);                                               \
-    IeoTerm *rhs_ = (RHS);                                               \
+    IeoTerm *lhs_ = (LHS);                                                     \
+    IeoTerm *rhs_ = (RHS);                                                     \
     do {                                                                       \
       (LHS) = lhs_;                                                            \
       (RHS) = rhs_;                                                            \
@@ -54,19 +54,19 @@
   do {                                                                         \
     FIND_BINARY(compare, LHS)                                                  \
     {                                                                          \
-      IeoTerm *cmp_;                                                     \
+      IeoTerm *cmp_;                                                           \
       IEO_TRY_UNWRAP(cmp_, CALL_BINARY(compare, LHS, RHS));                    \
       IEO_TRY_ERR_(ieo_is_int(cmp_), IEO_STP(COMPARE_RETURNED_NON_INT));       \
-      int64_t it = ieo_int_value(cmp_);                                        \
+      ieo_int_t it = ieo_int_value(cmp_);                                      \
       bool r_ = (COND);                                                        \
       return IEO_BOOL(r_);                                                     \
     }                                                                          \
     FIND_BINARY(compare, RHS)                                                  \
     {                                                                          \
-      IeoTerm *cmp_;                                                     \
+      IeoTerm *cmp_;                                                           \
       IEO_TRY_UNWRAP(cmp_, CALL_BINARY(compare, RHS, LHS));                    \
       IEO_TRY_ERR_(ieo_is_int(cmp_), IEO_STP(COMPARE_RETURNED_NON_INT));       \
-      int64_t it = -ieo_int_value(cmp_);                                       \
+      ieo_int_t it = -ieo_int_value(cmp_);                                     \
       bool r_ = (COND);                                                        \
       return IEO_BOOL(r_);                                                     \
     }                                                                          \

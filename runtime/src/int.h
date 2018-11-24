@@ -1,20 +1,27 @@
 #pragma once
 
+#include <stdint.h>
+
 #include "term.h"
+
+typedef int64_t ieo_int_t;
+#define IEO_INT_MIN INT64_MIN
+#define IEO_INT_MAX INT64_MAX
+#define PRIdIEO PRId64
 
 typedef struct IeoInt
 {
   IeoTermHeader head;
-  int64_t val;
+  ieo_int_t val;
 } IeoInt;
 
 IeoResult
-ieo_int_new(int64_t val);
+ieo_int_new(ieo_int_t val);
 
 IEO_PURE IeoResult
 ieo_is_int(IEO_NOTNULL IeoTerm *term);
 
-inline IEO_PURE int64_t
+inline IEO_PURE ieo_int_t
 ieo_int_value(IEO_NOTNULL IeoTerm *p)
 {
   IEO_ASSERT(p);

@@ -408,5 +408,53 @@
       4,
       0
     ]
+  },
+  {
+    "_stmtAnn": [],
+    "_stmtKind": {
+      "contents": {
+        "_exprAnn": [],
+        "_exprKind": {
+          "contents": [
+            {
+              "_exprAnn": [],
+              "_exprKind": {
+                "contents": {
+                  "contents": {
+                    "_scopeIdAnn": [],
+                    "_scopeIdSourcePos": [
+                      "test.ieo",
+                      5,
+                      0
+                    ],
+                    "_unScopeId": "nothing"
+                  },
+                  "tag": "ScopeId'"
+                },
+                "tag": "IdExpr"
+              },
+              "_exprSourcePos": [
+                "test.ieo",
+                5,
+                0
+              ]
+            },
+            []
+          ],
+          "tag": "CallExpr"
+        },
+        "_exprSourcePos": [
+          "test.ieo",
+          5,
+          0
+        ]
+      },
+      "tag": "ExprStmt"
+    },
+    "_stmtSourcePos": [
+      "test.ieo",
+      5,
+      0
+    ]
   }
 ]

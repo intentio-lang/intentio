@@ -697,7 +697,7 @@ anyReserved :: BM.Bimap Text TokenType -> Parser Token
 anyReserved = try . BM.fold (\s t p -> (symbol s >>= mkt t) <|> p) empty
 
 tokKw :: TokenType -> Parser Token
-tokKw = tokReserved keywords
+tokKw tt = notFollowedBy ident *> tokReserved keywords tt
 
 tokOp :: TokenType -> Parser Token
 tokOp = tokReserved operators

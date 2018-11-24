@@ -157,7 +157,7 @@ emitExpr expr = case expr ^. I.exprKind of
 
 emitLitExpr :: I.Lit () -> ImpBodyEmit C.Exp
 emitLitExpr lit = case lit ^. I.litKind of
-  I.NoneLit      -> return [cexp| ieo_none |]
+  I.NoneLit      -> return [cexp| ieo_none() |]
   I.IntegerLit x -> return [cexp| ieo_int_new( $llint:x ) |]
   I.FloatLit   x -> case toBoundedRealFloat x of
     Left _ ->

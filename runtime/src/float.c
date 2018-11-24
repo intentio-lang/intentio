@@ -5,6 +5,7 @@
 IeoResult
 ieo_float_new(IEO_UNUSED long double val)
 {
+  IEO_ASSERT(false);
   IeoResult result;
   return result;
 }

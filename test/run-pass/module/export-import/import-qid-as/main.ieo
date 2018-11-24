@@ -1,4 +1,4 @@
-import export-file:nothing as something
+import export_file:nothing as something
 
 fun main() {
   something();

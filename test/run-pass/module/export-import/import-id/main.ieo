@@ -1,5 +1,5 @@
-import export-file
+import export_file
 
 fun main() {
-  export-file:hello();
+  export_file:hello();
 }

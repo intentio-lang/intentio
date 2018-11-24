@@ -1,4 +1,4 @@
-import export-file:*
+import export_file:*
 
 fun main() {
   hello();

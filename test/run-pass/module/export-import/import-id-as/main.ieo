@@ -1,5 +1,5 @@
-import export-file as my-sweet-name
+import export_file as my_sweet_name
 
 fun main() {
-  my-sweet-name:hello();
+  my_sweet_name:hello();
 }

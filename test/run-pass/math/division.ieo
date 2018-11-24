@@ -1,12 +1,12 @@
 # - run:
 #     stdin:
-#       - "2"
+#       - "8"
 #       - "2"
 #     stdout:
-#       - "1"
+#       - "4"
 
 fun main() {
   a = int(scanln());
   b = int(scanln());
-  println(a \ b);
+  println(a / b);
 }

@@ -1,4 +1,4 @@
-import export-file:nothing
+import export_file:nothing
 
 fun main() {
   nothing();

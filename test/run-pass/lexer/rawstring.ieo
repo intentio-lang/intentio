@@ -1,9 +1,9 @@
 # - run:
-#     stdout: 
+#     stdout:
 #       - "succ"
-#       - "Quick \u{1f43a} jumps over the lazy \u{1f436}"
+#       - "Quick \\u{1f43a} jumps over the lazy \\u{1f436}"
 
 fun main() {
-  if(r""In quotes"" == "\"In quotes\"") { println("succ"); };
+  if(r#""In quotes""# == "\"In quotes\"") { println("succ"); };
   println(r"Quick \u{1f43a} jumps over the lazy \u{1f436}");
 }

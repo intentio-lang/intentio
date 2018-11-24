@@ -78,7 +78,7 @@ compare_func(IeoTerm *self, IeoTerm *other)
 }
 
 IeoType ieo_std_type_none = {
-  .type_name = &ieo_none_type_name,
+  .type_name = IEO_STP(ieo_none_type_name),
   .term_size = sizeof(IeoNone),
   .deleter = ieo_term_deleter,
   .neg_func = unary_math_func,

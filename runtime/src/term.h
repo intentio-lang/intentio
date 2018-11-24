@@ -25,7 +25,7 @@
 
 #define IEO_SUCC(RESULT) ((IeoResult){ .succ = true, .term = (RESULT).term })
 #define IEO_FAIL(RESULT) ((IeoResult){ .succ = false, .term = (RESULT).term })
-#define IEO_NOT(RESULT) (ieo_not_impl_((RESULT)))
+#define IEO_NOT(RESULT) (ieo_not((RESULT)))
 #define IEO_SSET(STATE, RESULT)                                                \
   ((IeoResult){ .succ = (STATE), .term = (RESULT).term })
 
@@ -118,11 +118,20 @@ typedef struct IeoResult
   IeoTerm *term;
 } IeoResult;
 
-/**
- * @private
- */
 inline IEO_CONST IeoResult
-ieo_not_impl_(IeoResult r)
+ieo_succ(IeoTerm *t)
+{
+  return IEO_SUCCT(t);
+}
+
+inline IEO_CONST IeoResult
+ieo_fail(IeoTerm *t)
+{
+  return IEO_FAILT(t);
+}
+
+inline IEO_CONST IeoResult
+ieo_not(IeoResult r)
 {
   return (IeoResult){ .succ = !r.succ, .term = r.term };
 }

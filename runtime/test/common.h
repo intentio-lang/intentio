@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <runtime/src/str.h>
 #include <runtime/src/term.h>
 #include <runtime/src/util.h>
 
@@ -25,11 +26,11 @@
     IeoResult tmp__ = (EXPR);                                                  \
     if ((SUCC)) {                                                              \
       if (!IEO_OK(tmp__)) {                                                    \
-        fail_msg("expected SUCC result");                                      \
+        assert_fancy_fail("expected SUCC result", tmp__.term);                 \
       }                                                                        \
     } else {                                                                   \
       if (!IEO_ERR(tmp__)) {                                                   \
-        fail_msg("expected FAIL result");                                      \
+        assert_fancy_fail("expected FAIL result", tmp__.term);                 \
       }                                                                        \
     }                                                                          \
     do {                                                                       \
@@ -40,6 +41,18 @@
       }                                                                        \
     } while (0);                                                               \
   } while (0)
+
+#define assert_fancy_fail(MSG, TERM)                                           \
+  do {                                                                         \
+    if ((TERM) == NULL) {                                                      \
+      fail_msg(MSG ": GOT NULL!");                                             \
+    } else if (IEO_OK(ieo_is_string((TERM)))) {                                \
+      fail_msg(MSG ": got string `%s`", ieo_string_c_str((TERM)));             \
+    } else {                                                                   \
+      fail_msg(MSG ": got term of type %s",                                    \
+               ieo_string_c_str(ieo_term_ty((TERM))->type_name));              \
+    }                                                                          \
+  } while (0);
 
 #define TRY_UNWRAP(TERM_VAR, EXPR)                                             \
   do {                                                                         \

@@ -15,7 +15,6 @@ add_library(
     src/str.c src/str.h
     src/term.c src/term.h
     src/type.c src/type.h
-    src/typeconv.c
     src/util.h
     src/util/attrs.h
     src/util/ieo_assert.h

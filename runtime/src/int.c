@@ -43,13 +43,49 @@ ieo_int(IEO_NOTNULL IeoTerm *x)
   return f ? f(x) : IEO_FAILT(&not_implemented);
 }
 
-#define INT_TO_STR_MAX_LEN 32
+static IeoResult
+neg_func(IEO_NOTNULL IeoTerm *p)
+{
+  return ieo_int_new(-ieo_int_value(p));
+}
+
+static IeoResult
+add_func(IEO_NOTNULL IeoTerm *p, IEO_NOTNULL IeoTerm *q)
+{
+  ieo_int_t a = ieo_int_value(p);
+  ieo_int_t b = ieo_int_value(q);
+  return ieo_int_new(a + b);
+}
+
+static IeoResult
+div_func(IEO_NOTNULL IeoTerm *p, IEO_NOTNULL IeoTerm *q)
+{
+  ieo_int_t a = ieo_int_value(p);
+  ieo_int_t b = ieo_int_value(q);
+  return ieo_int_new(a / b);
+}
+
+static IeoResult
+mul_func(IEO_NOTNULL IeoTerm *p, IEO_NOTNULL IeoTerm *q)
+{
+  ieo_int_t a = ieo_int_value(p);
+  ieo_int_t b = ieo_int_value(q);
+  return ieo_int_new(a * b);
+}
+
+static IeoResult
+sub_func(IEO_NOTNULL IeoTerm *p, IEO_NOTNULL IeoTerm *q)
+{
+  ieo_int_t a = ieo_int_value(p);
+  ieo_int_t b = ieo_int_value(q);
+  return ieo_int_new(a - b);
+}
 
 static IeoResult
 to_str_func(IEO_NOTNULL IeoTerm *x)
 {
-  char buff[INT_TO_STR_MAX_LEN];
-  snprintf(buff, INT_TO_STR_MAX_LEN, "%" PRIdIEO, ieo_int_value(x));
+  char buff[32];
+  snprintf(buff, IEO_COUNT_OF(buff), "%" PRIdIEO, ieo_int_value(x));
   return ieo_string_new(buff, strlen(buff));
 }
 
@@ -57,6 +93,12 @@ IeoType ieo_std_type_int = {
   .type_name = IEO_STP(ieo_int_type_name),
   .term_size = sizeof(IeoInt),
   .deleter = ieo_term_deleter,
+  .neg_func = &neg_func,
+  .add_func = &add_func,
+  .div_func = &div_func,
+  .mul_func = &mul_func,
+  .sub_func = &sub_func,
+  .compare_func = &sub_func,
   .to_int_func = &ieo_succ,
   .to_str_func = &to_str_func,
 };

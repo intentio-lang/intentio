@@ -80,7 +80,13 @@ mainUnit modul item = [cunit|
       if (r.succ) {
         return EXIT_SUCCESS;
       } else {
-        fprintf(stderr, "Intentio program failed unexpectedly.\n");
+        typename IeoResult s = ieo_str(r.term);
+        if(s.succ) {
+          fprintf(stderr, "Intentio program failed unexpectedly: %s\n",
+                  ieo_string_c_str(s.term));
+        } else {
+          fprintf(stderr, "Intentio program failed unexpectedly.\n");
+        }
         return EXIT_FAILURE;
       }
     }

@@ -37,6 +37,12 @@ ieo_string_new(const char *str, size_t strsz);
 IeoResult
 ieo_regex_new(const char *val);
 
+/**
+ * Return C string (null-terminated) of given Intentio string term.
+ */
+const char *
+ieo_string_c_str(IeoTerm *p);
+
 //----------------------------------------------------------------------------
 // Operators
 

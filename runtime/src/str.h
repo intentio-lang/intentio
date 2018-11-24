@@ -76,11 +76,8 @@ ieo_string_data(IEO_NOTNULL IeoTerm *p)
 /**
  * Return C string (null-terminated) of given Intentio string term.
  */
-inline IEO_PURE const char *
-ieo_string_c_str(IEO_NOTNULL IeoTerm *p)
-{
-  return ieo_string_data(p);
-}
+IEO_PURE const char *
+ieo_string_c_str(IEO_NOTNULL IeoTerm *p);
 
 IeoResult
 ieo_str(IEO_NOTNULL IeoTerm *x);

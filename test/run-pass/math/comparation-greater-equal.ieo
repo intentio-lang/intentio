@@ -1,10 +1,10 @@
 # - run:
 #     stdout:
 #       - "succ"
-#       - "succ"
+#       - "fail"
 
 fun main() {
   a = 2;
-  if(a >= a) { println("succ"); };
-  if(a >= a + 1) { println("succ"); };
+  if(a >= a) { println("succ"); } else { println("fail"); };
+  if(a >= a + 1) { println("succ"); } else { println("fail"); };
 }

@@ -77,16 +77,31 @@ compare_func(IeoTerm *self, IeoTerm *other)
   return ieo_int_new(0);
 }
 
+static IeoResult
+to_int_func(IEO_UNUSED IEO_NOTNULL IeoTerm *x)
+{
+  return ieo_int_new(0);
+}
+
+static IeoResult
+to_str_func(IEO_UNUSED IEO_NOTNULL IeoTerm *x)
+{
+  IEO_STATIC_STRING(STR, "None");
+  return IEO_SUCCT(&STR);
+}
+
 IeoType ieo_std_type_none = {
   .type_name = IEO_STP(ieo_none_type_name),
   .term_size = sizeof(IeoNone),
-  .deleter = ieo_term_deleter,
-  .neg_func = unary_math_func,
-  .add_func = binary_math_func,
-  .div_func = binary_math_func,
-  .mul_func = binary_math_func,
-  .sub_func = binary_math_func,
-  .eq_func = eq_func,
-  .neq_func = neq_func,
-  .compare_func = compare_func,
+  .deleter = &ieo_term_deleter,
+  .neg_func = &unary_math_func,
+  .add_func = &binary_math_func,
+  .div_func = &binary_math_func,
+  .mul_func = &binary_math_func,
+  .sub_func = &binary_math_func,
+  .eq_func = &eq_func,
+  .neq_func = &neq_func,
+  .compare_func = &compare_func,
+  .to_int_func = &to_int_func,
+  .to_str_func = &to_str_func,
 };

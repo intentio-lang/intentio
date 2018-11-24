@@ -28,6 +28,10 @@ import           System.IO.Temp                 ( createTempDirectory
                                                 )
 import qualified System.Process.Typed          as P
 
+import           TestRunner.Lines               ( Lines
+                                                , unlines
+                                                , tellLine
+                                                )
 import           TestRunner.Loader              ( LoaderError
                                                 , prettyLoaderError
                                                 , loadTestSpec
@@ -50,7 +54,13 @@ import           TestRunner.Opts                ( Opts
                                                 , noCleanup
                                                 )
 
-data TestError
+data TestError = TestError
+  { _testErrorWorkdir :: Maybe FilePath
+  , _testErrorKind    :: TestErrorKind
+  }
+  deriving (Show)
+
+data TestErrorKind
   = LoaderError LoaderError
   | CompilationFailure Int ByteString ByteString
   | RunCalledWithoutCompile
@@ -75,8 +85,12 @@ data CommandState = CommandState
 type RunSpecMT = ExceptT TestError IO
 type CommandMT = StateT CommandState RunSpecMT
 
+makeLenses ''TestError
 makeLenses ''TestResult
 makeLenses ''CommandState
+
+mkTestError :: TestErrorKind -> TestError
+mkTestError = TestError Nothing
 
 outputBinaryName :: FilePath
 outputBinaryName = "testbin.out"
@@ -85,30 +99,46 @@ testCaseCwd :: TestCase -> FilePath
 testCaseCwd testCase = testCase ^. testCasePath & takeDirectory
 
 prettyTestError :: TestError -> Text
-prettyTestError (LoaderError e) = prettyLoaderError e
-prettyTestError (CompilationFailure ec out err) =
-  T.unlines $ [ecs, ""] <> outs <> errs err
- where
-  ecs  = "Compilation failed with exit code: " <> show ec
-  outs = T.lines $ toS out
-  errs "" = []
-  errs bs = ["", "--- Standard error ---"] <> T.lines (toS bs)
-prettyTestError RunCalledWithoutCompile =
-  "Bad test specification: RUN command called without preceding COMPILE command"
-prettyTestError (RunExitFailure ec out err) =
-  T.unlines $ ecs <> outs out <> errs err
- where
-  ecs = ["Application failed with exit code: " <> show ec]
+prettyTestError err = unlines . execWriter $ do
+  case err ^. testErrorWorkdir of
+    Nothing      -> return ()
+    Just workDir -> tellLine $ "Working directory: " <> toS workDir
+  prettyTestErrorKind $ err ^. testErrorKind
 
-  outs "" = []
-  outs bs = ["", "--- Standard output ---"] <> T.lines (toS bs)
+prettyTestErrorKind :: TestErrorKind -> Writer Lines ()
+prettyTestErrorKind (LoaderError e) = tellLine $ prettyLoaderError e
 
-  errs "" = []
-  errs bs = ["", "--- Standard error ---"] <> T.lines (toS bs)
-prettyTestError (StdoutMismatch d) =
-  T.unlines ["Standard output mismatch:", toS $ ppDiff d]
-prettyTestError (StderrMismatch d) =
-  T.unlines ["Standard error mismatch:", toS $ ppDiff d]
+prettyTestErrorKind (CompilationFailure ec out err) = do
+  tellLine $ "Compilation failed with exit code: " <> show ec
+  tellLine ""
+  tellLine $ toS out
+  unless (err == "") $ do
+    tellLine ""
+    tellLine "--- Standard error ---"
+    tellLine $ toS err
+
+prettyTestErrorKind RunCalledWithoutCompile =
+  tellLine
+    "Bad test specification: RUN command called without preceding COMPILE command"
+
+prettyTestErrorKind (RunExitFailure ec out err) = do
+  tellLine $ "Application failed with exit code: " <> show ec
+  unless (out == "") $ do
+    tellLine ""
+    tellLine "--- Standard output ---"
+    tellLine $ toS out
+  unless (err == "") $ do
+    tellLine ""
+    tellLine "--- Standard error ---"
+    tellLine $ toS err
+
+prettyTestErrorKind (StdoutMismatch d) = do
+  tellLine "Standard output mismatch:"
+  tellLine . toS $ ppDiff d
+
+prettyTestErrorKind (StderrMismatch d) = do
+  tellLine "Standard error mismatch:"
+  tellLine . toS $ ppDiff d
 
 runTestCase :: Opts -> TestCase -> IO TestResult
 runTestCase opts testCase = do
@@ -119,15 +149,19 @@ runTestCase opts testCase = do
 
 loadTestSpec' :: TestCase -> RunSpecMT TestSpec
 loadTestSpec' testCase =
-  testCase & loadTestSpec & liftIO <&> (_Left %~ LoaderError) >>= liftEither
+  testCase
+    &   loadTestSpec
+    &   liftIO
+    <&> (_Left %~ mkTestError . LoaderError)
+    >>= liftEither
 
 runTestSpec :: Opts -> TestCase -> TestSpec -> RunSpecMT ()
 runTestSpec opts testCase spec = void $ do
   if opts ^. noCleanup
     then do
-      t1 <- lift getTemporaryDirectory
-      t2 <- lift $ createTempDirectory t1 dirName
-      f t2
+      sysTmp <- lift getTemporaryDirectory
+      tmpdir <- lift $ createTempDirectory sysTmp dirName
+      withExceptT (testErrorWorkdir ?~ tmpdir) $ f tmpdir
     else withSystemTempDirectory dirName f
  where
   dirName = "intentio-test"
@@ -153,14 +187,16 @@ runCommand (CompileCommand spec) = do
     P.readProcess . P.setWorkingDir myCwd $ P.proc myCompilerPath myCompilerArgs
   case exitCode of
     ExitSuccess    -> compiledBinary .= Just outputBinaryPath
-    ExitFailure ec -> throwError
-      $ CompilationFailure ec (toS compilerStdout) (toS compilerStderr)
+    ExitFailure ec -> throwError . mkTestError $ CompilationFailure
+      ec
+      (toS compilerStdout)
+      (toS compilerStderr)
 
 runCommand (RunCommand spec) = do
   myRunEntrypointPath <- use (stateOpts . runEntrypointPath)
   myCompiledBinary    <- use compiledBinary >>= \case
     Just p  -> return p
-    Nothing -> throwError RunCalledWithoutCompile
+    Nothing -> throwError $ mkTestError RunCalledWithoutCompile
   let myCwd    = takeDirectory myCompiledBinary
   let procPath = decorateProcPath myRunEntrypointPath (myCompiledBinary, [])
   let procConf =
@@ -169,8 +205,10 @@ runCommand (RunCommand spec) = do
           $ mkProc procPath
   (exitCode, actualStdout, actualStderr) <- P.readProcess procConf
   case exitCode of
-    ExitFailure ec ->
-      throwError $ RunExitFailure ec (toS actualStdout) (toS actualStderr)
+    ExitFailure ec -> throwError . mkTestError $ RunExitFailure
+      ec
+      (toS actualStdout)
+      (toS actualStderr)
     ExitSuccess -> do
       matchOutput (toS actualStdout) (spec ^. runCommandStdout) StdoutMismatch
       matchOutput (toS actualStderr) (spec ^. runCommandStderr) StderrMismatch
@@ -192,7 +230,7 @@ buildStdinSpec (Just (LinesIOSpec lines)) =
 matchOutput
   :: ByteString
   -> Maybe IOSpec
-  -> ([Diff [String]] -> TestError)
+  -> ([Diff [String]] -> TestErrorKind)
   -> CommandMT ()
 matchOutput _ Nothing _ = return ()
 matchOutput actualBS (Just (RawIOSpec expectedT)) f =
@@ -203,4 +241,4 @@ matchOutput actualBS (Just (LinesIOSpec expectedLinesT)) f =
   in  case getGroupedDiff expectedLinesS actualLinesS of
         []         -> return ()
         [Both _ _] -> return ()
-        d          -> throwError $ f d
+        d          -> throwError . mkTestError $ f d

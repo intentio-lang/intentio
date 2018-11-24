@@ -56,6 +56,15 @@ import           Control.Monad.Writer          as X
                                                 , mapWriter
                                                 , mapWriterT
                                                 )
+import           Control.Monad.Writer.Class    as X
+                                                ( MonadWriter
+                                                  ( writer
+                                                  , tell
+                                                  , listen
+                                                  )
+                                                , listens
+                                                , censor
+                                                )
 
 import           Data.Aeson                    as X
                                                 ( ToJSON

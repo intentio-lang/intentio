@@ -565,7 +565,17 @@ stmt :: Parser (Stmt ())
 stmt = try assignStmt <|> exprStmt
 
 stmts :: Parser [Stmt ()]
-stmts = sepEndBy stmt semi <?> "statements"
+stmts = (many semi *> sepEndByWith stmt stmtSemi) <?> "statements"
+ where
+  stmtSemi e | needsSemi e = many semi
+             | otherwise   = some semi
+
+  needsSemi (preview $ stmtKind . _ExprStmt . exprKind -> Just k)
+    | _BlockExpr `has` k = True
+    | _IfExpr `has` k    = True
+    | _WhileExpr `has` k = True
+    | otherwise          = False
+  needsSemi _ = False
 
 assignStmt :: Parser (Stmt ())
 assignStmt =
@@ -781,6 +791,15 @@ infixl 6 <:<
 infixr 6 >:>
 (>:>) :: StringConv t Text => Parser Char -> Parser t -> Parser Text
 (>:>) l r = cons <$> l <*> (toS <$> r)
+
+sepEndByWith :: Parser a -> (a -> Parser sep) -> Parser [a]
+sepEndByWith p fsep = sepEndByWith1 p fsep <|> return []
+
+sepEndByWith1 :: Parser a -> (a -> Parser fsep) -> Parser [a]
+sepEndByWith1 p fsep = do
+  a  <- p
+  as <- (fsep a *> sepEndByWith p fsep) <|> return []
+  return $ a : as
 
 srcPos :: Parser SourcePos
 srcPos = _sourcePos <$> getSourcePos

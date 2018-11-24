@@ -60,8 +60,11 @@ ieo_string_size(IEO_NOTNULL IeoTerm *p);
 extern inline IEO_PURE const char *
 ieo_string_data(IEO_NOTNULL IeoTerm *p);
 
-extern inline IEO_PURE const char *
-ieo_string_c_str(IEO_NOTNULL IeoTerm *p);
+IEO_PURE const char *
+ieo_string_c_str(IEO_NOTNULL IeoTerm *p)
+{
+  return ieo_string_data(p);
+}
 
 IeoResult
 ieo_str(IEO_NOTNULL IeoTerm *x)

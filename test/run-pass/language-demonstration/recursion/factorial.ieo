@@ -1,7 +1,7 @@
 # - run:
 #     stdin:
 #       - "5"
-#     stdout: 
+#     stdout:
 #       - "120"
 
 fun main() {
@@ -10,9 +10,9 @@ fun main() {
 }
 
 fun factorial(n) {
-    if(n < 0) { 
-        println("The number should be non-negative"); 
-        return fail None; 
+    if(n < 0) {
+        println("The number should be non-negative");
+        return fail none;
     }
     if(n == 0) { return 1; }
     factorial(n - 1) * factorial(n - 2);

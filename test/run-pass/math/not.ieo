@@ -3,6 +3,6 @@
 #       - "succ"
 
 fun main() {
-  a = succ None;
+  a = succ none;
   if(not a == fail) { println("succ"); };
 }

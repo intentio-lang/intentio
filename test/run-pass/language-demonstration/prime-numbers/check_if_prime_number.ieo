@@ -1,7 +1,7 @@
 # - run:
 #     stdin:
 #       - "1621"
-#     stdout: 
+#     stdout:
 #       - "yes"
 
 fun main() {
@@ -10,9 +10,9 @@ fun main() {
 }
 
 fun check_if_prime_number(a) {
-    if(a <= 0) { 
-        println("The number should be positive"); 
-        return fail None; 
+    if(a <= 0) {
+        println("The number should be positive");
+        return fail none;
     }
     factor = 2;
     while(a >= factor * factor) {

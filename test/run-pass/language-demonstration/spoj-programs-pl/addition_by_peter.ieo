@@ -4,7 +4,7 @@
 #       - "28"
 #       - "68"
 #       - "5"
-#     stdout: 
+#     stdout:
 #       - "121 2"
 #       - "1111 3"
 #       - "5 0"
@@ -31,12 +31,12 @@ fun addition_by_peter() {
             reverse = reverse + cut(len - i - 1, len - i, a);
             i = i + 1;
         }
-        if(obverse == reverse) { 
+        if(obverse == reverse) {
             println(obverse + " " + steps);
-            return succ None;
+            return succ none;
         }
         obverse = str(int(obverse) + int(reverse));
         reverse = "";
         steps = steps + 1;
-    }    
+    }
 }

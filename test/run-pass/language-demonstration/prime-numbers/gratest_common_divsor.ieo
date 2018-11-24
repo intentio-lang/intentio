@@ -2,19 +2,19 @@
 #     stdin:
 #       - "1620"
 #       - "35"
-#     stdout: 
+#     stdout:
 #       - "5"
 
 fun main() {
     a = int(scanln());
     b = int(scanlnn());
-    println(str(gratest_common_divisor(a, b));
+    println(str(gcd(a, b)));
 }
 
-fun gratest_common_divisor(a, b) {
-    if(a < 0 or b < 0) { 
-        println("The numbers should be positive"); 
-        return fail None; 
+fun gcd(a, b) {
+    if(a < 0 or b < 0) {
+        println("The numbers should be positive");
+        return fail none;
     }
     factor = 2;
     gcd = 1;

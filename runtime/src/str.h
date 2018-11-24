@@ -9,8 +9,8 @@
   IEO_STATIC_STRING(NAME##_str_, STR);                                         \
   IeoTerm *NAME = IEO_STP(NAME##_str_);
 
-#define IEO_STATIC_STRING_DECL(STR)                                              \
-  {                                                                              \
+#define IEO_STATIC_STRING_DECL(STR)                                            \
+  {                                                                            \
     .head =                                                                    \
       {                                                                        \
         .ty = &ieo_std_type_string,                                            \
@@ -21,13 +21,12 @@
           },                                                                   \
       },                                                                       \
     .value = {                                                                 \
-      .size = (sizeof(STR) / sizeof(char) - 1),                                \
+      .size = IEO_COUNT_OF((STR)) - 1,                                         \
       .data = (const char *)(STR)                                              \
-    } \
+    }                                                                          \
   }
 
-#define IEO_STRING_ALLOC(STR)                                                  \
-  ieo_string_new((STR), sizeof(STR) / sizeof(char) - 1)
+#define IEO_STRING_ALLOC(STR) ieo_string_new((STR), IEO_COUNT_OF((STR)) - 1)
 
 typedef struct IeoStringValue
 {

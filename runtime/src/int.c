@@ -43,13 +43,11 @@ ieo_int(IEO_NOTNULL IeoTerm *x)
   return f ? f(x) : IEO_FAILT(&not_implemented);
 }
 
-#define INT_TO_STR_MAX_LEN 32
-
 static IeoResult
 to_str_func(IEO_NOTNULL IeoTerm *x)
 {
-  char buff[INT_TO_STR_MAX_LEN];
-  snprintf(buff, INT_TO_STR_MAX_LEN, "%" PRIdIEO, ieo_int_value(x));
+  char buff[32];
+  snprintf(buff, IEO_COUNT_OF(buff), "%" PRIdIEO, ieo_int_value(x));
   return ieo_string_new(buff, strlen(buff));
 }
 

@@ -6,3 +6,5 @@
 #define IEO_JOIN(X, Y) IEO_JOIN_IMPL(X, Y)
 #define IEO_JOIN_IMPL(X, Y) IEO_JOIN_IMPL2(X, Y)
 #define IEO_JOIN_IMPL2(X, Y) X##Y
+
+#define IEO_COUNT_OF(ARRAY) (sizeof(ARRAY) / sizeof(ARRAY[0]))

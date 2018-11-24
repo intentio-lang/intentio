@@ -1,3 +1,10 @@
+// For getline
+#ifdef __STDC_ALLOC_LIB__
+#define __STDC_WANT_LIB_EXT2__ 1
+#else
+#define _POSIX_C_SOURCE 200809L
+#endif
+
 #include "io.h"
 
 #include <stdio.h>
@@ -27,7 +34,23 @@ ieo_println(IEO_NOTNULL IeoTerm *s)
 IeoResult
 ieo_scanln()
 {
-  IEO_ASSERT(false);
-  IeoResult e;
+  IEO_STATIC_STRING(FERR, "Error reading from standard input.");
+
+  char *data = NULL;
+  size_t len = 0;
+  ssize_t nread = getline(&data, &len, stdin);
+
+  if (nread == -1 && !feof(stdin)) {
+    free(data);
+    return IEO_FAILT(&FERR);
+  }
+
+  // Trim trailing \n
+  if (nread > 0) {
+    nread--;
+  }
+
+  IeoResult e = ieo_string_new(data, (size_t)nread);
+  free(data);
   return e;
 }

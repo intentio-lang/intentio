@@ -10,7 +10,7 @@ instance Semigroup Lines where
   Lines a <> Lines b = Lines $ a <> "\n" <> b
 
 instance Monoid Lines where
-  mempty = Lines ""
+  mempty  = Lines ""
   mconcat = Lines . T.unlines . fmap unlines
 
 tellLine :: (MonadWriter Lines m) => Text -> m ()

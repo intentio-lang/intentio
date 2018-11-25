@@ -11,14 +11,14 @@ fun rnp(input) {
 
 # Expression = Component "+" Expression | Component
 fun Expression(in) {
-    
+
     position = bal("+", in, "(", ")");
     if (position) {
         first_case_l = Component(cut(0, position, in);
         first_case_r = Expression(cut(position + 1, len(in), in);
         if (first_case_l and first_case_r) {
             return first_case_l + first_case_r + "+";
-    } 
+    }
 
     # second_case
     Component(in);
@@ -33,7 +33,7 @@ fun Component(in) {
         first_case_r = Component(cut(position + 1, len(in), in);
         if (first_case_l and first_case_r) {
             return first_case_l + first_case_r + "*";
-    } 
+    }
 
     # second_case
     Factor(in);
@@ -52,12 +52,12 @@ fun Factor(in) {
         and second_case
         and (cut(len - 1, len, in) == ")") {
             return second_case;
-    } 
-    fail None;
+    }
+    fail none;
 }
 
 # Identity = "a" | "b" | "c"
 fun Identity(in) {
 	if (in == "a" or in == "b" or in == "c") { return in }
-    fail None;
+    fail none;
 }

@@ -1,20 +1,20 @@
 # - run:
 #     stdin:
 #       - "4"
-#     stdout: 
+#     stdout:
 #       - "0 2 4 1 3"
 
 # https://pl.spoj.com/problems/NIEKOLEJ/
 
 fun main() {
     n = int(scanln());
-    if(n == 1 or n == 2) { 
+    if(n == 1 or n == 2) {
         println("NIE");
-        return fail None;
+        return fail none;
     }
-    if(n == 3) { 
+    if(n == 3) {
         println("2,0,3,1");
-        return succ None;
+        return succ none;
     }
     a = 0;
     o = "";

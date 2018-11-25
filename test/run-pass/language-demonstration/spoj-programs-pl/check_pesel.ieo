@@ -3,7 +3,7 @@
 #       - "2"
 #       - "44051401458"
 #       - "12345678901"
-#     stdout: 
+#     stdout:
 #       - "D"
 #       - "N"
 
@@ -23,7 +23,7 @@ fun check_pesel() {
     pesel = scanln();
     if(len(pesel) != 11) {
         println("PESEL should have 11 digits");
-        return fail None;
+        return fail none;
     }
     result = 0;
     while(len(pesel) > 0){

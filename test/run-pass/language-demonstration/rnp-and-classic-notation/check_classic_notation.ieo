@@ -49,6 +49,6 @@ fun Factor(in) {
 
 # Identity = "a" | "b" | "c"
 fun Identity(in)  {
-	if(in == "a" or in == "b" or in = "c") { return succ None}
-    fail None;
+	if(in == "a" or in == "b" or in = "c") { return succ none}
+    fail none;
 }

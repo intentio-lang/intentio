@@ -1,7 +1,7 @@
 # - run:
 #     stdin:
 #       - "1620"
-#     stdout: 
+#     stdout:
 #       - "2"
 #       - "2"
 #       - "3"
@@ -16,9 +16,9 @@ fun main() {
 }
 
 fun distribution_into_prime_factors(a) {
-    if(a <= 0) { 
-        println("The number should be positive"); 
-        return fail None; 
+    if(a <= 0) {
+        println("The number should be positive");
+        return fail none;
     }
     factor = 2;
     while(a >= factor * factor) {

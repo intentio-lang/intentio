@@ -197,7 +197,7 @@ ieo_lteq(IEO_NOTNULL IeoTerm *lhs, IEO_NOTNULL IeoTerm *rhs)
   FIND_DELEGATE_BINARY(lteq, lhs, rhs);
   FIND_DELEGATE_BINARY(gteq, rhs, lhs);
   CALL_COMPARE(lhs, rhs, it <= 0);
-  FAIL(gteq);
+  FAIL(lteq);
 }
 
 IeoResult

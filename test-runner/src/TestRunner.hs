@@ -88,11 +88,10 @@ printSummary summary
   = do
     let fc = show (summary ^. failedTestCount)
     let tc = show (summary ^. totalTestCount)
-    putText $ fc <> "/" <> tc <> " tests failed:"
-    putText ""
     forM_ (summary ^. failedTests) $ \(testCase, err) -> do
       let n = testCase ^. testCaseName
       let p = prettyTestError err
       putText $ "=== " <> n <> " ==="
       putText p
       putText ""
+    putText $ fc <> "/" <> tc <> " tests failed."

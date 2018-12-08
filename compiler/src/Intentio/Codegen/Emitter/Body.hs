@@ -121,7 +121,7 @@ emitExpr expr = case expr ^. I.exprKind of
     i <- emitVarById v
     let s = idSucc i
     let t = idTerm i
-    return [cexp| (typename IeoResult){ .succ = $exp:s, .term = $exp:t } |]
+    return [cexp| (typename IeoResult){ .succ = !$exp:s, .term = $exp:t } |]
 
   I.UnExpr o v -> do
     let (f :: String) = case o of

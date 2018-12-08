@@ -1,4 +1,4 @@
-export (add, sub, mu, div)
+export (add, sub, mul, div)
 
 # math operations on complex numbers
 # complex could have form: x+yi; -x+yi; x-yi; -x-yi; 0+0i; 1+1i
@@ -11,7 +11,7 @@ fun re(s) {
         s = cut(1, len(s), s) == "-";
     }
     pos = find("+", s);
-    if(not pos) { pos = find("-", s); } 
+    if(not pos) { pos = find("-", s); }
     sign * int(cut(0, pos, s));
 }
 

@@ -1,8 +1,8 @@
 - compile:
     - main.ieo
-    - operations-lib.ieo
+    - operations_lib.ieo
 - run:
-    stdin: 
+    stdin:
       - "1+8i"
       - "2+3i"
     stdout:
@@ -10,4 +10,3 @@
       - "-1+5i"
       - "-22+3i"
       - "2+1i"
-      

@@ -1,4 +1,4 @@
-import oparations_lib:*
+import operations_lib:*
 
 fun main() {
   a = scanln();

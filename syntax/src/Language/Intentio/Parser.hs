@@ -662,13 +662,13 @@ callExpr = expr' (CallExpr <$> term <*> args) <?> "function call"
 
 whileExpr :: Parser (Expr ())
 whileExpr = expr' p <?> "while expression"
-  where p = WhileExpr <$> (tok TKwWhile *> expr) <*> block
+  where p = WhileExpr <$> (tok TKwWhile *> expr) <*> blockExpr
 
 ifExpr :: Parser (Expr ())
 ifExpr = expr' p <?> "if expression"
  where
-  p = IfExpr <$> (tok TKwIf *> expr) <*> block <*> optional e
-  e = tok TKwElse *> block
+  p = IfExpr <$> (tok TKwIf *> expr) <*> blockExpr <*> optional e
+  e = tok TKwElse *> (ifExpr <|> blockExpr)
 
 parenExpr :: Parser (Expr ())
 parenExpr = expr' (ParenExpr <$> parens expr) <?> "parenthesized expression"

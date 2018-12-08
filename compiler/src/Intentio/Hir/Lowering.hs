@@ -230,8 +230,8 @@ runLowerBody afb = do
     A.UnExpr _ e               -> varsExpr e
     A.BinExpr _ l r            -> varsExpr l <> varsExpr r
     A.CallExpr  c a            -> concatMap varsExpr (c : a)
-    A.WhileExpr e b            -> varsExpr e <> varsBlock b
-    A.IfExpr c i e -> varsExpr c <> varsBlock i <> maybe [] varsBlock e
+    A.WhileExpr e b            -> varsExpr e <> varsExpr b
+    A.IfExpr c i e -> varsExpr c <> varsExpr i <> maybe [] varsExpr e
     A.ParenExpr  e             -> varsExpr e
     A.ReturnExpr e             -> maybe [] varsExpr e
     _                          -> []
@@ -298,13 +298,13 @@ lowerExpr aexpr = case aexpr ^. A.exprKind of
     H.CallExpr <$> lowerExpr acallee <*> mapM lowerExpr aargs <&> mk
 
   A.WhileExpr acond ab ->
-    H.WhileExpr <$> lowerExpr acond <*> lowerBlockToExpr ab <&> mk
+    H.WhileExpr <$> lowerExpr acond <*> lowerExpr ab <&> mk
 
   A.IfExpr acond athen aelse ->
     H.IfExpr
       <$> lowerExpr acond
-      <*> lowerBlockToExpr athen
-      <*> mapM lowerBlockToExpr aelse
+      <*> lowerExpr athen
+      <*> mapM lowerExpr aelse
       <&> mk
 
   A.ParenExpr  aie        -> lowerExpr aie

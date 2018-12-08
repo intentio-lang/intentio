@@ -260,8 +260,8 @@ data ExprKind a
   | UnExpr (UnOp a) (Expr a)
   | BinExpr (BinOp a) (Expr a) (Expr a)
   | CallExpr (Expr a) [Expr a]
-  | WhileExpr (Expr a) (Block a)
-  | IfExpr (Expr a) (Block a) (Maybe (Block a))
+  | WhileExpr (Expr a) (Expr a)
+  | IfExpr (Expr a) (Expr a) (Maybe (Expr a))
   | ParenExpr (Expr a)
   | ReturnExpr (Maybe (Expr a))
   deriving (Show, Eq, Generic, Functor, Foldable, Traversable)

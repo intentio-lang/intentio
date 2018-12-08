@@ -30,301 +30,345 @@
               ]
             },
             {
-              "_blockAnn": [],
-              "_blockSourcePos": [
-                "test.ieo",
-                0,
-                5
-              ],
-              "_blockStmts": [
-                {
-                  "_stmtAnn": [],
-                  "_stmtKind": {
-                    "contents": {
-                      "_exprAnn": [],
-                      "_exprKind": {
-                        "contents": [
-                          {
-                            "_exprAnn": [],
-                            "_exprKind": {
-                              "contents": {
-                                "contents": {
-                                  "_scopeIdAnn": [],
-                                  "_scopeIdSourcePos": [
-                                    "test.ieo",
-                                    1,
-                                    9
-                                  ],
-                                  "_unScopeId": "b"
+              "_exprAnn": [],
+              "_exprKind": {
+                "contents": {
+                  "_blockAnn": [],
+                  "_blockSourcePos": [
+                    "test.ieo",
+                    0,
+                    5
+                  ],
+                  "_blockStmts": [
+                    {
+                      "_stmtAnn": [],
+                      "_stmtKind": {
+                        "contents": {
+                          "_exprAnn": [],
+                          "_exprKind": {
+                            "contents": [
+                              {
+                                "_exprAnn": [],
+                                "_exprKind": {
+                                  "contents": {
+                                    "contents": {
+                                      "_scopeIdAnn": [],
+                                      "_scopeIdSourcePos": [
+                                        "test.ieo",
+                                        1,
+                                        9
+                                      ],
+                                      "_unScopeId": "b"
+                                    },
+                                    "tag": "ScopeId'"
+                                  },
+                                  "tag": "IdExpr"
                                 },
-                                "tag": "ScopeId'"
+                                "_exprSourcePos": [
+                                  "test.ieo",
+                                  1,
+                                  9
+                                ]
                               },
-                              "tag": "IdExpr"
-                            },
-                            "_exprSourcePos": [
-                              "test.ieo",
-                              1,
-                              9
-                            ]
-                          },
-                          {
-                            "_blockAnn": [],
-                            "_blockSourcePos": [
-                              "test.ieo",
-                              1,
-                              11
-                            ],
-                            "_blockStmts": [
                               {
-                                "_stmtAnn": [],
-                                "_stmtKind": {
+                                "_exprAnn": [],
+                                "_exprKind": {
                                   "contents": {
-                                    "_exprAnn": [],
-                                    "_exprKind": {
-                                      "contents": {
-                                        "contents": {
-                                          "_scopeIdAnn": [],
-                                          "_scopeIdSourcePos": [
-                                            "test.ieo",
-                                            2,
-                                            8
-                                          ],
-                                          "_unScopeId": "c"
-                                        },
-                                        "tag": "ScopeId'"
-                                      },
-                                      "tag": "IdExpr"
-                                    },
-                                    "_exprSourcePos": [
+                                    "_blockAnn": [],
+                                    "_blockSourcePos": [
                                       "test.ieo",
-                                      2,
-                                      8
+                                      1,
+                                      11
+                                    ],
+                                    "_blockStmts": [
+                                      {
+                                        "_stmtAnn": [],
+                                        "_stmtKind": {
+                                          "contents": {
+                                            "_exprAnn": [],
+                                            "_exprKind": {
+                                              "contents": {
+                                                "contents": {
+                                                  "_scopeIdAnn": [],
+                                                  "_scopeIdSourcePos": [
+                                                    "test.ieo",
+                                                    2,
+                                                    8
+                                                  ],
+                                                  "_unScopeId": "c"
+                                                },
+                                                "tag": "ScopeId'"
+                                              },
+                                              "tag": "IdExpr"
+                                            },
+                                            "_exprSourcePos": [
+                                              "test.ieo",
+                                              2,
+                                              8
+                                            ]
+                                          },
+                                          "tag": "ExprStmt"
+                                        },
+                                        "_stmtSourcePos": [
+                                          "test.ieo",
+                                          2,
+                                          8
+                                        ]
+                                      }
                                     ]
                                   },
-                                  "tag": "ExprStmt"
+                                  "tag": "BlockExpr"
                                 },
-                                "_stmtSourcePos": [
+                                "_exprSourcePos": [
                                   "test.ieo",
-                                  2,
-                                  8
+                                  1,
+                                  11
                                 ]
-                              }
-                            ]
-                          },
-                          {
-                            "_blockAnn": [],
-                            "_blockSourcePos": [
-                              "test.ieo",
-                              3,
-                              11
-                            ],
-                            "_blockStmts": [
+                              },
                               {
-                                "_stmtAnn": [],
-                                "_stmtKind": {
+                                "_exprAnn": [],
+                                "_exprKind": {
                                   "contents": {
-                                    "_exprAnn": [],
-                                    "_exprKind": {
-                                      "contents": {
-                                        "contents": {
-                                          "_scopeIdAnn": [],
-                                          "_scopeIdSourcePos": [
-                                            "test.ieo",
-                                            4,
-                                            8
-                                          ],
-                                          "_unScopeId": "d"
-                                        },
-                                        "tag": "ScopeId'"
-                                      },
-                                      "tag": "IdExpr"
-                                    },
-                                    "_exprSourcePos": [
+                                    "_blockAnn": [],
+                                    "_blockSourcePos": [
                                       "test.ieo",
-                                      4,
-                                      8
+                                      3,
+                                      11
+                                    ],
+                                    "_blockStmts": [
+                                      {
+                                        "_stmtAnn": [],
+                                        "_stmtKind": {
+                                          "contents": {
+                                            "_exprAnn": [],
+                                            "_exprKind": {
+                                              "contents": {
+                                                "contents": {
+                                                  "_scopeIdAnn": [],
+                                                  "_scopeIdSourcePos": [
+                                                    "test.ieo",
+                                                    4,
+                                                    8
+                                                  ],
+                                                  "_unScopeId": "d"
+                                                },
+                                                "tag": "ScopeId'"
+                                              },
+                                              "tag": "IdExpr"
+                                            },
+                                            "_exprSourcePos": [
+                                              "test.ieo",
+                                              4,
+                                              8
+                                            ]
+                                          },
+                                          "tag": "ExprStmt"
+                                        },
+                                        "_stmtSourcePos": [
+                                          "test.ieo",
+                                          4,
+                                          8
+                                        ]
+                                      }
                                     ]
                                   },
-                                  "tag": "ExprStmt"
+                                  "tag": "BlockExpr"
                                 },
-                                "_stmtSourcePos": [
+                                "_exprSourcePos": [
                                   "test.ieo",
-                                  4,
-                                  8
+                                  3,
+                                  11
                                 ]
                               }
-                            ]
-                          }
-                        ],
-                        "tag": "IfExpr"
+                            ],
+                            "tag": "IfExpr"
+                          },
+                          "_exprSourcePos": [
+                            "test.ieo",
+                            1,
+                            6
+                          ]
+                        },
+                        "tag": "ExprStmt"
                       },
-                      "_exprSourcePos": [
+                      "_stmtSourcePos": [
                         "test.ieo",
                         1,
                         6
                       ]
                     },
-                    "tag": "ExprStmt"
-                  },
-                  "_stmtSourcePos": [
-                    "test.ieo",
-                    1,
-                    6
-                  ]
-                },
-                {
-                  "_stmtAnn": [],
-                  "_stmtKind": {
-                    "contents": {
-                      "_exprAnn": [],
-                      "_exprKind": {
-                        "contents": [
-                          {
-                            "_exprAnn": [],
-                            "_exprKind": {
-                              "contents": {
-                                "contents": {
-                                  "_scopeIdAnn": [],
-                                  "_scopeIdSourcePos": [
-                                    "test.ieo",
-                                    7,
-                                    10
-                                  ],
-                                  "_unScopeId": "b"
-                                },
-                                "tag": "ScopeId'"
-                              },
-                              "tag": "IdExpr"
-                            },
-                            "_exprSourcePos": [
-                              "test.ieo",
-                              7,
-                              10
-                            ]
-                          },
-                          {
-                            "_blockAnn": [],
-                            "_blockSourcePos": [
-                              "test.ieo",
-                              7,
-                              12
-                            ],
-                            "_blockStmts": [
+                    {
+                      "_stmtAnn": [],
+                      "_stmtKind": {
+                        "contents": {
+                          "_exprAnn": [],
+                          "_exprKind": {
+                            "contents": [
                               {
-                                "_stmtAnn": [],
-                                "_stmtKind": {
+                                "_exprAnn": [],
+                                "_exprKind": {
                                   "contents": {
-                                    "_exprAnn": [],
-                                    "_exprKind": {
-                                      "contents": {
-                                        "_blockAnn": [],
-                                        "_blockSourcePos": [
+                                    "contents": {
+                                      "_scopeIdAnn": [],
+                                      "_scopeIdSourcePos": [
+                                        "test.ieo",
+                                        7,
+                                        10
+                                      ],
+                                      "_unScopeId": "b"
+                                    },
+                                    "tag": "ScopeId'"
+                                  },
+                                  "tag": "IdExpr"
+                                },
+                                "_exprSourcePos": [
+                                  "test.ieo",
+                                  7,
+                                  10
+                                ]
+                              },
+                              {
+                                "_exprAnn": [],
+                                "_exprKind": {
+                                  "contents": {
+                                    "_blockAnn": [],
+                                    "_blockSourcePos": [
+                                      "test.ieo",
+                                      7,
+                                      12
+                                    ],
+                                    "_blockStmts": [
+                                      {
+                                        "_stmtAnn": [],
+                                        "_stmtKind": {
+                                          "contents": {
+                                            "_exprAnn": [],
+                                            "_exprKind": {
+                                              "contents": {
+                                                "_blockAnn": [],
+                                                "_blockSourcePos": [
+                                                  "test.ieo",
+                                                  8,
+                                                  8
+                                                ],
+                                                "_blockStmts": []
+                                              },
+                                              "tag": "BlockExpr"
+                                            },
+                                            "_exprSourcePos": [
+                                              "test.ieo",
+                                              8,
+                                              8
+                                            ]
+                                          },
+                                          "tag": "ExprStmt"
+                                        },
+                                        "_stmtSourcePos": [
                                           "test.ieo",
                                           8,
                                           8
-                                        ],
-                                        "_blockStmts": []
+                                        ]
                                       },
-                                      "tag": "BlockExpr"
-                                    },
-                                    "_exprSourcePos": [
-                                      "test.ieo",
-                                      8,
-                                      8
-                                    ]
-                                  },
-                                  "tag": "ExprStmt"
-                                },
-                                "_stmtSourcePos": [
-                                  "test.ieo",
-                                  8,
-                                  8
-                                ]
-                              },
-                              {
-                                "_stmtAnn": [],
-                                "_stmtKind": {
-                                  "contents": {
-                                    "_exprAnn": [],
-                                    "_exprKind": {
-                                      "contents": {
-                                        "contents": {
-                                          "_scopeIdAnn": [],
-                                          "_scopeIdSourcePos": [
-                                            "test.ieo",
-                                            9,
-                                            8
-                                          ],
-                                          "_unScopeId": "d"
+                                      {
+                                        "_stmtAnn": [],
+                                        "_stmtKind": {
+                                          "contents": {
+                                            "_exprAnn": [],
+                                            "_exprKind": {
+                                              "contents": {
+                                                "contents": {
+                                                  "_scopeIdAnn": [],
+                                                  "_scopeIdSourcePos": [
+                                                    "test.ieo",
+                                                    9,
+                                                    8
+                                                  ],
+                                                  "_unScopeId": "d"
+                                                },
+                                                "tag": "ScopeId'"
+                                              },
+                                              "tag": "IdExpr"
+                                            },
+                                            "_exprSourcePos": [
+                                              "test.ieo",
+                                              9,
+                                              8
+                                            ]
+                                          },
+                                          "tag": "ExprStmt"
                                         },
-                                        "tag": "ScopeId'"
+                                        "_stmtSourcePos": [
+                                          "test.ieo",
+                                          9,
+                                          8
+                                        ]
                                       },
-                                      "tag": "IdExpr"
-                                    },
-                                    "_exprSourcePos": [
-                                      "test.ieo",
-                                      9,
-                                      8
-                                    ]
-                                  },
-                                  "tag": "ExprStmt"
-                                },
-                                "_stmtSourcePos": [
-                                  "test.ieo",
-                                  9,
-                                  8
-                                ]
-                              },
-                              {
-                                "_stmtAnn": [],
-                                "_stmtKind": {
-                                  "contents": {
-                                    "_exprAnn": [],
-                                    "_exprKind": {
-                                      "contents": {
-                                        "_blockAnn": [],
-                                        "_blockSourcePos": [
+                                      {
+                                        "_stmtAnn": [],
+                                        "_stmtKind": {
+                                          "contents": {
+                                            "_exprAnn": [],
+                                            "_exprKind": {
+                                              "contents": {
+                                                "_blockAnn": [],
+                                                "_blockSourcePos": [
+                                                  "test.ieo",
+                                                  10,
+                                                  8
+                                                ],
+                                                "_blockStmts": []
+                                              },
+                                              "tag": "BlockExpr"
+                                            },
+                                            "_exprSourcePos": [
+                                              "test.ieo",
+                                              10,
+                                              8
+                                            ]
+                                          },
+                                          "tag": "ExprStmt"
+                                        },
+                                        "_stmtSourcePos": [
                                           "test.ieo",
                                           10,
                                           8
-                                        ],
-                                        "_blockStmts": []
-                                      },
-                                      "tag": "BlockExpr"
-                                    },
-                                    "_exprSourcePos": [
-                                      "test.ieo",
-                                      10,
-                                      8
+                                        ]
+                                      }
                                     ]
                                   },
-                                  "tag": "ExprStmt"
+                                  "tag": "BlockExpr"
                                 },
-                                "_stmtSourcePos": [
+                                "_exprSourcePos": [
                                   "test.ieo",
-                                  10,
-                                  8
+                                  7,
+                                  12
                                 ]
                               }
-                            ]
-                          }
-                        ],
-                        "tag": "WhileExpr"
+                            ],
+                            "tag": "WhileExpr"
+                          },
+                          "_exprSourcePos": [
+                            "test.ieo",
+                            7,
+                            4
+                          ]
+                        },
+                        "tag": "ExprStmt"
                       },
-                      "_exprSourcePos": [
+                      "_stmtSourcePos": [
                         "test.ieo",
                         7,
                         4
                       ]
-                    },
-                    "tag": "ExprStmt"
-                  },
-                  "_stmtSourcePos": [
-                    "test.ieo",
-                    7,
-                    4
+                    }
                   ]
-                }
+                },
+                "tag": "BlockExpr"
+              },
+              "_exprSourcePos": [
+                "test.ieo",
+                0,
+                5
               ]
             },
             null

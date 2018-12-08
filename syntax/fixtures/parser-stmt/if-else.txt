@@ -4,4 +4,6 @@ if a {
     } else {
         d;
     }
+} else if e {
+    f;
 }

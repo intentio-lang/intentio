@@ -529,20 +529,20 @@ resolveExpr e = case e ^. exprKind of
     args' <- mapM resolveExpr args
     return $ e & exprKind .~ CallExpr expr' args'
 
-  WhileExpr cond block ->
+  WhileExpr cond expr ->
     withScope (mkScopeT @ValueName VariableScope "while" e) $ do
       cond' <- resolveExpr cond
       currentScope @ValueName . scopeWriteTransparent .= True
-      block' <- resolveBlock block
-      return $ e & exprKind .~ WhileExpr cond' block'
+      expr' <- resolveExpr expr
+      return $ e & exprKind .~ WhileExpr cond' expr'
 
-  IfExpr cond ifBlock elseBlockOpt ->
+  IfExpr cond ifExpr elseExprOpt ->
     withScope (mkScopeT @ValueName VariableScope "if" e) $ do
       cond' <- resolveExpr cond
       currentScope @ValueName . scopeWriteTransparent .= True
-      ifBlock'      <- resolveBlock ifBlock
-      elseBlockOpt' <- mapM resolveBlock elseBlockOpt
-      return $ e & exprKind .~ IfExpr cond' ifBlock' elseBlockOpt'
+      ifExpr'      <- resolveExpr ifExpr
+      elseExprOpt' <- mapM resolveExpr elseExprOpt
+      return $ e & exprKind .~ IfExpr cond' ifExpr' elseExprOpt'
 
   ParenExpr expr -> do
     expr' <- resolveExpr expr

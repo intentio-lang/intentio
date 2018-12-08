@@ -7,6 +7,6 @@
 
 fun main() {
   a = int(scanln());
-  b = int(scanln());
+  b = float(scanln());
   println(a * b);
 }

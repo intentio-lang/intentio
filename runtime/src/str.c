@@ -3,8 +3,10 @@
 #include <ctype.h>
 #include <errno.h>
 #include <inttypes.h>
+#include <math.h>
 #include <string.h>
 
+#include "float.h"
 #include "int.h"
 #include "none.h"
 #include "util.h"
@@ -161,16 +163,48 @@ compare_func(IEO_NOTNULL IeoTerm *lhs, IEO_NOTNULL IeoTerm *rhs)
 }
 
 static IeoResult
+to_float_func(IEO_NOTNULL IeoTerm *x)
+{
+  IEO_STATIC_STRING(
+    ERR_RANGE, "Cannot convert string to float because it is out of range.");
+  IEO_STATIC_STRING(ERR_INCONVERTIBLE,
+                    "Cannot convert string to float because it does not "
+                    "represent numeric value.");
+
+  const char *data = ieo_string_c_str(x);
+  char *end = (char *)data;
+
+  ieo_float_t n = strtold(data, &end);
+
+  if (errno == ERANGE && n == HUGE_VALL) {
+    return IEO_FAILT(&ERR_RANGE);
+  } else if (n == 0.0 && end == data) {
+    return IEO_FAILT(&ERR_INCONVERTIBLE);
+  } else if (*end != '\0') {
+    while (*end != '\0') {
+      if (!isspace(*end)) {
+        return IEO_FAILT(&ERR_INCONVERTIBLE);
+      }
+      end++;
+    }
+
+    return ieo_float_new(n);
+  } else {
+    return ieo_float_new(n);
+  }
+}
+
+static IeoResult
 to_int_func(IEO_NOTNULL IeoTerm *x)
 {
   IEO_STATIC_STRING(
     ERR_UNDERFLOW,
-    "Cannot convert integer to string because it is out of range (underflow).");
+    "Cannot convert string to integer because it is out of range (underflow).");
   IEO_STATIC_STRING(
     ERR_OVERFLOW,
-    "Cannot convert integer to string because it is out of range (overflow).");
+    "Cannot convert string to integer because it is out of range (overflow).");
   IEO_STATIC_STRING(ERR_INCONVERTIBLE,
-                    "Cannot convert integer to string because it does not "
+                    "Cannot convert string to integer because it does not "
                     "represent numeric value.");
 
   const char *data = ieo_string_c_str(x);
@@ -205,6 +239,7 @@ IeoType ieo_std_type_string = {
   .eq_func = eq_func,
   .neq_func = neq_func,
   .compare_func = compare_func,
+  .to_float_func = &to_float_func,
   .to_int_func = &to_int_func,
   .to_str_func = &ieo_succ,
 };

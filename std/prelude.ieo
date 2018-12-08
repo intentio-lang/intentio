@@ -1,6 +1,7 @@
 export (
   println,
   scanln,
+  float,
   int,
   str,
 )

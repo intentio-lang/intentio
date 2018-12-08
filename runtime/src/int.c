@@ -4,7 +4,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "float.h"
 #include "none.h"
+#include "ops.h"
 #include "str.h"
 
 IEO_STATIC_STRING(ieo_int_type_name, "Int");
@@ -35,49 +37,74 @@ extern inline IEO_PURE ieo_int_t
 ieo_int_value(IEO_NOTNULL IeoTerm *p);
 
 IeoResult
-ieo_int(IEO_NOTNULL IeoTerm *x)
+ieo_int(IEO_NOTNULL IeoTerm *self)
 {
   IEO_STATIC_STRING(not_implemented,
                     "Method __int__ is not implemented for this term.");
-  IeoOpUnary *f = ieo_term_ty(x)->to_int_func;
-  return f ? f(x) : IEO_FAILT(&not_implemented);
+  IeoOpUnary *f = ieo_term_ty(self)->to_int_func;
+  return f ? f(self) : IEO_FAILT(&not_implemented);
 }
 
 static IeoResult
-neg_func(IEO_NOTNULL IeoTerm *p)
+neg_func(IEO_NOTNULL IeoTerm *self)
 {
-  return ieo_int_new(-ieo_int_value(p));
+  return ieo_int_new(-ieo_int_value(self));
 }
 
+IEO_STATIC_STRING(ERR_ARITH_TYPE_ERROR,
+                  "Type error on arithmetic operation with integer.");
+
+#define ARITH_PROMOTE_FLOAT(SELF, V, OP)                                       \
+  do {                                                                         \
+    if (IEO_OK(ieo_is_float((V)))) {                                           \
+      return ieo_##OP((V), (SELF));                                            \
+    }                                                                          \
+  } while (0)
+
+#define ARITH_FAIL_OTHERWISE(V)                                                \
+  do {                                                                         \
+    if (IEO_ERR(ieo_is_int((V)))) {                                            \
+      return IEO_FAILT(&ERR_ARITH_TYPE_ERROR);                                 \
+    }                                                                          \
+  } while (0)
+
 static IeoResult
-add_func(IEO_NOTNULL IeoTerm *p, IEO_NOTNULL IeoTerm *q)
+add_func(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *other)
 {
-  ieo_int_t a = ieo_int_value(p);
-  ieo_int_t b = ieo_int_value(q);
+  ARITH_PROMOTE_FLOAT(self, other, add);
+  ARITH_FAIL_OTHERWISE(other);
+  ieo_int_t a = ieo_int_value(self);
+  ieo_int_t b = ieo_int_value(other);
   return ieo_int_new(a + b);
 }
 
 static IeoResult
-div_func(IEO_NOTNULL IeoTerm *p, IEO_NOTNULL IeoTerm *q)
+div_func(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *other)
 {
-  ieo_int_t a = ieo_int_value(p);
-  ieo_int_t b = ieo_int_value(q);
+  ARITH_PROMOTE_FLOAT(self, other, div);
+  ARITH_FAIL_OTHERWISE(other);
+  ieo_int_t a = ieo_int_value(self);
+  ieo_int_t b = ieo_int_value(other);
   return ieo_int_new(a / b);
 }
 
 static IeoResult
-mul_func(IEO_NOTNULL IeoTerm *p, IEO_NOTNULL IeoTerm *q)
+mul_func(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *other)
 {
-  ieo_int_t a = ieo_int_value(p);
-  ieo_int_t b = ieo_int_value(q);
+  ARITH_PROMOTE_FLOAT(self, other, mul);
+  ARITH_FAIL_OTHERWISE(other);
+  ieo_int_t a = ieo_int_value(self);
+  ieo_int_t b = ieo_int_value(other);
   return ieo_int_new(a * b);
 }
 
 static IeoResult
-sub_func(IEO_NOTNULL IeoTerm *p, IEO_NOTNULL IeoTerm *q)
+sub_func(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *other)
 {
-  ieo_int_t a = ieo_int_value(p);
-  ieo_int_t b = ieo_int_value(q);
+  ARITH_PROMOTE_FLOAT(self, other, sub);
+  ARITH_FAIL_OTHERWISE(other);
+  ieo_int_t a = ieo_int_value(self);
+  ieo_int_t b = ieo_int_value(other);
   return ieo_int_new(a - b);
 }
 

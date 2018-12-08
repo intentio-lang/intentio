@@ -35,57 +35,76 @@ extern inline IEO_PURE ieo_float_t
 ieo_float_value(IEO_NOTNULL IeoTerm *p);
 
 IeoResult
-ieo_float(IEO_NOTNULL IeoTerm *x)
+ieo_float(IEO_NOTNULL IeoTerm *self)
 {
   IEO_STATIC_STRING(not_implemented,
                     "Method __float__ is not implemented for this term.");
-  IeoOpUnary *f = ieo_term_ty(x)->to_float_func;
-  return f ? f(x) : IEO_FAILT(&not_implemented);
+  IeoOpUnary *f = ieo_term_ty(self)->to_float_func;
+  return f ? f(self) : IEO_FAILT(&not_implemented);
 }
 
 static IeoResult
-neg_func(IEO_NOTNULL IeoTerm *p)
+neg_func(IEO_NOTNULL IeoTerm *self)
 {
-  return ieo_float_new(-ieo_float_value(p));
+  return ieo_float_new(-ieo_float_value(self));
 }
 
+IEO_STATIC_STRING(
+  ERR_ARITH_NOT_NUMERIC,
+  "Right hand side of the arithmetic operation is not convertible to float.");
+
+#define ARITH_CONVERT_TO_FLOAT(Z, V)                                           \
+  do {                                                                         \
+    if (IEO_OK(ieo_is_float((V)))) {                                           \
+      (Z) = ieo_float_value((V));                                              \
+    } else if (IEO_OK(ieo_is_int((V)))) {                                      \
+      (Z) = (ieo_float_t)ieo_int_value((V));                                   \
+    } else {                                                                   \
+      return IEO_FAILT(&ERR_ARITH_NOT_NUMERIC);                                \
+    }                                                                          \
+  } while (0)
+
 static IeoResult
-add_func(IEO_NOTNULL IeoTerm *p, IEO_NOTNULL IeoTerm *q)
+add_func(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *other)
 {
-  ieo_float_t a = ieo_float_value(p);
-  ieo_float_t b = ieo_float_value(q);
+  ieo_float_t a = ieo_float_value(self);
+  ieo_float_t b;
+  ARITH_CONVERT_TO_FLOAT(b, other);
   return ieo_float_new(a + b);
 }
 
 static IeoResult
-div_func(IEO_NOTNULL IeoTerm *p, IEO_NOTNULL IeoTerm *q)
+div_func(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *other)
 {
-  ieo_float_t a = ieo_float_value(p);
-  ieo_float_t b = ieo_float_value(q);
+  ieo_float_t a = ieo_float_value(self);
+  ieo_float_t b;
+  ARITH_CONVERT_TO_FLOAT(b, other);
   return ieo_float_new(a / b);
 }
 
 static IeoResult
-mul_func(IEO_NOTNULL IeoTerm *p, IEO_NOTNULL IeoTerm *q)
+mul_func(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *other)
 {
-  ieo_float_t a = ieo_float_value(p);
-  ieo_float_t b = ieo_float_value(q);
+  ieo_float_t a = ieo_float_value(self);
+  ieo_float_t b;
+  ARITH_CONVERT_TO_FLOAT(b, other);
   return ieo_float_new(a * b);
 }
 
 static IeoResult
-sub_func(IEO_NOTNULL IeoTerm *p, IEO_NOTNULL IeoTerm *q)
+sub_func(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *other)
 {
-  ieo_float_t a = ieo_float_value(p);
-  ieo_float_t b = ieo_float_value(q);
+  ieo_float_t a = ieo_float_value(self);
+  ieo_float_t b;
+  ARITH_CONVERT_TO_FLOAT(b, other);
   return ieo_float_new(a - b);
 }
 
 static IeoResult
-compare_func(IEO_NOTNULL IeoTerm *p, IEO_NOTNULL IeoTerm *q)
+compare_func(IEO_NOTNULL IeoTerm *self, IEO_NOTNULL IeoTerm *other)
 {
-  ieo_float_t a = ieo_float_value(p);
-  ieo_float_t b = ieo_float_value(q);
+  ieo_float_t a = ieo_float_value(self);
+  ieo_float_t b = ieo_float_value(other);
   if (a < b) {
     return ieo_int_new(-1);
   } else if (a > b) {

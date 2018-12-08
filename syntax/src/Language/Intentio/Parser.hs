@@ -648,7 +648,13 @@ litExpr :: Parser (Expr ())
 litExpr = expr' (LitExpr <$> literal)
 
 blockExpr :: Parser (Expr ())
-blockExpr = expr' (BlockExpr <$> block) <?> "block"
+blockExpr = blockExpr' block
+
+parenBlockExpr :: Parser (Expr ())
+parenBlockExpr = blockExpr' parenBlock
+
+blockExpr' :: Parser (Block ()) -> Parser (Expr ())
+blockExpr' f = expr' (BlockExpr <$> f) <?> "block"
 
 succExpr :: Parser (Expr ())
 succExpr = expr' (SuccExpr <$> (tok TKwSucc *> expr) <?> "succ expression")
@@ -662,12 +668,12 @@ callExpr = expr' (CallExpr <$> term <*> args) <?> "function call"
 
 whileExpr :: Parser (Expr ())
 whileExpr = expr' p <?> "while expression"
-  where p = WhileExpr <$> (tok TKwWhile *> expr) <*> blockExpr
+  where p = WhileExpr <$> (tok TKwWhile *> conditionExpr) <*> blockExpr
 
 ifExpr :: Parser (Expr ())
 ifExpr = expr' p <?> "if expression"
  where
-  p = IfExpr <$> (tok TKwIf *> expr) <*> blockExpr <*> optional e
+  p = IfExpr <$> (tok TKwIf *> conditionExpr) <*> blockExpr <*> optional e
   e = tok TKwElse *> (ifExpr <|> blockExpr)
 
 parenExpr :: Parser (Expr ())
@@ -677,6 +683,9 @@ returnExpr :: Parser (Expr ())
 returnExpr =
   expr' (ReturnExpr <$> (tok TKwReturn *> optional expr))
     <?> "return expression"
+
+conditionExpr :: Parser (Expr ())
+conditionExpr = parenBlockExpr <|> expr
 
 --------------------------------------------------------------------------------
 -- Utilities
@@ -814,7 +823,13 @@ expr' :: Parser (ExprKind ()) -> Parser (Expr ())
 expr' p = Expr <$> pure () <*> srcPos <*> p
 
 block :: Parser (Block ())
-block = Block <$> pure () <*> srcPos <*> p where p = braced stmts <?> "block"
+block = block' braced
+
+parenBlock :: Parser (Block ())
+parenBlock = block' parens
+
+block' :: (Parser [Stmt ()] -> Parser [Stmt ()]) -> Parser (Block ())
+block' f = Block <$> pure () <*> srcPos <*> p where p = f stmts <?> "block"
 
 braced :: Parser a -> Parser a
 braced = between (tok TOpLBrace) (tok TOpRBrace)

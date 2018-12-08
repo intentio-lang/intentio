@@ -55,6 +55,7 @@ runGCC asm = do
   let sharedGCCArgs =
         (opts ^. gccIncludeDirs & concatMap (\p -> ["-I", p]))
           <> (opts ^. gccLibraryDirs & concatMap (\p -> ["-L", p]))
+          <> ["-g"]
 
   let getObjFile f = f `replaceDirectory` objwd -<.> ".o"
 

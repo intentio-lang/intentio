@@ -69,7 +69,7 @@ clang-format :
 init-cmake :
   rm -rf cmake-build-vsc
   mkdir -p cmake-build-vsc
-  cd cmake-build-vsc && cmake ..
+  cd cmake-build-vsc && cmake -DCMAKE_BUILD_TYPE=Debug ..
 
 # Clean all build artifacts
 clean : clean-stack clean-cmake clean-intentio

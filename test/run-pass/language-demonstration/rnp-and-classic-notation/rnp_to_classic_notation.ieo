@@ -1,4 +1,4 @@
-export classic_notation
+export (classic_notation)
 
 # classic notation with minimal number of parenthesis for expressions made with (,),+,*,a,b,c
 
@@ -32,7 +32,7 @@ fun get_elem(stack) {
 }
 
 fun add_parens_if_needed(data, op) {
-    if(int(cut(0, 1, data)) <  int(cut(0, 1, op))) { 
+    if(int(cut(0, 1, data)) <  int(cut(0, 1, op))) {
         return cut(0, 1, data) + "(" + cut(1, len(data), data) + ")";
     }
     data1;
@@ -42,15 +42,15 @@ fun add_parens_if_needed(data, op) {
 # + : 1
 # * : 2
 # a, b, c : 3
-fun add_priorities(in) {
+fun add_priorities(inn) {
     pos = 0;
     res = "";
-    while(pos < len(in)) {
+    while(pos < len(inn)) {
         char = cut(pos, pos + 1, s);
-        if(char == "+") { 
-            res = res + "1+" ; 
-        } else if(char == "*") { 
-            res = res + "2*" ; 
+        if(char == "+") {
+            res = res + "1+" ;
+        } else if(char == "*") {
+            res = res + "2*" ;
         } else {
             res = res + "3" + char;
         }

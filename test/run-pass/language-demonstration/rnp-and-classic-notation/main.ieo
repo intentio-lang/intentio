@@ -1,6 +1,6 @@
-import check-classic-notation:check_classic_notation
-import classic-notation-to-rnp:rnp
-import rnp-to-classic-notation:classic_notation
+import check_classic_notation:check_classic_notation
+import classic_notation_to_rnp:rnp
+import rnp_to_classic_notation:classic_notation
 
 fun main() {
     while(input = scanln()) {

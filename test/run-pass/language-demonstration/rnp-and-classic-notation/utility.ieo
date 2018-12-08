@@ -13,5 +13,5 @@ fun bal(x, s, l, r) {
             if(i == 0) { return pos; }
         }
     }
-    return fail;
+    return fail none;
 }

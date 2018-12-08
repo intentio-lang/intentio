@@ -9,46 +9,46 @@ fun check_classic_notation(input) {
 }
 
 # Expression = Component "+" Expression | Component
-fun Expression(in) {
+fun Expression(inn) {
     # first_case
-    position = bal("+", in, "(", ")");
+    position = bal("+", inn, "(", ")");
     if (position) {
-        return Component(cut(0, position, in)
-            and Expression(cut(position + 1, len(in), in);
+        return Component(cut(0, position, inn))
+            and Expression(cut(position + 1, len(inn), inn));
     }
 
     # second_case
-    Component(in);
+    Component(inn);
 }
 
 # Component = Factor "*" Component | Factor
-fun Component(in) {
+fun Component(inn) {
     # first_case
-    position = bal("*", in, "(", ")");
+    position = bal("*", inn, "(", ")");
     if (position) {
-        return Factor(cut(0, position, in)
-            and Component(cut(position + 1, len(in), in);
+        return Factor(cut(0, position, inn))
+            and Component(cut(position + 1, len(inn), inn));
     }
 
     # second_case
-    Factor(in);
+    Factor(inn);
 }
 
 # Factor = Identity | "(" Expression ")"
-fun Factor(in) {
-    len = len(in);
+fun Factor(inn) {
+    len = len(inn);
 
     #first_case
-    if(len == 1) { return Identity(in); }
+    if(len == 1) { return Identity(inn); }
 
     #second_case
-    return cut(0, 1, in) == "("
-        and Expression(cut(position + 1, len - 1, in)
-        and (cut(len - 1, len, in) == ")";
+    return cut(0, 1, inn) == "("
+        and Expression(cut(position + 1, len - 1, inn))
+        and (cut(len - 1, len, inn) == ")");
 }
 
 # Identity = "a" | "b" | "c"
-fun Identity(in)  {
-	if(in == "a" or in == "b" or in = "c") { return succ none}
+fun Identity(inn)  {
+	if(inn == "a" or inn == "b" or inn == "c") { return succ none }
     fail none;
 }

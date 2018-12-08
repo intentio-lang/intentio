@@ -1,9 +1,7 @@
-# - run:
-#     stdout:
-#       - "succ"
+# - run: {}
 
 fun main() {
   a = succ none;
   b = fail none;
-  if(not (a and b)) { println("succ"); };
+  not (a and b)
 }

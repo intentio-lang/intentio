@@ -7,7 +7,7 @@
 #       - "1024"
 #       - "23456"
 #       - "8735373"
-#     stdout: 
+#     stdout:
 #       - "0"
 #       - "14"
 #       - "24"
@@ -28,11 +28,11 @@ fun main() {
 
 fun factorial() {
     a = int(scanln());
-    div = 5
+    div = 5;
     res = 0;
     while(n / div > 0) {
         res = res + n / div;
         div = div * 5;
     }
-    println(str(res));
+    println(res);
 }

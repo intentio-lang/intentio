@@ -10,6 +10,7 @@ function(ADD_INTENTIORT_TEST test_file)
 endfunction(ADD_INTENTIORT_TEST)
 
 
+add_intentiort_test(float.c)
 add_intentiort_test(int.c)
 add_intentiort_test(none.c)
 add_intentiort_test(str.c)

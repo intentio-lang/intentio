@@ -1,12 +1,11 @@
 - compile:
     - main.ieo
-    - check-classic-notation.ieo
-    - classic-notation-to-rnp.ieo
-    - rnp-to-classic-notation.ieo
+    - check_classic_notation.ieo
+    - classic_notation_to_rnp.ieo
+    - rnp_to_classic_notation.ieo
     - utility.ieo
 - run:
-    stdin: 
+    stdin:
       - "(a+b)*c+a*b"
     stdout:
-      - "ab+c*ab*+""
-      
+      - "ab+c*ab*+"

@@ -223,7 +223,7 @@ ieo_seq(IEO_NOTNULL IeoTerm *lhs, IEO_NOTNULL IeoTerm *rhs)
 IeoResult
 ieo_sneq(IEO_NOTNULL IeoTerm *lhs, IEO_NOTNULL IeoTerm *rhs)
 {
-  return SAME_TYPE(lhs, rhs) ? IEO_BOOL(true) : ieo_neq(lhs, rhs);
+  return SAME_TYPE(lhs, rhs) ? ieo_neq(lhs, rhs) : IEO_BOOL(true);
 }
 
 IeoResult

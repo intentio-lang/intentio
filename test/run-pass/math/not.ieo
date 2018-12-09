@@ -1,8 +1,5 @@
-# - run:
-#     stdout:
-#       - "succ"
+# - run: {}
 
 fun main() {
-  a = succ none;
-  if(not a == fail) { println("succ"); };
+  not (fail none)
 }

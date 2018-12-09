@@ -7,7 +7,7 @@
 
 fun main() {
     a = int(scanln());
-    b = int(scanlnn());
+    b = int(scanln());
     println(str(gcd(a, b)));
 }
 

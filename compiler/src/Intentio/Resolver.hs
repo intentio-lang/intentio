@@ -468,7 +468,7 @@ resolveStmt s = case s ^. stmtKind of
       lookupOrDefine sid sid (ToNodeId (sid ^. nodeId)) >>= \case
         ToNodeId ni        -> return ni
         ToItem mName iName -> do
-          void . lift . pushWarningFor s $ warnItemShadow sid mName iName
+          lift . pushWarningFor s $ warnItemShadow sid mName iName
           redefine sid sid $ ToNodeId (sid ^. nodeId)
           return (sid ^. nodeId)
     let sid' = sid & resolution .~ ResolvedLocal resolvedToNodeId

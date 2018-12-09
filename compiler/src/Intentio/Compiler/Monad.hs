@@ -240,31 +240,28 @@ pushDiagnosticsE :: (Foldable t, Monad m) => t Diagnostic -> CompileT m ()
 pushDiagnosticsE = pushDiagnostics_ DiagnosticICE
 {-# INLINABLE pushDiagnosticsE #-}
 
-pushNote :: forall a m . (Monad m) => SourcePos -> Text -> CompileT m a
-pushNote s t = pushDiagnostic (cnote s t) >> unreachable
+pushNote :: (Monad m) => SourcePos -> Text -> CompileT m ()
+pushNote s t = pushDiagnostic (cnote s t)
 {-# INLINABLE pushNote #-}
 
-pushNoteFor
-  :: forall a m s . (Monad m, HasSourcePos s) => s -> Text -> CompileT m a
-pushNoteFor s t = pushDiagnostic (cnoteFor s t) >> unreachable
+pushNoteFor :: (Monad m, HasSourcePos s) => s -> Text -> CompileT m ()
+pushNoteFor s t = pushDiagnostic (cnoteFor s t)
 {-# INLINABLE pushNoteFor #-}
 
-pushHint :: forall a m . (Monad m) => SourcePos -> Text -> CompileT m a
-pushHint s t = pushDiagnostic (chint s t) >> unreachable
+pushHint :: (Monad m) => SourcePos -> Text -> CompileT m ()
+pushHint s t = pushDiagnostic (chint s t)
 {-# INLINABLE pushHint #-}
 
-pushHintFor
-  :: forall a m s . (Monad m, HasSourcePos s) => s -> Text -> CompileT m a
-pushHintFor s t = pushDiagnostic (chintFor s t) >> unreachable
+pushHintFor :: (Monad m, HasSourcePos s) => s -> Text -> CompileT m ()
+pushHintFor s t = pushDiagnostic (chintFor s t)
 {-# INLINABLE pushHintFor #-}
 
-pushWarning :: forall a m . (Monad m) => SourcePos -> Text -> CompileT m a
-pushWarning s t = pushDiagnostic (cwarning s t) >> unreachable
+pushWarning :: (Monad m) => SourcePos -> Text -> CompileT m ()
+pushWarning s t = pushDiagnostic (cwarning s t)
 {-# INLINABLE pushWarning #-}
 
-pushWarningFor
-  :: forall a m s . (Monad m, HasSourcePos s) => s -> Text -> CompileT m a
-pushWarningFor s t = pushDiagnostic (cwarningFor s t) >> unreachable
+pushWarningFor :: (Monad m, HasSourcePos s) => s -> Text -> CompileT m ()
+pushWarningFor s t = pushDiagnostic (cwarningFor s t)
 {-# INLINABLE pushWarningFor #-}
 
 pushError :: forall a m . (Monad m) => SourcePos -> Text -> CompileT m a

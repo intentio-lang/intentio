@@ -43,3 +43,11 @@ ieo_seq(IEO_NOTNULL IeoTerm *lhs, IEO_NOTNULL IeoTerm *rhs);
 
 IeoResult
 ieo_sneq(IEO_NOTNULL IeoTerm *lhs, IEO_NOTNULL IeoTerm *rhs);
+
+IeoResult
+ieo_len(IEO_NOTNULL IeoTerm *self);
+
+IeoResult
+ieo_slice(IEO_NOTNULL IeoTerm *self,
+          IEO_NOTNULL IeoTerm *from,
+          IEO_NOTNULL IeoTerm *to);

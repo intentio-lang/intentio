@@ -25,6 +25,14 @@ ieo_int_new(ieo_int_t val)
   return IEO_SUCCT(p);
 }
 
+IeoTerm *
+ieo_int_new_unwrap(ieo_int_t val)
+{
+  IeoResult r = ieo_int_new(val);
+  assert(r.succ);
+  return r.term;
+}
+
 IEO_PURE IeoResult
 ieo_is_int(IEO_NOTNULL IeoTerm *term)
 {

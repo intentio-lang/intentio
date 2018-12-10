@@ -88,6 +88,12 @@ ieo_seq(IeoTerm *lhs, IeoTerm *rhs);
 IeoResult
 ieo_sneq(IeoTerm *lhs, IeoTerm *rhs);
 
+IeoResult
+ieo_len(IeoTerm *self);
+
+IeoResult
+ieo_slice(IeoTerm *self, IeoTerm *from, IeoTerm *to);
+
 //----------------------------------------------------------------------------
 // Type conversions
 

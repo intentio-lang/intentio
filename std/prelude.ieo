@@ -4,6 +4,8 @@ export (
   float,
   int,
   str,
+  len,
+  cut,
 )
 
 fun println(s) { ieo_println(s) }
@@ -20,3 +22,9 @@ extern "intentio" fun ieo_int(x)
 
 fun str(x) { ieo_str(x) }
 extern "intentio" fun ieo_str(x)
+
+fun len(x) { ieo_len(x) }
+extern "intentio" fun ieo_len(x)
+
+fun cut(from, to, s) { ieo_slice(s, from, to) }
+extern "intentio" fun ieo_slice(s, from, to)

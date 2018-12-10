@@ -14,6 +14,10 @@ typedef IeoResult(IeoOpUnary)(IEO_NOTNULL IeoTerm *self);
 typedef IeoResult(IeoOpBinary)(IEO_NOTNULL IeoTerm *self,
                                IEO_NOTNULL IeoTerm *rhs);
 
+typedef IeoResult(IeoOpTernary)(IEO_NOTNULL IeoTerm *self,
+                                IEO_NOTNULL IeoTerm *a0,
+                                IEO_NOTNULL IeoTerm *a1);
+
 typedef struct IeoType
 {
   /**
@@ -163,11 +167,21 @@ typedef struct IeoType
   IeoOpUnary *to_int_func;
 
   /**
-   * Convert term to `Str`.
+   * Convert term to `String`.
    */
   IeoOpUnary *to_str_func;
 
   /** @} */
+
+  /**
+   * Get item length.
+   */
+  IeoOpUnary *len_func;
+
+  /**
+   * Get item subsequence.
+   */
+  IeoOpTernary *slice_func;
 
   /** @} */
 } IeoType;

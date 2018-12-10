@@ -33,6 +33,15 @@ extern IeoType ieo_std_type_string;
 IeoResult
 ieo_string_new(const char *str, size_t strsz)
 {
+  IeoResult r;
+  IEO_TRY(r, ieo_string_alloc(strsz));
+  memcpy((void *)((IeoStringAllocated *)r.term)->value, str, strsz);
+  return r;
+}
+
+IeoResult
+ieo_string_alloc(size_t strsz)
+{
   // Allocate base storage for string term + storage for string data + one byte
   // for NULL character
   IeoStringAllocated *p =
@@ -42,8 +51,6 @@ ieo_string_new(const char *str, size_t strsz)
 
   p->str.value.size = strsz;
   p->str.value.data = p->value;
-
-  memcpy((void *)p->value, str, strsz);
 
   return IEO_SUCCT(IEO_TP(p));
 }
@@ -162,6 +169,46 @@ compare_func(IEO_NOTNULL IeoTerm *lhs, IEO_NOTNULL IeoTerm *rhs)
   return ieo_int_new(cmp);
 }
 
+static IEO_PURE IeoResult
+len_func(IEO_NOTNULL IeoTerm *self)
+{
+  IEO_ASSERT(IEO_OK(ieo_is_string(self)));
+  return ieo_int_new(ieo_string_size(self));
+}
+
+static IeoResult
+slice_func(IEO_NOTNULL IeoTerm *self,
+           IEO_NOTNULL IeoTerm *from_term,
+           IEO_NOTNULL IeoTerm *to_term)
+{
+  IEO_STATIC_STRING(ERR_FROM_RANGE, "Left bound is out of range.");
+  IEO_STATIC_STRING(ERR_TO_RANGE, "Right bound is out of range.");
+
+  IEO_ASSERT(IEO_OK(ieo_is_string(self)));
+
+  ieo_int_t from = ieo_int_value(from_term);
+  ieo_int_t to = ieo_int_value(to_term);
+  ieo_int_t orig_size = ieo_string_size(self);
+
+  if (from < 0) {
+    return IEO_FAILT(&ERR_FROM_RANGE);
+  }
+
+  if (to > orig_size) {
+    return IEO_FAILT(&ERR_TO_RANGE);
+  }
+
+  ieo_int_t size = to - from;
+
+  IeoResult r;
+  IEO_TRY(r, ieo_string_alloc(size));
+
+  const char *str = ieo_string_data(self);
+  memcpy((void *)((IeoStringAllocated *)r.term)->value, str + from, size);
+
+  return r;
+}
+
 static IeoResult
 to_float_func(IEO_NOTNULL IeoTerm *x)
 {
@@ -234,11 +281,13 @@ to_int_func(IEO_NOTNULL IeoTerm *x)
 IeoType ieo_std_type_string = {
   .type_name = IEO_STP(ieo_str_type_name),
   .term_size = sizeof(IeoStringAllocated),
-  .deleter = ieo_term_deleter,
-  .add_func = add_func,
-  .eq_func = eq_func,
-  .neq_func = neq_func,
-  .compare_func = compare_func,
+  .deleter = &ieo_term_deleter,
+  .add_func = &add_func,
+  .eq_func = &eq_func,
+  .neq_func = &neq_func,
+  .compare_func = &compare_func,
+  .len_func = &len_func,
+  .slice_func = &slice_func,
   .to_float_func = &to_float_func,
   .to_int_func = &to_int_func,
   .to_str_func = &ieo_succ,

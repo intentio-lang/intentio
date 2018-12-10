@@ -10,22 +10,29 @@
 
 #define FIND_UNARY(METHOD, SELF) FIND_IMPL(Unary, METHOD, SELF)
 #define FIND_BINARY(METHOD, SELF) FIND_IMPL(Binary, METHOD, SELF)
+#define FIND_TERNARY(METHOD, SELF) FIND_IMPL(Ternary, METHOD, SELF)
 #define FIND_IMPL(KIND, METHOD, SELF)                                          \
   IeoOp##KIND *FNAME(METHOD, SELF) = ieo_term_ty((SELF))->METHOD##_func;       \
   if (FNAME(METHOD, SELF))
 
 #define CALL_UNARY(METHOD, SELF) (FNAME(METHOD, SELF)(SELF))
 #define CALL_BINARY(METHOD, SELF, OTHER) (FNAME(METHOD, SELF)(SELF, OTHER))
+#define CALL_TERNARY(METHOD, SELF, A0, A1) (FNAME(METHOD, SELF)(SELF, A0, A1))
 
 #define DELEGATE_UNARY(METHOD, SELF) return CALL_UNARY(METHOD, SELF);
 #define DELEGATE_BINARY(METHOD, SELF, OTHER)                                   \
   return CALL_BINARY(METHOD, SELF, OTHER);
+#define DELEGATE_TERNARY(METHOD, SELF, A0, A1)                                 \
+  return CALL_TERNARY(METHOD, SELF, A0, A1);
 
 #define FIND_DELEGATE_UNARY(METHOD, SELF)                                      \
   FIND_UNARY(METHOD, SELF) { DELEGATE_UNARY(METHOD, SELF); }
 
 #define FIND_DELEGATE_BINARY(METHOD, SELF, OTHER)                              \
   FIND_BINARY(METHOD, SELF) { DELEGATE_BINARY(METHOD, SELF, OTHER); }
+
+#define FIND_DELEGATE_TERNARY(METHOD, SELF, A0, A1)                            \
+  FIND_TERNARY(METHOD, SELF) { DELEGATE_TERNARY(METHOD, SELF, A0, A1); }
 
 #define FAIL(METHOD)                                                           \
   return IEO_FAIL(IEO_STRING_ALLOC(#METHOD " is not available"));
@@ -244,4 +251,26 @@ ieo_compare(IEO_NOTNULL IeoTerm *lhs, IEO_NOTNULL IeoTerm *rhs)
     return ieo_neg(cmp);
   }
   FAIL(compare);
+}
+
+IeoResult
+ieo_len(IEO_NOTNULL IeoTerm *self)
+{
+  IEO_ASSERT(self);
+
+  FIND_DELEGATE_UNARY(len, self);
+  FAIL(len);
+}
+
+IeoResult
+ieo_slice(IEO_NOTNULL IeoTerm *self,
+          IEO_NOTNULL IeoTerm *from,
+          IEO_NOTNULL IeoTerm *to)
+{
+  IEO_ASSERT(self);
+  IEO_ASSERT(from);
+  IEO_ASSERT(to);
+
+  FIND_DELEGATE_TERNARY(slice, self, from, to);
+  FAIL(slice);
 }

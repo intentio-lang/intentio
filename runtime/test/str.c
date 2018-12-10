@@ -98,6 +98,42 @@ add_with_string(IEO_UNUSED void **state)
   assert_ieo_ok_cond(ieo_add(foo, bar), IEO_OK(ieo_eq(it, foobar)));
 }
 
+static void
+length(IEO_UNUSED void **state)
+{
+  IEO_STATIC_STRING_P(empty, "");
+  IEO_STATIC_STRING_P(foo, "foo");
+
+  assert_ieo_ok_cond(ieo_len(empty), ieo_int_value(it) == 0);
+  assert_ieo_ok_cond(ieo_len(foo), ieo_int_value(it) == 3);
+}
+
+static void
+slice(IEO_UNUSED void **state)
+{
+  IEO_STATIC_STRING_P(empty, "");
+  IEO_STATIC_STRING_P(foo, "foo");
+  IEO_STATIC_STRING_P(bar, "bar");
+  IEO_STATIC_STRING_P(ob, "ob");
+  IEO_STATIC_STRING_P(foobar, "foobar");
+
+  assert_ieo_ok_cond(
+    ieo_slice(empty, ieo_int_new_unwrap(0), ieo_int_new_unwrap(0)),
+    IEO_OK(ieo_eq(it, empty)));
+  assert_ieo_ok_cond(
+    ieo_slice(foobar, ieo_int_new_unwrap(0), ieo_int_new_unwrap(6)),
+    IEO_OK(ieo_eq(it, foobar)));
+  assert_ieo_ok_cond(
+    ieo_slice(foobar, ieo_int_new_unwrap(0), ieo_int_new_unwrap(3)),
+    IEO_OK(ieo_eq(it, foo)));
+  assert_ieo_ok_cond(
+    ieo_slice(foobar, ieo_int_new_unwrap(2), ieo_int_new_unwrap(4)),
+    IEO_OK(ieo_eq(it, ob)));
+  assert_ieo_ok_cond(
+    ieo_slice(foobar, ieo_int_new_unwrap(3), ieo_int_new_unwrap(6)),
+    IEO_OK(ieo_eq(it, bar)));
+}
+
 int
 main(void)
 {
@@ -109,6 +145,8 @@ main(void)
     cmocka_unit_test(string_equal),
     cmocka_unit_test(string_compare),
     cmocka_unit_test(add_with_string),
+    cmocka_unit_test(length),
+    cmocka_unit_test(slice),
   };
 
   return cmocka_run_group_tests(tests, NULL, NULL);

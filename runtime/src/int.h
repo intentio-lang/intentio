@@ -18,6 +18,9 @@ typedef struct IeoInt
 IeoResult
 ieo_int_new(ieo_int_t val);
 
+IeoTerm *
+ieo_int_new_unwrap(ieo_int_t val);
+
 IEO_PURE IeoResult
 ieo_is_int(IEO_NOTNULL IeoTerm *term);
 

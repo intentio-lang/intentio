@@ -53,6 +53,9 @@ extern IeoType ieo_std_type_string;
 IeoResult
 ieo_string_new(const char *str, size_t strsz);
 
+IeoResult
+ieo_string_alloc(size_t strsz);
+
 IEO_PURE IeoResult
 ieo_is_string(IEO_NOTNULL IeoTerm *term);
 

@@ -10,30 +10,31 @@
 # https://pl.spoj.com/problems/JPESEL/
 
 fun main(){
-    n = int(scanln());
-    i = 0;
-    while(i < n) {
-        i = i + 1;
-        check_pesel();
+  n = int(scanln());
+  i = 0;
+  while (i < n) {
+    i = i + 1;
+    if (check_pesel()){
+      println("D");
+    } else {
+      println("N");
     }
+  }
 }
 
 fun check_pesel() {
-    factors = "13791379131";
-    pesel = scanln();
-    if(len(pesel) != 11) {
-        println("PESEL should have 11 digits");
-        return fail none;
-    }
-    result = 0;
-    while(len(pesel) > 0){
-        result = result + int(cut(0, 1, pesel)) * int(cut(0, 1, factors));
-        pesel = cut(1, len(pesel), pesel);
-    }
-    result = str(result);
-    if(cut(len(result) - 1, len(result), result) == "0"){
-        println("D");
-    } else {
-        println("N");
-    }
+  factors = "13791379131";
+  pesel = scanln();
+  if (len(pesel) != 11) {
+    println("PESEL should have 11 digits");
+    return fail none;
+  }
+  result = 0;
+  while (len(pesel) > 0){
+    result = result + int(cut(0, 1, pesel)) * int(cut(0, 1, factors));
+    pesel = cut(1, len(pesel), pesel);
+    factors = cut(1, len(factors), factors);
+  }
+  result = str(result);
+  return cut(len(result) - 1, len(result), result) == "0";
 }

@@ -4,7 +4,7 @@
 #       - "24 1"
 #       - "4358 754"
 #       - "305 794"
-#     stdout: 
+#     stdout:
 #       - "34"
 #       - "1998"
 #       - "1"
@@ -34,14 +34,14 @@ fun reverse_add(a, b) {
 
 fun reverse(s) {
     reverse = "";
-    len = len(s);
+    l = len(s);
     i = 0;
-    while(i < len) {
-        reverse = reverse + cut(len - i - 1, len - i, s);
+    while(i < l) {
+        reverse = reverse + cut(l - i - 1, l - i, s);
         i = i + 1;
     }
     while(cut(0, 1, reverse) == "0") {
-        reverse = (1, len(reverse), reverse);
+        reverse = cut(1, len(reverse), reverse);
     }
     reverse;
 }

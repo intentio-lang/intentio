@@ -28,6 +28,7 @@ fun check_pesel() {
     result = 0;
     while(len(pesel) > 0){
         result = result + int(cut(0, 1, pesel)) * int(cut(0, 1, factors));
+        pesel = cut(1, len(pesel), pesel);
     }
     result = str(result);
     if(cut(len(result) - 1, len(result), result) == "0"){

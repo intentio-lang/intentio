@@ -24,11 +24,11 @@ fun distribution_into_prime_factors(a) {
     while(a >= factor * factor) {
         tmp = a / factor;
         while(tmp * factor == a) {
-            println(str(factor));
+            println(factor);
             a = tmp;
             tmp = a / factor;
         }
         factor = factor + 1;
     }
-    if(a != 1) { println(str(factor)); }
+    if(a != 1) { println(factor + 1); }
 }

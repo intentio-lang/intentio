@@ -464,6 +464,7 @@ resolveBlock = blockStmts %%~ mapM resolveStmt
 resolveStmt :: Stmt RS -> ResolveM (Stmt RS)
 resolveStmt s = case s ^. stmtKind of
   AssignStmt sid expr -> do
+    expr'            <- resolveExpr expr
     resolvedToNodeId <-
       lookupOrDefine sid sid (ToNodeId (sid ^. nodeId)) >>= \case
         ToNodeId ni        -> return ni
@@ -472,7 +473,6 @@ resolveStmt s = case s ^. stmtKind of
           redefine sid sid $ ToNodeId (sid ^. nodeId)
           return (sid ^. nodeId)
     let sid' = sid & resolution .~ ResolvedLocal resolvedToNodeId
-    expr' <- resolveExpr expr
     return $ s & stmtKind .~ AssignStmt sid' expr'
 
   ExprStmt expr -> do

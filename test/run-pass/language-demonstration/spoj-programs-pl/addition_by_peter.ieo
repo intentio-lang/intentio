@@ -28,7 +28,7 @@ fun addition_by_peter() {
         len = len(obverse);
         i = 0;
         while(i < len) {
-            reverse = reverse + cut(len - i - 1, len - i, a);
+            reverse = reverse + cut(len - i - 1, len - i, obverse);
             i = i + 1;
         }
         if(obverse == reverse) {

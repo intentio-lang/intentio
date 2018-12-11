@@ -21,7 +21,7 @@ fun gcd(a, b) {
     while(a >= factor * factor) {
         tmpa = a / factor;
         if(tmpa * factor == a) {
-            if(tmpb = b / factor and tmpb * factor == b) {
+            if(tmpb = b / factor; tmpb and tmpb * factor == b) {
                 gcd = factor;
             }
         }

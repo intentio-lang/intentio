@@ -1,7 +1,7 @@
 # - run:
 #     stdin:
 #       - "aabbcdedcbbaa"
-#     stdout: 
+#     stdout:
 #       - "yes"
 
 fun main() {
@@ -10,10 +10,10 @@ fun main() {
     len = len(obverse);
     i = 0;
     while(i < len) {
-        reverse = reverse + cut(len - i - 1, len - i, a);
+        reverse = reverse + cut(len - i - 1, len - i, obverse);
         i = i + 1;
     }
-    if(obverse == reverse) { 
+    if(obverse == reverse) {
         println("yes");
     } else {
         println("no");

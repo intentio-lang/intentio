@@ -6,7 +6,11 @@
 
 fun main() {
     a = int(scanln());
-    println(check_if_prime_number(a));
+    if (check_if_prime_number(a)) {
+      println("yes");
+    } else {
+      println("no");
+    }
 }
 
 fun check_if_prime_number(a) {
@@ -18,9 +22,8 @@ fun check_if_prime_number(a) {
     while(a >= factor * factor) {
         tmp = a / factor;
         if (tmp * factor == a) {
-            println("no");
+            return fail none;
         }
         factor = factor + 1;
     }
-    println("yes");
 }

@@ -21,13 +21,13 @@ fun main() {
     n = int(scanln());
     i = 0;
     while(i < n) {
-        factorial(n);
+        factorial();
         i = i + 1;
     }
 }
 
-fun factorial(n) {
-    a = int(scanln());
+fun factorial() {
+    n = int(scanln());
     div = 5;
     res = 0;
     while(n / div > 0) {

@@ -32,7 +32,7 @@ fun addition_by_peter() {
             i = i + 1;
         }
         if(obverse == reverse) {
-            println(obverse + " " + steps);
+            println(obverse + " " + str(steps));
             return succ none;
         }
         obverse = str(int(obverse) + int(reverse));

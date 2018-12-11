@@ -60,11 +60,11 @@ emitBlock = mapM emitStmt . view I.blockStmts
 
 emitStmt :: I.Stmt () -> ImpBodyEmit C.BlockItem
 emitStmt stmt = case stmt ^. I.stmtKind of
-  I.ExprStmt   v e -> emitExprStmt v e
-  I.AssignStmt d s -> emitAssignStmt d s
-  I.WhileStmt  v w -> emitWhileStmt v w
-  I.IfStmt c i e   -> emitIfStmt c i e
-  I.ReturnStmt v   -> emitReturnStmt v
+  I.ExprStmt   v e  -> emitExprStmt v e
+  I.AssignStmt d s  -> emitAssignStmt d s
+  I.WhileStmt p v b -> emitWhileStmt p v b
+  I.IfStmt    c i e -> emitIfStmt c i e
+  I.ReturnStmt v    -> emitReturnStmt v
 
 emitExprStmt :: I.VarId -> I.Expr () -> ImpBodyEmit C.BlockItem
 emitExprStmt varId expr = do
@@ -78,8 +78,14 @@ emitAssignStmt dst src = do
   s <- emitVarById src
   return [citem| $id:d = $id:s; |]
 
-emitWhileStmt :: I.VarId -> I.Block () -> ImpBodyEmit C.BlockItem
-emitWhileStmt = fail "Codegen for while statements is not implemented"
+emitWhileStmt :: I.Block () -> I.VarId -> I.Block () -> ImpBodyEmit C.BlockItem
+emitWhileStmt condBody condVar body = do
+  c  <- emitVarById condVar
+  cb <- emitBlock condBody
+  bb <- emitBlock body
+  let cs  = [citem| if (!($id:c).succ) { break; } |]
+  let its = cb <> (cs <| bb)
+  return [citem| for(;;) { $items:its } |]
 
 emitIfStmt :: I.VarId -> I.Block () -> I.Block () -> ImpBodyEmit C.BlockItem
 emitIfStmt cond ifBlock elseBlock = do

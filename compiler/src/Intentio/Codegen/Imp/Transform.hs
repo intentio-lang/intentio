@@ -180,7 +180,13 @@ impExpr expr' = case expr' ^. H.exprKind of
   H.CallExpr _ _ ->
     lift $ pushIceFor expr' "Imp: dynamic CallExpr not implemented."
 
-  H.WhileExpr _ _ -> lift $ pushIceFor expr' "Imp: WhileExpr not implemented."
+  H.WhileExpr cond body -> do
+    r  <- allocVar
+    c  <- allocVar
+    cb <- withBlock $ impExpr cond >>= pushStmt . I.AssignStmt c
+    bb <- withBlock $ impExpr body >>= pushStmt . I.AssignStmt r
+    pushStmt $ I.WhileStmt cb c bb
+    return r
 
   H.IfExpr cond ifBlock elseBlockOpt -> do
     r  <- allocVar

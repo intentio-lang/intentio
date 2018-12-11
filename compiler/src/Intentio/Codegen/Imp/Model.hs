@@ -82,7 +82,7 @@ instance FromJSON a => FromJSON (Stmt a)
 data StmtKind a
   = ExprStmt VarId (Expr a)
   | AssignStmt VarId VarId
-  | WhileStmt VarId (Block a)
+  | WhileStmt (Block a) VarId (Block a)
   | IfStmt VarId (Block a) (Block a)
   | ReturnStmt VarId
   deriving (Show, Eq, Generic, Functor, Foldable, Traversable)

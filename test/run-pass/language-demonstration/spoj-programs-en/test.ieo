@@ -5,7 +5,7 @@
 #       - "88"
 #       - "42"
 #       - "99"
-#     stdout: 
+#     stdout:
 #       - "1"
 #       - "2"
 #       - "88"
@@ -14,8 +14,9 @@
 
 fun main() {
     while(a = scanln()) {
-        if(a == 42) {
+        if(a == "42") {
             while(a = scanln()) {}
+            return;
         }
         println(a);
     }

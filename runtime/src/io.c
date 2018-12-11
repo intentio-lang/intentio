@@ -40,7 +40,7 @@ ieo_scanln()
   size_t len = 0;
   ssize_t nread = getline(&data, &len, stdin);
 
-  if (nread == -1 && !feof(stdin)) {
+  if (nread < 0) {
     free(data);
     return IEO_FAILT(&FERR);
   }

@@ -49,7 +49,7 @@ fun Factor(inn) {
     if (len == 1) { return Identity(inn); }
 
     # second_case
-    second_case = Expression(cut(position + 1, len - 1, inn));
+    second_case = Expression(cut(1, len - 1, inn));
     if (cut(0, 1, inn) == "("
         and second_case
         and (cut(len - 1, len, inn) == ")")) {

@@ -43,7 +43,7 @@ fun Factor(inn) {
 
     #second_case
     return cut(0, 1, inn) == "("
-        and Expression(cut(position + 1, len - 1, inn))
+        and Expression(cut(1, len - 1, inn))
         and (cut(len - 1, len, inn) == ")");
 }
 

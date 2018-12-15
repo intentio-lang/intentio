@@ -69,4 +69,3 @@ steps:
 
   - script: stack exec test-runner -- --root test --compiler bin/test-intentioc.sh
     displayName: "Run Reference Test Suite"
-    continueOnError: true

@@ -24,7 +24,7 @@ fun addition_by_peter() {
     obverse = scanln();
     reverse = "";
     steps = 0;
-    while(succ none) {
+    while(true()) {
         len = len(obverse);
         i = 0;
         while(i < len) {
@@ -33,7 +33,7 @@ fun addition_by_peter() {
         }
         if(obverse == reverse) {
             println(obverse + " " + str(steps));
-            return succ none;
+            return true();
         }
         obverse = str(int(obverse) + int(reverse));
         reverse = "";

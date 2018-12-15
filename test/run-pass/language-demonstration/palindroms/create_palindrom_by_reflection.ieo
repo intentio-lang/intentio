@@ -20,7 +20,7 @@ fun main() {
 fun create_palindrom_by_reflection(a, mode) {
     if(mode != "even" and mode != "odd") {
         println(r#"The mode should be "even" or "odd""#);
-        return fail none;
+        return false();
     }
     obverse = a;
     reverse = "";

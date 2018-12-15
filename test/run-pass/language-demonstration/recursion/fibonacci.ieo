@@ -12,7 +12,7 @@ fun main() {
 fun fibonacci(n) {
     if(n < 0) {
         println("The number should be non-negative");
-        return fail none;
+        return false();
     }
     if(n == 0) { return 0; }
     if(n == 1) { return 1; }

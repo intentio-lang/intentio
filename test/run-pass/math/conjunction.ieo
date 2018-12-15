@@ -1,7 +1,7 @@
 # - run: {}
 
 fun main() {
-  a = succ none;
-  b = fail none;
+  a = true();
+  b = false();
   not (a and b)
 }

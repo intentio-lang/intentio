@@ -16,13 +16,13 @@ fun main() {
 fun check_if_prime_number(a) {
     if(a <= 0) {
         println("The number should be positive");
-        return fail none;
+        return false();
     }
     factor = 2;
     while(a >= factor * factor) {
         tmp = a / factor;
         if (tmp * factor == a) {
-            return fail none;
+            return false();
         }
         factor = factor + 1;
     }

@@ -12,7 +12,7 @@ fun main() {
 fun factorial(n) {
   return if (n < 0) {
     println("The number should be non-negative");
-    fail none
+    false()
   } else if (n < 2) {
     1
   } else {

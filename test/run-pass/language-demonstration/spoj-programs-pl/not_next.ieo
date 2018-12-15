@@ -10,11 +10,11 @@ fun main() {
     n = int(scanln());
     if(n == 1 or n == 2) {
         println("NIE");
-        return fail none;
+        return false();
     }
     if(n == 3) {
         println("2,0,3,1");
-        return succ none;
+        return true();
     }
     a = 0;
     o = "";

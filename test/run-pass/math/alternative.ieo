@@ -3,7 +3,7 @@
 #       - "succ"
 
 fun main() {
-  a = succ none;
-  b = fail none;
+  a = true();
+  b = false();
   if (a or b) { println("succ"); };
 }

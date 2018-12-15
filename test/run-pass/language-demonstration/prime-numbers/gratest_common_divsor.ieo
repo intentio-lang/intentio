@@ -14,7 +14,7 @@ fun main() {
 fun gcd(a, b) {
     if(a < 0 or b < 0) {
         println("The numbers should be positive");
-        return fail none;
+        return false();
     }
     factor = 2;
     gcd = 1;

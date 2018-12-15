@@ -1,42 +1,109 @@
 export (
+  cut,
+  empty,
+  false,
+  find,
+  float,
+  get,
+  head,
+  init,
+  int,
+  last,
+  len,
+  max,
+  min,
   println,
   scanln,
-  float,
-  int,
+  single,
   str,
-  len,
-  cut,
-  find,
+  tail,
+  true,
 )
 
-fun println(s) { ieo_println(s) }
-extern "intentio" fun ieo_println(s)
-
-fun scanln() { ieo_scanln() }
-extern "intentio" fun ieo_scanln()
-
-fun float(x) { ieo_float(x) }
 extern "intentio" fun ieo_float(x)
-
-fun int(x) { ieo_int(x) }
 extern "intentio" fun ieo_int(x)
-
-fun str(x) { ieo_str(x) }
+extern "intentio" fun ieo_len(x)
+extern "intentio" fun ieo_println(s)
+extern "intentio" fun ieo_scanln()
+extern "intentio" fun ieo_slice(s, from, to)
 extern "intentio" fun ieo_str(x)
 
-fun len(x) { ieo_len(x) }
-extern "intentio" fun ieo_len(x)
+fun true() { succ none }
+fun false() { fail none }
 
-fun cut(from, to, s) { ieo_slice(s, from, to) }
-extern "intentio" fun ieo_slice(s, from, to)
+fun println(s) { ieo_println(s) }
+
+fun scanln() { ieo_scanln() }
+
+fun float(x) { ieo_float(x) }
+
+fun int(x) { ieo_int(x) }
+
+fun str(x) { ieo_str(x) }
+
+fun len(x) { ieo_len(x) }
+
+fun cut(from, to, s) {
+  l = len(s);
+
+  if (from < 0) {
+    from = from + l;
+  }
+
+  if (to < 0) {
+    to = to + l;
+  }
+
+  if (from > to) {
+    return ieo_slice(s, from, l) + ieo_slice(s, 0, to);
+  }
+
+  return ieo_slice(s, from, to);
+}
+
+fun get(i, s) {
+  cut(i, i + 1, s)
+}
+
+fun max(a, b) {
+  if (a < b) { b } else { a }
+}
+
+fun min(a, b) {
+  if (a < b) { a } else { b }
+}
+
+fun empty(s) {
+  len(s) == 0
+}
+
+fun single(s) {
+  len(s) == 1 and head(s)
+}
+
+fun head(s) {
+  cut(0, 1, s)
+}
+
+fun last(s) {
+  cut(-1, 0, s);
+}
+
+fun tail(s) {
+  cut(1, 0, s)
+}
+
+fun init(s) {
+  cut(0, -1, s)
+}
 
 fun find(needle, haystack) {
   i = 0;
-  while (len(needle) <= len(haystack)) {
-    if (p = cut(i, i + len(needle), haystack); p == needle) {
-      return succ i;
+  while (i + len(needle) <= len(haystack)) {
+    if (cut(i, i + len(needle), haystack) == needle) {
+      return i;
     }
     i = i + 1;
   }
-  return fail none;
+  return false();
 }

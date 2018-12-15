@@ -1,0 +1,29 @@
+export (find_outside)
+
+# Find position of the left-most occurence of `needle` in `haystack`,
+# but only if it's not within a subrange delimited with one of the
+# characters from sets `left` (left delimiter) and `right` (right delimiter).
+# Stacked subranges are supported, but delimiters are not matched.
+# Needle must not contain any of the characters from left and right sets.
+fun find_outside(needle, left, right, haystack) {
+  if (empty(needle)) {
+    return 0;
+  }
+
+  i = 0;
+  stack = 0;
+  while (i + len(needle) <= len(haystack)) {
+    c = get(i, haystack);
+    if (find(c, left)) {
+      stack = stack + 1;
+    } else if (find(c, right)) {
+      stack = max(0, stack - 1);
+    } else if (stack == 0 and cut(i, i + len(needle), haystack) == needle) {
+      return i;
+    }
+
+    i = i + 1;
+  }
+
+  return false();
+}

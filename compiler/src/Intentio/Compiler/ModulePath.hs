@@ -42,7 +42,7 @@ resolveModuleFiles :: Assembly SourceFile -> Compile (Assembly SourceFile)
 resolveModuleFiles = mapModulesM resolveModuleFile
 
 stdModules :: NonEmpty SourceFile
-stdModules = SourceFile <$> fromList ["prelude.ieo"]
+stdModules = SourceFile <$> fromList ["prelude.ieo", "simpleparsing.ieo"]
 
 injectStd :: Assembly SourceFile -> Assembly SourceFile
 injectStd = assemblyModules <>~ mkModuleMap stdModules

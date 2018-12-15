@@ -1,19 +1,12 @@
 import check_classic_notation:check_classic_notation
 import classic_notation_to_rnp:rnp
-import rnp_to_classic_notation:classic_notation
 
 fun main() {
-    while(input = scanln()) {
-        if(check_classic_notation(input)) {
-            rnp = rnp(input);
-            # checking the correctness of the function
-            if(input == classic_notation(rnp)) {
-                println("rnp: " + rnp);
-            } else {
-                println("Error");
-            }
-        } else {
-            println("Incorrect input; please use only proper expressions in classic notation build with: (,),*,+,a,b,c");
-        }
+  while (input = scanln()) {
+    if (check_classic_notation(input)) {
+      println(rnp(input));
+    } else {
+      println("Incorrect input; please use only proper expressions in classic notation build with: (,),*,+,a,b,c");
     }
+  }
 }

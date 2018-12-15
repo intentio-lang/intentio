@@ -1,65 +1,36 @@
 export (rnp)
 
-import utility:bal
+import simpleparsing:find_outside
 
 # rnp for expressions made with (,),+,*,a,b,c
-
-
 fun rnp(input) {
-    Expression(input);
+  Expression(input);
 }
 
 # Expression = Component "+" Expression | Component
-fun Expression(inn) {
-
-    position = bal("+", inn, "(", ")");
-    if (position) {
-        first_case_l = Component(cut(0, position, inn));
-        first_case_r = Expression(cut(position + 1, len(inn), inn));
-        if (first_case_l and first_case_r) {
-            return first_case_l + first_case_r + "+";
-        }
-    }
-
-    # second_case
-    Component(inn);
+fun Expression(s) {
+  if (p = find_outside("+", "(", ")", s)) {
+    Component(cut(0, p, s)) + Expression(cut(p + 1, 0, s)) + "+"
+  } else {
+    Component(s)
+  }
 }
 
 # Component = Factor "*" Component | Factor
-fun Component(inn) {
-    # first_case
-    position = bal("*", inn, "(", ")");
-    if (position) {
-        first_case_l = Factor(cut(0, position, inn));
-        first_case_r = Component(cut(position + 1, len(inn), inn));
-        if (first_case_l and first_case_r) {
-            return first_case_l + first_case_r + "*";
-        }
-    }
-
-    # second_case
-    Factor(inn);
+fun Component(s) {
+  if (p = find_outside("*", "(", ")", s)) {
+    Factor(cut(0, p, s)) + Component(cut(p + 1, 0, s)) + "*"
+  } else {
+    Factor(s)
+  }
 }
 
 # Factor = Identity | "(" Expression ")"
-fun Factor(inn) {
-    len = len(inn);
-
-    # first_case
-    if (len == 1) { return Identity(inn); }
-
-    # second_case
-    second_case = Expression(cut(1, len - 1, inn));
-    if (cut(0, 1, inn) == "("
-        and second_case
-        and (cut(len - 1, len, inn) == ")")) {
-            return second_case;
-    }
-    fail none;
+fun Factor(s) {
+  Identity(s) or (head(s) == "(" and last(s) == ")" and Expression(cut(1, -1, s)))
 }
 
 # Identity = "a" | "b" | "c"
-fun Identity(inn) {
-	if (inn == "a" or inn == "b" or inn == "c") { return inn }
-    fail none;
+fun Identity(s) {
+	(s == "a" or s == "b" or s == "c") and s
 }

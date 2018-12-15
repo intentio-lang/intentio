@@ -1,54 +1,34 @@
 export (check_classic_notation)
 
-import utility:bal
+import simpleparsing:find_outside
 
 # check if expressions in classic notation made with (,),+,*,a,b,c are correct
-
-fun check_classic_notation(input) {
-    Expression(input);
-}
+fun check_classic_notation(s) { Expression(s) }
 
 # Expression = Component "+" Expression | Component
-fun Expression(inn) {
-    # first_case
-    position = bal("+", inn, "(", ")");
-    if (position) {
-        return Component(cut(0, position, inn))
-            and Expression(cut(position + 1, len(inn), inn));
-    }
-
-    # second_case
-    Component(inn);
+fun Expression(s) {
+  if (p = find_outside("+", "(", ")", s)) {
+    Component(cut(0, p, s)) and Expression(cut(p + 1, 0, s))
+  } else {
+    Component(s)
+  }
 }
 
 # Component = Factor "*" Component | Factor
-fun Component(inn) {
-    # first_case
-    position = bal("*", inn, "(", ")");
-    if (position) {
-        return Factor(cut(0, position, inn))
-            and Component(cut(position + 1, len(inn), inn));
-    }
-
-    # second_case
-    Factor(inn);
+fun Component(s) {
+  if (p = find_outside("*", "(", ")", s)) {
+    Factor(cut(0, p, s)) and Component(cut(p + 1, 0, s))
+  } else {
+    Factor(s)
+  }
 }
 
 # Factor = Identity | "(" Expression ")"
-fun Factor(inn) {
-    len = len(inn);
-
-    #first_case
-    if(len == 1) { return Identity(inn); }
-
-    #second_case
-    return cut(0, 1, inn) == "("
-        and Expression(cut(1, len - 1, inn))
-        and (cut(len - 1, len, inn) == ")");
+fun Factor(s) {
+  Identity(s) or (head(s) == "(" and last(s) == ")" and Expression(cut(1, -1, s)))
 }
 
 # Identity = "a" | "b" | "c"
-fun Identity(inn)  {
-	if(inn == "a" or inn == "b" or inn == "c") { return succ none }
-    fail none;
+fun Identity(s) {
+	s == "a" or s == "b" or s == "c"
 }

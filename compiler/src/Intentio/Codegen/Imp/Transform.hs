@@ -69,9 +69,6 @@ allocVar' _varSucc = do
   impVars %= cons I.Var { .. }
   return _varId
 
-emptyBlock :: I.Block ()
-emptyBlock = I.Block () []
-
 pattern DirectPath :: H.PathKind a -> H.Expr a
 -- brittany-disable-next-binding
 pattern DirectPath pk <- (preview (H.exprKind . H._PathExpr . H.pathKind)
@@ -163,7 +160,22 @@ impExpr expr' = case expr' ^. H.exprKind of
       return rs
 
     H.BinXor -> lift $ pushIceFor o' "Imp: 'xor' not implemented."
-    where go o = I.BinExpr o <$> impExpr l <*> impExpr r >>= pushExpr
+   where
+    go o = do
+      rs    <- allocVar
+      lcond <- impExpr l
+      lbody <- withBlock $ do
+        rcond <- impExpr r
+        rbody <- withBlock $ do
+          v <- pushExpr $ I.BinExpr o lcond rcond
+          pushStmt $ I.AssignStmt rs v
+        relse <- withBlock $ do
+          pushStmt $ I.AssignStmt rs rcond
+        pushStmt $ I.IfStmt rcond rbody relse
+      lelse <- withBlock $ do
+        pushStmt $ I.AssignStmt rs lcond
+      pushStmt $ I.IfStmt lcond lbody lelse
+      return rs
 
   -- Optimization: calls directly to items do not require item boxing.
   H.CallExpr (DirectPath (H.ToItem mName iName)) args -> do
@@ -192,10 +204,9 @@ impExpr expr' = case expr' ^. H.exprKind of
     r  <- allocVar
     vc <- impExpr cond
     ib <- withBlock $ impExpr ifBlock >>= pushStmt . I.AssignStmt r
-    eb <- case elseBlockOpt of
-      Just elseBlock ->
-        withBlock $ impExpr elseBlock >>= pushStmt . I.AssignStmt r
-      Nothing -> return emptyBlock
+    eb <- withBlock $ case elseBlockOpt of
+      Just elseBlock -> impExpr elseBlock >>= pushStmt . I.AssignStmt r
+      Nothing        -> pushStmt $ I.AssignStmt r vc
     pushStmt $ I.IfStmt vc ib eb
     return r
 

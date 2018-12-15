@@ -181,8 +181,7 @@ slice_func(IEO_NOTNULL IeoTerm *self,
            IEO_NOTNULL IeoTerm *from_term,
            IEO_NOTNULL IeoTerm *to_term)
 {
-  IEO_STATIC_STRING(ERR_FROM_RANGE, "Left bound is out of range.");
-  IEO_STATIC_STRING(ERR_TO_RANGE, "Right bound is out of range.");
+  IEO_STATIC_STRING(ERR_RANGE, "Slice bounds are out of range.");
 
   IEO_ASSERT(IEO_OK(ieo_is_string(self)));
 
@@ -190,12 +189,8 @@ slice_func(IEO_NOTNULL IeoTerm *self,
   ieo_int_t to = ieo_int_value(to_term);
   ieo_int_t orig_size = ieo_string_size(self);
 
-  if (from < 0) {
-    return IEO_FAILT(&ERR_FROM_RANGE);
-  }
-
-  if (to > orig_size) {
-    return IEO_FAILT(&ERR_TO_RANGE);
+  if (from < 0 || to > orig_size || from > to) {
+    return IEO_FAILT(&ERR_RANGE);
   }
 
   ieo_int_t size = to - from;

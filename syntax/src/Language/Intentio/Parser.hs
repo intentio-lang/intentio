@@ -38,10 +38,12 @@ import qualified Data.Text                     as T
 import           Text.Megaparsec                ( Parsec
                                                 , ParseError
                                                 , ParseErrorBundle
+                                                , ShowErrorComponent(..)
                                                 , (<?>)
                                                 , anySingleBut
                                                 , between
                                                 , count
+                                                , customFailure
                                                 , eof
                                                 , getSourcePos
                                                 , many
@@ -55,7 +57,6 @@ import           Text.Megaparsec                ( Parsec
                                                 , sepEndBy
                                                 , some
                                                 , try
-                                                , unexpected
                                                 )
 import qualified Text.Megaparsec               as M
 import           Text.Megaparsec.Char           ( alphaNumChar
@@ -80,9 +81,18 @@ import           Language.Intentio.Token
 --------------------------------------------------------------------------------
 -- Parser monad
 
-type Parser = Parsec Void Text
-type ParserError = ParseError Text Void
-type ParserErrorBundle = ParseErrorBundle Text Void
+type Parser = Parsec CustomError Text
+type ParserError = ParseError Text CustomError
+type ParserErrorBundle = ParseErrorBundle Text CustomError
+
+newtype CustomError = UnknownStringModifier Char
+  deriving (Show, Eq, Ord)
+
+instance ShowErrorComponent CustomError where
+  showErrorComponent (UnknownStringModifier c) =
+    "Unknown string modifier: " |> c
+
+  errorComponentLen = length . showErrorComponent
 
 --------------------------------------------------------------------------------
 -- Lexer-only parsing entry points
@@ -367,18 +377,23 @@ rawstring :: Parser (Token, Text)
 rawstring = genString irawstring TRawString "raw string"
 
 genString :: Parser (Text, Text) -> TokenType -> String -> Parser (Token, Text)
-genString parser tt lbl = (lexeme . try) grammar >>= mktt tt <?> lbl
+genString parser tt lbl = p <?> lbl
  where
+  p = do
+    (t, v, prefix) <- (lexeme . try) grammar
+    v'             <- applyMods (toS prefix) v
+    mktt tt (t, v')
+
   grammar = do
     prefix <- stringprefix
     (t, v) <- parser
     let t' = prefix <> t
-    v' <- applyMods (toS prefix) v
-    return (t', v')
+    return (t', v, prefix)
 
   applyMods []         v = return v
   applyMods ('x' : ps) v = applyMods ps v
-  applyMods (p   : _ ) _ = unexpected $ M.Tokens (p :| [])
+  applyMods ('t' : ps) v = applyMods ps $ T.strip v
+  applyMods (c   : _ ) _ = customFailure $ UnknownStringModifier c
 
 istring' :: Parser (Text, Text)
 istring' = do

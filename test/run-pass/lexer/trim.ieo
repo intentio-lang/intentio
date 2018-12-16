@@ -1,9 +1,9 @@
 # - run:
-#     stdout: 
-#       - "succ"
-#       - "Trim."
+#     stdout:
+#       - $a$
+#       - $"Trim."$
 
 fun main() {
-  if(t"   a   " == "a") { println("succ"); };
-  println(tr#"   "Trim."   "#);
+  println("$" + t"   a   " + "$");
+  println("$" + tr#"   "Trim."   "# + "$");
 }

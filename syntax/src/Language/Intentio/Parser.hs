@@ -334,30 +334,30 @@ float = (lexeme . try) grammar >>= mktt TFloat <?> "floating-point literal"
     return ("", et, 0, ev)
 
 decimalNum :: Num a => Parser (Text, a)
-decimalNum = parseNum <$> p <?> "decimal digits"
+decimalNum = parseNum 10 <$> p <?> "decimal digits"
   where p = digitChar >:> many (digitChar <|> char '_')
 
 binaryNum :: Num a => Parser (Text, a)
-binaryNum = parseNum <$> p <?> "binary digits"
+binaryNum = parseNum 2 <$> p <?> "binary digits"
  where
   p            = binDigitChar >:> many (binDigitChar <|> char '_')
   binDigitChar = oneOf ['0', '1'] <?> "binary digit"
 
 octalNum :: Num a => Parser (Text, a)
-octalNum = parseNum <$> p <?> "octal digits"
+octalNum = parseNum 8 <$> p <?> "octal digits"
   where p = octDigitChar >:> many (octDigitChar <|> char '_')
 
 hexadecimalNum :: Num a => Parser (Text, a)
-hexadecimalNum = parseNum <$> p <?> "hexadecimal digits"
+hexadecimalNum = parseNum 16 <$> p <?> "hexadecimal digits"
   where p = hexDigitChar >:> many (hexDigitChar <|> char '_')
 
-parseNum :: (StringConv s String, StringConv s Text, Num n) => s -> (Text, n)
-parseNum s = (toS s, fromIntegral r)
+parseNum :: (StringConv s String, StringConv s Text, Num n) => Int -> s -> (Text, n)
+parseNum base s = (toS s, fromIntegral r)
  where
   r = foldl' step 0 (toS s :: String)
 
   step a '_' = a
-  step a c   = 10 * a + digitToInt c
+  step a c   = base * a + digitToInt c
 
 exponent :: Num a => Parser (Text, a)
 exponent = do
@@ -398,10 +398,11 @@ genString parser tt lbl = p <?> lbl
 istring' :: Parser (Text, Text)
 istring' = do
   l <- string "\""
-  v <- T.concat <$> many strchr
+  (b', v') <- unzip <$> many strchr
   r <- string "\""
-  -- FIXME: Process escape sequences
-  return (l <> v <> r, v)
+  let b = T.concat b'
+  let v = toS v'
+  return (l <> b <> r, v)
 
 irawstring :: Parser (Text, Text)
 irawstring = do
@@ -434,27 +435,41 @@ stringmod :: Parser Text
 stringmod = toS <$> some (satisfy isStringModChar) <?> "string modifier"
   where isStringModChar c = c /= 'r' && isLower c
 
-strchr :: Parser Text
+strchr :: Parser (Text, Char)
 strchr =
   try escseq
-    <|> (T.singleton <$> satisfy (\c -> c /= '"' && c /= '\\'))
+    <|> ((_1 %~ T.singleton) . dup <$> satisfy (\c -> c /= '"' && c /= '\\'))
     <?> "string character or escape sequence"
 
-escseq :: Parser Text
+escseq :: Parser (Text, Char)
 escseq = try charesc <|> try asciiesc <|> try unicodeesc
  where
   charesc = do
     slash <- char '\\'
     code  <- oneOf ['\'', '"', 'n', 'r', 't', '\\', '0']
-    return $ toS [slash, code]
+    let val = case code of
+              '\'' -> '\''
+              '"' -> '"'
+              'n' -> '\n'
+              'r' -> '\r'
+              't' -> '\t'
+              '\\' -> '\\'
+              '0' -> '\0'
+              _ -> unreachable
+    return (toS [slash, code], val)
 
-  asciiesc   = string "\\x" <:< hexDigitChar <:< hexDigitChar
+  asciiesc   = do
+    x <- string "\\x"
+    c1 <- hexDigitChar
+    c2 <- hexDigitChar
+    let (code, codeN) = parseNum 16 [c1, c2]
+    return (x <> code, chr codeN)
 
   unicodeesc = do
     prefix <- string "\\u{"
-    val    <- many (hexDigitChar <|> char '_')
+    (code, codeN)   <- parseNum 16 <$> many (hexDigitChar <|> char '_')
     suffix <- string "}"
-    return $ prefix <> toS val <> suffix
+    return (prefix <> toS code <> suffix, chr codeN)
 
 --------------------------------------------------------------------------------
 -- Core parser productions
@@ -704,6 +719,9 @@ conditionExpr = parenBlockExpr <|> expr
 
 --------------------------------------------------------------------------------
 -- Utilities
+
+dup :: a -> (a, a)
+dup a = (a, a)
 
 mkt :: TokenType -> Text -> Parser Token
 mkt _ty _text = return Token { .. }

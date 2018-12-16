@@ -1,11 +1,8 @@
-# - run:
-#     stdout:
-#       - "succ"
-#       - "succ"
-#       - "succ"
+# - run: {}
 
 fun main() {
-  if(r"'" == "\'") { println("succ"); };
-  if(r" " == "\t") { println("succ"); };
-  if(r"\" == "\\") { println("succ"); };
+  r"'" == "\'"
+   and r"\" == "\\"
+   and r"A" == "\x41"
+   and r"ą" == "\u{105}"
 }
